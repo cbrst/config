@@ -1,0 +1,7 @@
+.DS_Store
+
+karabiner/automatic_backups
+
+thefuck/__pycache__
+
+zsh/.*
