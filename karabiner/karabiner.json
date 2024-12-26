@@ -16,7 +16,8 @@
                                             "^io\\.alacritty$",
                                             "^org\\.alacritty$",
                                             "^net\\.kovidgoyal\\.kitty$",
-                                            "^com\\.github\\.wez\\.wezterm$"
+                                            "^com\\.github\\.wez\\.wezterm$",
+                                            "^com\\.mitchellh\\.ghostty$"
                                         ],
                                         "type": "frontmost_application_if"
                                     }
