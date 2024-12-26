@@ -38,4 +38,10 @@ export ZIM_HOME=${__zsh_user_data_dir}/zim
 export ZIM_CONFIG_FILE=${ZDOTDIR:-${HOME}/.config/zsh}/zimrc.zsh
 
 # PATH
-export PATH=${PATH}:${HOME}/.local/bin
+export PATH=${PATH}:${HOME}/.local/bin:${HOME}/Library/Python/3.9/bin
+
+# Starship
+export STARSHIP_CONFIG=${XDG_CONFIG_HOME}/starship/starship.toml
+
+# Homebrew
+[ -f /opt/homebrew/bin/brew ] && eval $(/opt/homebrew/bin/brew shellenv)
