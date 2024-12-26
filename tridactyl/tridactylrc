@@ -1,0 +1,35 @@
+colorscheme mytheme
+
+set smoothscroll true
+"set editorcmd /opt/homebrew/bin/wezterm start --always-new-process -- /opt/homebrew/bin/nvim
+set editorcmd /opt/homebrew/bin/neovide
+
+" Tab groups
+unbind T
+bind Ts fillcmdline tgroupswitch
+bind Tc fillcmdline tgroupcreate
+bind Tm fillcmdline tgroupmove
+
+autocmd DocStart .*stripchat\.com.* composite tgroupmove nooti | tgroupswitch nooti
+
+" Search engines
+set searchurls.amazon https://www.amazon.de/s?k=%s
+set searchurls.github https://github.com/search?q=%s
+set searchurls.wayback https://web.archive.org/web/*/%s
+
+" Commands
+command withUrl composite get_current_url |
+command wayback withUrl tabopen wayback
+command dlvid withUrl !s /opt/homebrew/bin/yt-dlp
+
+" Find
+bind / fillcmdline find
+bind n findnext 1
+bind N findnext -1
+bind <esc> nohlsearch
+
+" Git{Hub,Lab} git clone via SSH yank
+bind <space>g composite js "git clone " + document.location.href | clipboard yank
+bind <space>G composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
+
+" vim: set ft=vim
