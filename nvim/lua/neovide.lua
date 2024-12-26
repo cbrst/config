@@ -12,4 +12,6 @@ vim.g.neovide_light_radius = 5
 vim.g.neovide_scroll_animation_length = 0.13
 vim.g.neovide_cursor_animation_length = 0.08
 vim.g.neovide_cursor_trail_size = 0.1
-vim.g.neovide_cursor_vfx_mode = 'torpedo'
+vim.g.neovide_cursor_vfx_mode = "torpedo"
+
+vim.g.guifont = "CartographCF Nerd Font"
