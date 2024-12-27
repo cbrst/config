@@ -1,0 +1,47 @@
+ # black (fg1)
+# palette = 0=#4f3839
+palette = 0=#fbf4ec
+ # red
+palette = 1=#c14a4a
+ # green
+palette = 2=#6c782e
+ # yellow
+palette = 3=#b47109
+ # blue
+palette = 4=#45707a
+ # magenta (purple)
+palette = 5=#945e80
+ # cyan (aqua)
+palette = 6=#4c7a5d
+ # white (grey3)
+palette = 7=#7c6f64
+
+# light colors are moved up by 10% on the OKLCH lightness
+ # light black (grey0)
+# palette = 8=#6b5354
+palette = 8=#a89984
+ # light red
+palette = 9=#e46967
+ # light green
+palette = 10=#89964d
+ # light yellow
+palette = 11=#d59039
+ # light blue
+palette = 12=#628e98
+ # light magenta
+palette = 13=#b47b9e
+ # light cyan
+palette = 14=#69987a
+ # light white
+palette = 15=#fffcd2
+
+ # this is from rose-pine, since gruvbox' bg colors
+ # look like unhealthy piss
+background = fbf4ec
+ # fg0
+foreground = 654735
+ # fg0
+cursor-color = 4f3829
+ # bg_visual_green
+selection-background = dde5c2
+

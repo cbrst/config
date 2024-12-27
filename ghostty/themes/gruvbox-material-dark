@@ -1,0 +1,46 @@
+ # black (bg5)
+# palette = 0=#504945
+palette = 0=#1d2021
+ # red
+palette = 1=#ea6962
+ # green
+palette = 2=#a9b665
+ # yellow
+palette = 3=#d8a657
+ # blue
+palette = 4=#7daea3
+ # magenta (purple)
+palette = 5=#d3869b
+ # cyan (aqua)
+palette = 6=#89b482
+ # white (fg1)
+palette = 7=#ddc7a1
+
+# light colors are moved up by 10% on the OKLCH lightness
+ # light black
+# palette = 8=#6c6560
+palette = 8=#504945
+ # light red
+palette = 9=#ff8b82
+ # light green
+palette = 10=#c8d684
+ # light yellow
+palette = 11=#f9c677
+ # light blue
+palette = 12=#9ccec2
+ # light magenta
+palette = 13=#f5a5ba
+ # light cyan
+palette = 14=#a8d4a1
+ # light white
+palette = 15=#fee8c1
+
+ # bg0
+background = 1d2021
+ # fg0
+foreground = d4be98
+ # fg0
+cursor-color = d4be98
+ # bg_visual_green
+selection-background = 333e34
+

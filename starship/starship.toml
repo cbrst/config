@@ -21,7 +21,7 @@ add_newline = true
 show_always = true
 style_user = "white"
 style_root = "red"
-format = '[]($style)[$user](bold bg:$style fg:bright-black)[](bg:bright-black fg:$style)'
+format = '[]($style)[$user](bold bg:$style fg:black)[](bg:bright-black fg:$style)'
 disabled = false
 
 [os]

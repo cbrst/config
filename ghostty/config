@@ -5,12 +5,12 @@ config-file = ?keybindings
 font-family = CartographCF Nerd Font
 font-style-italic = Demi Bold Italic
 font-size = 14
-adjust-cell-height = 15%
+# adjust-cell-height = 15%
 adjust-cursor-thickness = 2
 
 # Theme
-theme = light:rose-pine-dawn,dark:rose-pine
-selection-background = c4a7e7
+# theme = light:rose-pine-dawn,dark:rose-pine
+theme = light:gruvbox-material-light,dark:gruvbox-material-dark
 
 # Mouse
 mouse-hide-while-typing = true

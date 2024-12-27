@@ -29,7 +29,8 @@ require("lazy").setup({
 
 	-- pretty looks
 	{ import = "plugins.ui" },
-	require("plugins.theme.rose-pine"),
+	-- require("plugins.theme.rose-pine"),
+	require("plugins.theme.gruvbox-material"),
 
 	-- smarts
 	{ import = "plugins.smart" },
