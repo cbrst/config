@@ -1,0 +1,31 @@
+gui:
+  theme:
+    activeBorderColor:
+      - blue
+    inactiveBorderColor:
+      - default
+    optionsTextColor:
+      - green
+    selectedLineBgColor:
+      - blue
+  nerdFontsVersion: "3"
+  showDivergenceFromBaseBranch: arrowAndNumber
+  border: rounded
+  spinner:
+    frames:
+      - '󰪞'
+      - '󰪟'
+      - '󰪠'
+      - '󰪡'
+      - '󰪢'
+      - '󰪣'
+      - '󰪤'
+      - '󰪥'
+    rate: 25
+
+update:
+  method: never
+
+git:
+  paging:
+    pager: "DELTA_FEATURES=lazygit delta --dark --paging=never"
