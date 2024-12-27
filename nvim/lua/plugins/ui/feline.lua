@@ -117,14 +117,17 @@ local c = {
 	git_removed = {
 		provider = "git_diff_removed",
 		hl = "FlnStatusAlt",
-		right_sep = {
-			str = "right_rounded",
-			hl = "FlnSepAltDefault",
-			always_visible = function()
-				local g = vim.b.gitsigns_status_dict
-				return g and (g["added"] or 0) + (g["changed"] or 0) + (g["removed"] or 0) > 0
-			end,
-		},
+	},
+	git_end = {
+		provider = function()
+			local g = vim.b.gitsigns_status_dict
+			if g and (g["added"] or 0) + (g["changed"] or 0) + (g["removed"] or 0) > 0 then
+				return ""
+			else
+				return ""
+			end
+		end,
+		hl = "FlnSepAltDefault",
 	},
 
 	-- Default
@@ -240,6 +243,7 @@ local active = {
 		c.git_added,
 		c.git_changed,
 		c.git_removed,
+		c.git_end,
 		c.default,
 	},
 	{
