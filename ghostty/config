@@ -33,7 +33,6 @@ macos-icon-ghost-color = eb6f92
 macos-icon-screen-color = 191724
 
 # Updating
-# TODO: Change this to "off" once I moved to a package manager
-auto-update = check
+auto-update = off
 
 # vim: set ft=config:
