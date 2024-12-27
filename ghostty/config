@@ -10,6 +10,7 @@ adjust-cursor-thickness = 2
 
 # Theme
 theme = light:rose-pine-dawn,dark:rose-pine
+selection-background = c4a7e7
 
 # Mouse
 mouse-hide-while-typing = true
@@ -21,10 +22,9 @@ window-padding-x = 5
 window-padding-y = 5
 window-padding-balance = true
 window-padding-color = extend
-macos-titlebar-style = tabs
+# macos-titlebar-style = tabs
+macos-titlebar-style = hidden
 window-colorspace = display-p3
-# background = 191724
-# unfocused-split-opacity = 0.6
 
 # Icon
 macos-icon = custom-style
