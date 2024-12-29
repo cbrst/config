@@ -1,11 +1,6 @@
-# Prompt with newline
-# format = '''
-#  $username$directory$git_branch$git_status[](fg:bright-black)
-#  [ ](bold fg:yellow)
-# '''
-
 format = '''
  $username$directory$git_branch$git_status[](fg:bright-black) 
+  [󱞩 ](bold)
 '''
 
 right_format = """
@@ -47,18 +42,21 @@ Windows = " "
 [directory]
 style = "bg:bright-black fg:black"
 format = "[ $path]($style)"
-home_symbol = "󱂵 "
+repo_root_style = "bold bg:bright-black fg:black"
+repo_root_format = "[ $before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)"
 truncation_length = 3
-truncation_symbol = "…/"
+truncate_to_repo = true
+# home_symbol = " "
+# truncation_symbol = "…/"
 
 # Here is how you can shorten some long paths by text replacement
 # similar to mapped_locations in Oh My Posh:
 [directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
-"Projects" = "󰵮 "
+# "Documents" = "󰈙 "
+# "Downloads" = " "
+# "Music" = " "
+# "Pictures" = " "
+# "Projects" = "󰵮 "
 
 # Keep in mind that the order matters. For example:
 # "Important Documents" = " 󰈙 "
@@ -69,7 +67,7 @@ truncation_symbol = "…/"
 [git_branch]
 symbol = ""
 style = "bg:bright-black fg:black"
-format = '[ $symbol $branch]($style)'
+format = '[  $symbol $branch]($style)'
 
 [git_status]
 style = "bg:bright-black fg:black"
