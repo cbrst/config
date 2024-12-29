@@ -1,16 +1,15 @@
 colorscheme mytheme
 
 set smoothscroll true
-"set editorcmd /opt/homebrew/bin/wezterm start --always-new-process -- /opt/homebrew/bin/nvim
-set editorcmd /opt/homebrew/bin/neovide
+"set editorcmd /opt/homebrew/bin/neovide
+set editorcmd /Users/cbrst/.config/tridactyl/editor.sh
 
 " Tab groups
 unbind T
 bind Ts fillcmdline tgroupswitch
 bind Tc fillcmdline tgroupcreate
 bind Tm fillcmdline tgroupmove
-
-autocmd DocStart .*stripchat\.com.* composite tgroupmove nooti | tgroupswitch nooti
+source grouprules
 
 " Search engines
 set searchurls.amazon https://www.amazon.de/s?k=%s
@@ -21,6 +20,7 @@ set searchurls.wayback https://web.archive.org/web/*/%s
 command withUrl composite get_current_url |
 command wayback withUrl tabopen wayback
 command dlvid withUrl !s /opt/homebrew/bin/yt-dlp
+command cydl withUrl !s cyberdrop-dl
 
 " Find
 bind / fillcmdline find
