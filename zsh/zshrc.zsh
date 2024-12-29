@@ -42,6 +42,22 @@ setopt hist_ignore_space
 hash -d h=${HOME}
 hash -d c=${XDG_CONFIG_HOME}
 hash -d p=${HOME}/Projects
+hash -d tap=/opt/homebrew/Library/Taps/cbrst/homebrew-tap
+
+#
+# Functions
+#
+
+# Autoload functions from $ZDOTDIR/functions
+fpath=(${ZDOTDIR}/functions $fpath)
+() {
+	autoload ${1:t}
+} ${ZDOTDIR}/functions/*
+
+function mkcd {
+	mkdir -p ${1}
+	cd ${1}
+}
 
 #
 # Aliases
@@ -113,6 +129,7 @@ _fzf_comprun() {
 #
 
 (( $+commands[thefuck] )) && eval $(thefuck --alias)
+alias f=fuck
 
 #
 # Zoxide

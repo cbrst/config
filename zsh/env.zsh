@@ -28,9 +28,9 @@ export XDG_PROJECTS_DIR=${XDG_PROJECTS_DIR:-${HOME}/Projects}
 (( $+commands[nvim] )) && export EDITOR=nvim
 
 # FZF
-_fzf_opts="--height 50% --layout=reverse --border=horizontal --margin=1 --padding=1"
-_fzf_opts+=" --color=bg+:#1f2335,border:#545c7e,pointer:#e0af68,hl:#bb9af7,hl+:#ff007c,info:#394b70"
-_fzf_opts+=" --prompt=' ' --pointer=' ' --marker=' ' --header=' ' --info=inline:' ᰄ '"
+_fzf_opts="--height 50% --layout=reverse"
+_fzf_opts+=" --color=border:7,pointer:6,hl:6,info:6,marker:2,fg+:-1:bold,bg+:-1,hl+:6"
+_fzf_opts+=" --prompt=' ' --pointer=' ' --marker=' ' --info=inline:'  '"
 export FZF_DEFAULT_OPTS=$_fzf_opts
 
 # zimfw

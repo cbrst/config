@@ -1,0 +1,74 @@
+function _themeswitch_ghostty {
+	# Path to Ghostty config
+	local GHOSTTY_DIR=${CONF_PATH}/ghostty
+
+	# Create Ghostty's theme string to automatically switch between
+	# light and dark themes based on the system
+	local themestring="light:${1},dark:${2}"
+
+	# Replace the theme value in the config
+	sed -i -e "s/^theme = .*/theme = ${themestring}/" $GHOSTTY_DIR/config
+
+	# If we're on macOS, activate Ghostty and send it a keybind to reload the config
+	(( $+commands[osascript] )) && osascript -e 'tell application "Ghostty" to activate' -e 'tell application "System Events" to keystroke "," using {command down, shift down}'
+}
+
+function _themeswitch_nvim {
+	# Path to nvim config
+	local NVIM_DIR=${CONF_PATH}/nvim
+
+	# For nvim, we're only concerned with the part up to the last hyphen.
+	# Vim themes handle the switching between light and dark internally
+	local themename=$(echo ${1} | sed -e "s/\(.*\)-.*/\1/")
+
+	sed -i -e "s/M\.colorscheme.*/M.colorscheme = \"${themename}\"/" $NVIM_DIR/lua/myvi.lua
+
+	# Send command to change colorscheme to all running nvim servers
+	local sockets=(${XDG_RUNTIME_DIR}/nvim*)
+	if [[ -f ${sockets[0]} ]]; then
+		for socket in ${sockets}; do
+			nvim --headless --server ${socket} --remote-send "<C-\><C-N>:lua Myvi.set_colorscheme(\"${themename}\")<CR>"
+		done
+	fi
+}
+
+function _themeswitch_wallpaper {
+	local wallpaper=$(osascript -e 'tell application "Finder" to get POSIX path of (get desktop picture as alias)')
+
+	# For the wallpaper, we're only concerned with the part up to the last hyphen.
+	# Wallpapers for the light and dark variants are the same
+	local themename=$(echo ${1} | sed -e "s/\(.*\)-.*/\1/")
+	
+	# Stupid BSD sed doesn't do alternation with \|, so we have to loop
+	# and call sed multiple times
+	_replacements=""
+	for old_theme in catppuccin "gruvbox-material" "rose-pine"; do
+		wallpaper=$(echo ${wallpaper} | sed -e "s/${old_theme}/${themename}/")
+	done
+
+	if [[ -f ${wallpaper} ]]; then
+		osascript -e "tell application \"System Events\" to set picture of every desktop to \"${wallpaper}\""
+	else
+		printf 'There is no variant "%s" for the current wallpaper\n' $themename
+	fi
+}
+
+# Declare the selectable themes, where the key is the theme name and the value
+# are the light and dark variants, separated by a space
+declare -A local themes=(
+	[catppuccin]="catppuccin-latte catppuccin-mocha"
+	[gruvbox]="gruvbox-material-light gruvbox-material-dark"
+	[rosepine]="rose-pine-dawn rose-pine"
+)
+
+# Show the selection using fzf and assign the light and dark themes to variables
+local selected=$(printf "%s\n" ${(k)themes} | fzf)
+local light=${${=themes[${selected}]}[1]}
+local dark=${${=themes[${selected}]}[2]}
+
+# Run the helper functions to do the theme switching
+_themeswitch_ghostty $light $dark
+_themeswitch_nvim $light
+_themeswitch_wallpaper $light
+
+# vim: set ft=zsh:
