@@ -28,9 +28,8 @@ require("lazy").setup({
 	require("plugins"),
 
 	-- pretty looks
+	{ import = "plugins.theme" },
 	{ import = "plugins.ui" },
-	-- require("plugins.theme.rose-pine"),
-	require("plugins.theme.gruvbox-material"),
 
 	-- smarts
 	{ import = "plugins.smart" },
@@ -54,4 +53,8 @@ require("lazy").setup({
 			lazy = "💤 ",
 		},
 	},
+	-- profiling = {
+	-- 	loader = true,
+	-- 	require = true,
+	-- },
 })

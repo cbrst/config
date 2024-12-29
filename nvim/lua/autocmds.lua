@@ -11,3 +11,12 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
+-- Overwrite highlight FlnStatusBg on BufEnter
+-- Somehow the gui=bold gets removed sometimes
+-- vim.api.nvim_create_autocmd("BufEnter", {
+-- 	desc = "Make sure FlnStatusBg is bold",
+-- 	group = vim.api.nvim_create_augroup("kickstart-highlight-flnstatusbg", { clear = true }),
+-- 	callback = function()
+-- 		vim.cmd("hi FlnStatusBg cterm=bold gui=bold")
+-- 	end,
+-- })

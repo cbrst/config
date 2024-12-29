@@ -1,88 +1,32 @@
 local fmt = string.format
 local icons = require("utils.icons")
 
-local u = {
-	vi = {
-		colors = {
-			n = "FlnViCyan",
-			no = "FlnViCyan",
-			i = "FlnViYellow",
-			v = "FlnViMagenta",
-			V = "FlnViMagenta",
-			[""] = "FlnViMagenta",
-			R = "FlnViRed",
-			Rv = "FlnViRed",
-			r = "FlnViBlue",
-			rm = "FlnViBlue",
-			s = "FlnViMagenta",
-			S = "FlnViMagenta",
-			[""] = "FelnMagenta",
-			c = "FlnViYellow",
-			["!"] = "FlnViBlue",
-			t = "FlnViBlue",
-		},
-		sep = {
-			n = "FlnCyan",
-			no = "FlnCyan",
-			i = "FlnYellow",
-			v = "FlnMagenta",
-			V = "FlnMagenta",
-			[""] = "FlnMagenta",
-			R = "FlnRed",
-			Rv = "FlnRed",
-			r = "FlnBlue",
-			rm = "FlnBlue",
-			s = "FlnMagenta",
-			S = "FlnMagenta",
-			[""] = "FelnMagenta",
-			c = "FlnYellow",
-			["!"] = "FlnBlue",
-			t = "FlnBlue",
-		},
-	},
-}
-
-local function vi_mode_hl()
-	return u.vi.colors[vim.fn.mode()] or "FlnViBlack"
-end
-
-local function vi_sep_hl_right()
-	return u.vi.colors[vim.fn.mode()] .. "Sep" or "FlnBlack"
-end
-
-local function vi_sep_hl()
-	return u.vi.sep[vim.fn.mode()] or "FlnBlack"
-end
-
 -- components
 local c = {
 	vimode = {
 		provider = function()
 			return fmt("%s ", icons.vimode[vim.fn.mode()])
 		end,
-		hl = vi_mode_hl,
-		left_sep = { str = "left_rounded", hl = vi_sep_hl },
-		right_sep = { str = "left_rounded", hl = vi_sep_hl_right },
+		hl = { fg = "fg1", bg = "bg1" },
+		left_sep = { str = "left_rounded", hl = { fg = "bg1", bg = "bg0" } },
+		right_sep = { str = "left_rounded", hl = { fg = "bg2", bg = "bg1" } },
 	},
+
+	-- File
+	--
 	fileinfo = {
 		provider = { name = "file_info", opts = { type = "relative" } },
-		hl = "FlnStatusBg",
+		hl = { fg = "fg2", bg = "bg2", style = "bold" },
 		right_sep = {
 			str = "right_rounded",
 			hl = function()
 				if require("feline.providers.git").git_info_exists() then
-					return "FlnSepBgAlt"
+					return { fg = "bg2", bg = "bg1" }
 				else
-					return "FlnSep"
+					return { fg = "bg2", bg = "bg0" }
 				end
 			end,
 		},
-	},
-	file_type = {
-		provider = function()
-			return fmt(" %s ", vim.bo.filetype:upper())
-		end,
-		hl = "FlnAlt",
 	},
 
 	-- Git
@@ -90,33 +34,33 @@ local c = {
 	gitbranch = {
 		provider = "git_branch",
 		icon = "  ",
-		hl = "FlnStatusAlt",
+		hl = { fg = "fg1", bg = "bg1" },
 		right_sep = function()
 			local g = vim.b.gitsigns_status_dict
 			if g and (g["added"] or 0) + (g["changed"] or 0) + (g["removed"] or 0) > 0 then
 				return {
 					str = "right_rounded_thin",
-					hl = "FlnStatusAlt",
+					hl = { fg = "fg1", bg = "bg1" },
 				}
 			else
 				return {
 					str = "right_rounded",
-					hl = "FlnSepAltDefault",
+					hl = { fg = "bg1", bg = "bg0" },
 				}
 			end
 		end,
 	},
 	git_added = {
 		provider = "git_diff_added",
-		hl = "FlnStatusAlt",
+		hl = { fg = "fg1", bg = "bg1" },
 	},
 	git_changed = {
 		provider = "git_diff_changed",
-		hl = "FlnStatusAlt",
+		hl = { fg = "fg1", bg = "bg1" },
 	},
 	git_removed = {
 		provider = "git_diff_removed",
-		hl = "FlnStatusAlt",
+		hl = { fg = "fg1", bg = "bg1" },
 	},
 	git_end = {
 		provider = function()
@@ -127,14 +71,14 @@ local c = {
 				return ""
 			end
 		end,
-		hl = "FlnSepAltDefault",
+		hl = { fg = "bg1", bg = "bg0" },
 	},
 
 	-- Default
 	--
 	default = {
 		provider = "",
-		hl = "FlnStatus",
+		hl = { fg = "fg0", bg = "bg0" },
 	},
 
 	-- Outline
@@ -146,35 +90,35 @@ local c = {
 			}) or ""
 		end,
 		icon = icons.general.outline .. " ",
-		hl = "FlnStatus",
-		right_sep = { str = " ", hl = "FlnStatus" },
+		hl = { fg = "fg0", bg = "bg0" },
+		right_sep = { str = " ", hl = { fg = "fg0", bg = "bg0" } },
 	},
 
 	-- LSP
 	--
 	lsp_status = {
 		provider = "lsp_client_names",
-		hl = "FlnStatusBg",
+		hl = { fg = "fg2", bg = "bg2", style = "bold" },
 		left_sep = {
 			str = "left_rounded",
 			hl = function()
 				if require("feline.providers.lsp").diagnostics_exist() then
-					return "FlnSepBgAlt"
+					return { fg = "bg2", bg = "bg1" }
 				else
-					return "FlnSep"
+					return { fg = "bg2", bg = "bg0" }
 				end
 			end,
 		},
-		right_sep = { str = "right_rounded", hl = "FlnSep" },
+		right_sep = { str = "right_rounded", hl = { fg = "bg2", bg = "bg0" } },
 	},
 	lsp_error = {
 		provider = "diagnostic_errors",
-		hl = "FlnStatusAlt",
-		right_sep = { str = " ", hl = "FlnStatusAlt" },
+		hl = { fg = "fg1", bg = "bg1" },
+		right_sep = { str = " ", hl = { fg = "fg1", bg = "bg1" } },
 	},
 	lsp_warning = {
 		provider = "diagnostic_warnings",
-		hl = "FlnStatusAlt",
+		hl = { fg = "fg1", bg = "bg1" },
 		left_sep = {
 			str = function()
 				if require("feline.providers.lsp").diagnostics_exist("ERROR") then
@@ -183,13 +127,13 @@ local c = {
 					return ""
 				end
 			end,
-			hl = "FlnStatusAlt",
+			hl = { fg = "fg1", bg = "bg1" },
 		},
-		right_sep = { str = " ", hl = "FlnStatusAlt" },
+		right_sep = { str = " ", hl = { fg = "fg1", bg = "bg1" } },
 	},
 	lsp_hint = {
 		provider = "diagnostic_hints",
-		hl = "FlnStatusAlt",
+		hl = { fg = "fg1", bg = "bg1" },
 		left_sep = {
 			str = function()
 				if require("feline.providers.lsp").diagnostics_exist({ "ERROR", "WARN" }) then
@@ -198,16 +142,16 @@ local c = {
 					return ""
 				end
 			end,
-			hl = "FlnStatusAlt",
+			hl = { fg = "fg1", bg = "bg1" },
 		},
-		right_sep = { str = " ", hl = "FlnStatusAlt" },
+		right_sep = { str = " ", hl = { fg = "fg1", bg = "bg1" } },
 	},
 	lsp_start = {
 		provider = "",
 		enabled = function()
 			return require("feline.providers.lsp").diagnostics_exist()
 		end,
-		hl = "FlnSepAltDefault",
+		hl = { fg = "bg1", bg = "bg0" },
 	},
 	search = {
 		provider = function()
@@ -224,14 +168,14 @@ local c = {
 			return fmt(" %s/%s ", result.current, denominator)
 		end,
 		icon = icons.general.search .. " ",
-		hl = "FlnStatus",
+		hl = { fg = "fg0", bg = "bg0" },
 	},
 	macro = {
 		provider = function()
 			return vim.fn.reg_recording()
 		end,
 		icon = icons.general.macro .. " ",
-		hl = "FlnStatus",
+		hl = { fg = "fg0", bg = "bg0" },
 	},
 }
 
@@ -290,7 +234,7 @@ local w = {
 		provider = function()
 			return get_winbar_filename()
 		end,
-		hl = "FlnStatus",
+		hl = { fg = "fg0", bg = "bg0" },
 	},
 }
 local winbar_active = {
@@ -310,16 +254,6 @@ return {
 			},
 		})
 		require("feline").winbar.setup({
-			-- disable = {
-			-- 	filetypes = {
-			-- 		"^neo-tree$",
-			-- 		"^Outline$",
-			-- 		"^qf$",
-			-- 	},
-			-- 	buftypes = {
-			-- 		"^nofile$",
-			-- 	},
-			-- },
 			components = {
 				active = winbar_active,
 				inactive = winbar_inactive,
