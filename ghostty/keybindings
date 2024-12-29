@@ -12,4 +12,4 @@ keybind = ctrl+a>equal=equalize_splits
 
 # keybind = ctrl+a>i=inspector
 
-# vim: set ft=config:
+# vim: set ft=ghostty:

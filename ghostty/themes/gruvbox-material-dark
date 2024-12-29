@@ -44,3 +44,7 @@ cursor-color = d4be98
  # bg_visual_green
 selection-background = 333e34
 
+macos-icon-ghost-color = d4be98
+macos-icon-screen-color = 1d2021
+
+# vim: set ft=ghostty:
