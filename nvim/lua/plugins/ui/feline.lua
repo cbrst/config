@@ -15,7 +15,13 @@ local c = {
 	-- File
 	--
 	fileinfo = {
-		provider = { name = "file_info", opts = { type = "relative" } },
+		provider = {
+			name = "file_info",
+			opts = {
+				colored_icon = false,
+				type = "relative",
+			},
+		},
 		hl = { fg = "fg2", bg = "bg2", style = "bold" },
 		right_sep = {
 			str = "right_rounded",
