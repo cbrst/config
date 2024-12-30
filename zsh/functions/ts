@@ -7,7 +7,7 @@ function _themeswitch_ghostty {
 	local themestring="light:${1},dark:${2}"
 
 	# Replace the theme value in the config
-	sed -i -e "s/^theme = .*/theme = ${themestring}/" $GHOSTTY_DIR/config
+	echo "theme = ${themestring}" > $GHOSTTY_DIR/theme
 
 	# If we're on macOS, activate Ghostty and send it a keybind to reload the config
 	(( $+commands[osascript] )) && osascript -e 'tell application "Ghostty" to activate' -e 'tell application "System Events" to keystroke "," using {command down, shift down}'
@@ -21,11 +21,11 @@ function _themeswitch_nvim {
 	# Vim themes handle the switching between light and dark internally
 	local themename=$(echo ${1} | sed -e "s/\(.*\)-.*/\1/")
 
-	sed -i -e "s/M\.colorscheme.*/M.colorscheme = \"${themename}\"/" $NVIM_DIR/lua/myvi.lua
+	echo "return \"${themename}\"" > ${NVIM_DIR}/lua/myvi/colorscheme.lua
 
 	# Send command to change colorscheme to all running nvim servers
 	local sockets=(${XDG_RUNTIME_DIR}/nvim*)
-	if [[ -f ${sockets[0]} ]]; then
+	if [[ -e ${sockets[1]} ]]; then
 		for socket in ${sockets}; do
 			nvim --headless --server ${socket} --remote-send "<C-\><C-N>:lua Myvi.set_colorscheme(\"${themename}\")<CR>"
 		done

@@ -1,6 +1,10 @@
 local M = {}
 
-M.colorscheme = "rose-pine"
+-- Set a default colorscheme
+-- and overwrite with theme set by ts
+local success, ts_theme = pcall(require, "myvi.colorscheme")
+M.colorscheme = success and ts_theme or "catppuccin"
+
 M.feline_themes = {
 	default = {
 		light = {
