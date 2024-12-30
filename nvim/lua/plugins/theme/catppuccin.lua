@@ -4,7 +4,15 @@ return {
 	priority = 1000,
 	lazy = false,
 	config = function()
-		require("catppuccin").setup()
+		require("catppuccin").setup({
+			integrations = {
+				beacon = true,
+				dropbar = true,
+				fidget = true,
+				mason = true,
+				which_key = true,
+			},
+		})
 
 		local create_feline_colors = function(colors)
 			return {

@@ -81,19 +81,6 @@ local c = {
 		hl = { fg = "fg0", bg = "bg0" },
 	},
 
-	-- Outline
-	--
-	outline = {
-		provider = function()
-			return require("outline").get_symbol({
-				depth = 1,
-			}) or ""
-		end,
-		icon = icons.general.outline .. " ",
-		hl = { fg = "fg0", bg = "bg0" },
-		right_sep = { str = " ", hl = { fg = "fg0", bg = "bg0" } },
-	},
-
 	-- LSP
 	--
 	lsp_status = {
@@ -195,7 +182,6 @@ local active = {
 		c.macro,
 	},
 	{
-		c.outline,
 		c.lsp_start,
 		c.lsp_error,
 		c.lsp_warning,
@@ -253,11 +239,11 @@ return {
 				inactive = inactive,
 			},
 		})
-		require("feline").winbar.setup({
-			components = {
-				active = winbar_active,
-				inactive = winbar_inactive,
-			},
-		})
+		-- require("feline").winbar.setup({
+		-- 	components = {
+		-- 		active = winbar_active,
+		-- 		inactive = winbar_inactive,
+		-- 	},
+		-- })
 	end,
 }
