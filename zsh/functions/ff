@@ -1,0 +1,8 @@
+local _ff_get_os_config() {
+	if [[ $(uname) == "Darwin" ]]; then
+		echo "${XDG_CONFIG_HOME}/fastfetch/mac.jsonc"
+	fi
+}
+
+clear
+fastfetch -c $(_ff_get_os_config)
