@@ -3,33 +3,100 @@ colorscheme mytheme
 set smoothscroll true
 "set editorcmd /opt/homebrew/bin/neovide
 set editorcmd /Users/cbrst/.config/tridactyl/editor.sh
+set followpagepatterns.next ^(next|newer|weiter)\b|»|>>|more
+set followpagepatterns.prev ^(prev(ious)?|older|zurück)\b|«|<<
 
+"
 " Tab groups
+"
 unbind T
 bind Ts fillcmdline tgroupswitch
 bind Tc fillcmdline tgroupcreate
 bind Tm fillcmdline tgroupmove
-source grouprules
 
+" Move tab to group if it is not already in the group, then switch to it
+command tgroupmove* js -p tri.browserBg.tabs.query({currentWindow: true, active: true}).then(tabs => tri.browserBg.sessions.getTabValue(tabs[0].id, "tridactyl-tgroup").then(group => { if ( group != '' && group != JS_ARG ) { tri.excmds.tgroupmove(JS_ARG).then(name => tri.excmds.tgroupswitch(name)) } }))
+
+js -r grouprules.js
+
+"
 " Search engines
+"
 set searchurls.amazon https://www.amazon.de/s?k=%s
 set searchurls.github https://github.com/search?q=%s
 set searchurls.wayback https://web.archive.org/web/*/%s
 
+"
 " Commands
+"
+
+" Commands get replaced in-place.
+" So we can define utilities like this, which don't do anything on their own,
+" but work as "aliases" in combination with other commands.
+" This just passes the current URL as an argument to whatever follows
 command withUrl composite get_current_url |
 command wayback withUrl tabopen wayback
-command dlvid withUrl !s /opt/homebrew/bin/yt-dlp
 command cydl withUrl !s cyberdrop-dl
 
+" Couple of things happen here:
+"
+" Since we rely on yt-dlp being able to find ffmpeg, we call it through zsh so
+" we have the proper PATH.
+"
+" We use js -d instead of the exclaim command so we can pass arguments to
+" yt-dlp:
+" - Using withUrl, the URL will always be the last argument:
+"   (JS_ARGS.slice(-1)),
+" - everything else passed to the command will be used as arguments to yt-dlp
+"   (JS_ARGS.slice(0, -1))
+command dlvid withUrl js -d€ tri.excmds.exclaim(`zsh -c 'yt-dlp ${JS_ARGS.slice(0, -1).join(" ")} "${JS_ARGS.slice(-1)}"'`)€
+
+"
 " Find
+"
+
+" By default, / binds to Firefox' Quick Find, which is useless.
+" The find command does basically the same, but with extras.
 bind / fillcmdline find
 bind n findnext 1
 bind N findnext -1
 bind <esc> nohlsearch
+set findcase smart
+
+"
+" Site Specifics
+"
 
 " Git{Hub,Lab} git clone via SSH yank
-bind <space>g composite js "git clone " + document.location.href | clipboard yank
-bind <space>G composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
+bind ,g composite js "git clone " + document.location.href | clipboard yank
+bind ,G composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
+
+" Wallhaven
+command wh:min4k urlmodify -s atleast 3840x2160
+command wh:min5k2k urlmodify -s atleast 5120x2160
+command wh:toggle js -d€ let u=new URL(window.location.href);let p=new URLSearchParams(window.location.search);let c=p.get(JS_ARGS[1])?.split('')||['1','1','1'];let f=JS_ARGS[2]-1;c[f]=(c[f]=="0")?"1":"0";p.set(JS_ARGS[1],c.join(''));u.search=p.toString();window.location.href=u.href€
+
+bindurl wallhaven\.cc ,m4 wh:min4k
+bindurl wallhaven\.cc ,m5 wh:min5k2k
+bindurl wallhaven\.cc/w ,d hint -!J*A #wallpaper
+bindurl wallhaven\.cc ,p1 wh:toggle purity 1
+bindurl wallhaven\.cc ,p2 wh:toggle purity 2
+bindurl wallhaven\.cc ,p3 wh:toggle purity 3
+bindurl wallhaven\.cc ,c1 wh:toggle categories 1
+bindurl wallhaven\.cc ,c2 wh:toggle categories 2
+bindurl wallhaven\.cc ,c3 wh:toggle categories 3
+
+" does the same as urlmodify -s, except checks first
+" otherwise we'll end up with a loop using autocmd
+command wh:landscape js let u=new URL(window.location.href);let p=new URLSearchParams(window.location.search);if(!p.get('ratios')||p.get('ratios')!='landscape'){p.set('ratios','landscape');u.search=p.toString();window.location.href=u.href}
+autocmd DocStart .*wallhaven\.cc/(hot|random|search|toplist).* wh:landscape
+
+autocmd DocStart .*wallhaven\.cc/tag/.* composite js "wallhaven.cc/search?q=id%3A" + window.location.pathname.split('/')[2] | open 
+
+" Youtube
+bindurl youtube\.com/watch ,f hint -!J* .ytp-fullscreen-button
+bindurl youtube\.com/watch ,d dlvid --no-playlist
+bindurl youtube\.com/watch ,p dlvid --yes-playlist
+
 
 " vim: set ft=vim
