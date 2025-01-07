@@ -34,6 +34,15 @@ setopt hist_expire_dups_first
 setopt hist_ignore_dups
 setopt hist_verify
 setopt hist_ignore_space
+setopt inc_append_history
+
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "^[[A" up-line-or-beginning-search
+bindkey "^[[B" down-line-or-beginning-search
+
 
 #
 # Named directories
@@ -50,9 +59,7 @@ hash -d tap=/opt/homebrew/Library/Taps/cbrst/homebrew-tap
 
 # Autoload functions from $ZDOTDIR/functions
 fpath=(${ZDOTDIR}/functions $fpath)
-() {
-	autoload ${1:t}
-} ${ZDOTDIR}/functions/*
+autoload -Uz ${ZDOTDIR}/functions/*(.:t)
 
 function mkcd {
 	mkdir -p ${1}

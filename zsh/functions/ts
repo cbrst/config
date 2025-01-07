@@ -23,6 +23,11 @@ function _themeswitch_nvim {
 
 	echo "return \"${themename}\"" > ${NVIM_DIR}/lua/myvi/colorscheme.lua
 
+	# Check if nvim socket dir exists, otherwise return
+	if [[ ! -d ${XDG_RUNTIME_DIR}/nvim ]]; then
+		return
+	fi
+
 	# Send command to change colorscheme to all running nvim servers
 	local sockets=(${XDG_RUNTIME_DIR}/nvim*)
 	if [[ -e ${sockets[1]} ]]; then
