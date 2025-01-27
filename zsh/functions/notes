@@ -1,0 +1,17 @@
+# this is where the notes live
+local NOTES_DIR="${HOME}/Nextcloud/Notes"
+
+# select subdirectories with fzf
+# or return the query if no match
+local _select=$(find -L ${NOTES_DIR} -type d -depth 1 | sed 's/^.*\///' | fzf --bind 'enter:accept-or-print-query')
+
+# combine to form full path
+local _notes_path=${NOTES_DIR}/${_select}
+
+# create the directory if it doesn't exist
+mkdir -p ${_notes_path}
+
+# open in nvim
+nvim +"cd ${_notes_path}" +Neotree ${_notes_path}
+
+#: vim: set ft=zsh

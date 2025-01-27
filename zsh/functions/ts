@@ -1,3 +1,9 @@
+function _themeswitch_debug {
+	if [[ $DEBUG -gt 0 ]]; then
+		echo $1
+	fi
+}
+
 function _themeswitch_ghostty {
 	# Path to Ghostty config
 	local GHOSTTY_DIR=${CONF_PATH}/ghostty
@@ -47,9 +53,12 @@ function _themeswitch_wallpaper {
 	# Stupid BSD sed doesn't do alternation with \|, so we have to loop
 	# and call sed multiple times
 	_replacements=""
-	for old_theme in catppuccin "gruvbox-material" "rose-pine"; do
+	for old_theme in catppuccin jellybeans "gruvbox-material" "rose-pine"; do
 		wallpaper=$(echo ${wallpaper} | sed -e "s/${old_theme}/${themename}/")
 	done
+
+	_themeswitch_debug $themename
+	_themeswitch_debug $wallpaper
 
 	if [[ -f ${wallpaper} ]]; then
 		osascript -e "tell application \"System Events\" to set picture of every desktop to \"${wallpaper}\""
@@ -63,6 +72,7 @@ function _themeswitch_wallpaper {
 declare -A local themes=(
 	[catppuccin]="catppuccin-latte catppuccin-mocha"
 	[gruvbox]="gruvbox-material-light gruvbox-material-dark"
+	[jellybeans]="jellybeans-light jellybeans-dark"
 	[rosepine]="rose-pine-dawn rose-pine"
 )
 

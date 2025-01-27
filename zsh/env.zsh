@@ -8,6 +8,12 @@ export XDG_STATE_HOME=${XDG_STATE_HOME:-${HOME}/.local/state}
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-${HOME}/.xdg}
 export XDG_PROJECTS_DIR=${XDG_PROJECTS_DIR:-${HOME}/Projects}
 
+# Homebrew
+[ -f /opt/homebrew/bin/brew ] && eval $(/opt/homebrew/bin/brew shellenv)
+
+# PATH
+export PATH=${PATH}:${HOME}/.local/bin:${HOME}/Library/Python/3.9/bin
+
 # Fish-like dirs
 : ${__zsh_config_dir:=${ZDOTDIR:-${XDG_CONFIG_HOME:-${HOME}/.config}/zsh}}
 : ${__zsh_user_data_dir:=${XDG_DATA_HOME:-${HOME}/.local/share}/zsh}
@@ -37,11 +43,10 @@ export FZF_DEFAULT_OPTS=$_fzf_opts
 export ZIM_HOME=${__zsh_user_data_dir}/zim
 export ZIM_CONFIG_FILE=${ZDOTDIR:-${HOME}/.config/zsh}/zimrc.zsh
 
-# PATH
-export PATH=${PATH}:${HOME}/.local/bin:${HOME}/Library/Python/3.9/bin
-
 # Starship
 export STARSHIP_CONFIG=${XDG_CONFIG_HOME}/starship/starship.toml
 
-# Homebrew
-[ -f /opt/homebrew/bin/brew ] && eval $(/opt/homebrew/bin/brew shellenv)
+# Secrets
+# API keys and such. Obviously I won't put this into the repo, this needs to be created by hand:
+# export ANTHROPIC_API_KEY="api_key"
+[ -f ${ZDOTDIR}/secrets.zsh ] && . ${ZDOTDIR}/secrets.zsh
