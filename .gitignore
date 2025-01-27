@@ -5,8 +5,10 @@ karabiner/automatic_backups
 thefuck/__pycache__
 
 tridactyl/grouprules
+tridactyl/grouprules.js
 
 zsh/.*
+zsh/secrets.zsh
 
 # Theme definitions
 # These are changed regularly and don't need to be tracked.
