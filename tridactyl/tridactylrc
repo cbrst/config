@@ -7,6 +7,12 @@ set followpagepatterns.next ^(next|newer|weiter)\b|»|>>|more
 set followpagepatterns.prev ^(prev(ious)?|older|zurück)\b|«|<<
 
 "
+" Hints
+"
+
+bind yf hint -y
+
+"
 " Tab groups
 "
 unbind T
@@ -15,7 +21,7 @@ bind Tc fillcmdline tgroupcreate
 bind Tm fillcmdline tgroupmove
 
 " Move tab to group if it is not already in the group, then switch to it
-command tgroupmove* js -p tri.browserBg.tabs.query({currentWindow: true, active: true}).then(tabs => tri.browserBg.sessions.getTabValue(tabs[0].id, "tridactyl-tgroup").then(group => { if ( group != '' && group != JS_ARG ) { tri.excmds.tgroupmove(JS_ARG).then(name => tri.excmds.tgroupswitch(name)) } }))
+command tgroupmove* js -p tri.browserBg.tabs.query({currentWindow: true, active: true}).then(tabs => tri.browserBg.sessions.getTabValue(tabs[0].id, "tridactyl-tgroup").then(group => { if ( group != '' && group != JS_ARG ) { tri.excmds.tgroupmove(JS_ARG).then(() => tri.excmds.tgroupswitch(JS_ARG)) } }))
 
 js -r grouprules.js
 
@@ -24,6 +30,7 @@ js -r grouprules.js
 "
 set searchurls.amazon https://www.amazon.de/s?k=%s
 set searchurls.github https://github.com/search?q=%s
+set searchurls.nzb https://nzbfinder.ws/search?search=%s
 set searchurls.wayback https://web.archive.org/web/*/%s
 
 "
@@ -36,7 +43,6 @@ set searchurls.wayback https://web.archive.org/web/*/%s
 " This just passes the current URL as an argument to whatever follows
 command withUrl composite get_current_url |
 command wayback withUrl tabopen wayback
-command cydl withUrl !s cyberdrop-dl
 
 " Couple of things happen here:
 "
@@ -50,6 +56,14 @@ command cydl withUrl !s cyberdrop-dl
 " - everything else passed to the command will be used as arguments to yt-dlp
 "   (JS_ARGS.slice(0, -1))
 command dlvid withUrl js -d€ tri.excmds.exclaim(`zsh -c 'yt-dlp ${JS_ARGS.slice(0, -1).join(" ")} "${JS_ARGS.slice(-1)}"'`)€
+
+" This isn't quite as evolved, but it made sense to reuse the work already done.
+" For macOS, pretty much everything non-native needs to be run through zsh for PATH to work.
+" Obviously I could use absolute paths to executables, but that wouldn't be cross-platform.
+command run_cydl js -d€ tri.excmds.exclaim_quiet(`zsh -c 'cyberdrop-dl --appdata-folder ~/Downloads/Cyberdrop-DL/ --download "${JS_ARGS.slice(-1)}"'`)€
+command cydl withUrl run_cydl
+" bind ,c composite hint -pipe a[class="link-external"] href | yank
+bind ,c composite hint -pipe a href | run_cydl
 
 "
 " Find
@@ -86,7 +100,7 @@ bindurl wallhaven\.cc ,c1 wh:toggle categories 1
 bindurl wallhaven\.cc ,c2 wh:toggle categories 2
 bindurl wallhaven\.cc ,c3 wh:toggle categories 3
 
-" does the same as urlmodify -s, except checks first
+" does the same as urlmodify -s, except checks if search param is already set first
 " otherwise we'll end up with a loop using autocmd
 command wh:landscape js let u=new URL(window.location.href);let p=new URLSearchParams(window.location.search);if(!p.get('ratios')||p.get('ratios')!='landscape'){p.set('ratios','landscape');u.search=p.toString();window.location.href=u.href}
 autocmd DocStart .*wallhaven\.cc/(hot|random|search|toplist).* wh:landscape
@@ -94,9 +108,10 @@ autocmd DocStart .*wallhaven\.cc/(hot|random|search|toplist).* wh:landscape
 autocmd DocStart .*wallhaven\.cc/tag/.* composite js "wallhaven.cc/search?q=id%3A" + window.location.pathname.split('/')[2] | open 
 
 " Youtube
+bindurl youtube\.com ,v hint -J* a[id="video-title-link"]
 bindurl youtube\.com/watch ,f hint -!J* .ytp-fullscreen-button
 bindurl youtube\.com/watch ,d dlvid --no-playlist
 bindurl youtube\.com/watch ,p dlvid --yes-playlist
 
 
-" vim: set ft=vim
+" vim: set ft=tridactyl

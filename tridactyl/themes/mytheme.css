@@ -1,13 +1,9 @@
 :root {
-    --tridactyl-font-family: -apple-system, "San Francisco", sans-serif;
-    --tridactyl-cmdl-font-family: -apple-system, "San Francisco", sans-serif;
-    --tridactyl-bg: hsl(0, 0%, 25%);
-    --tridactyl-bg-border: 1px solid hsla(0, 0%, 0%, 80%);
-    --tridactyl-bg-inset: inset 0 0 0 1px hsla(0, 0%, 100%, 50%);
-    --tridactyl-fg: white;
+    --tridactyl-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --tridactyl-cmdl-font-family: var(--tridactyl-font-family);
 
     --tridactyl-status-font-size: 14px;
-    --tridactyl-status-font-family: "San Francisco";
+    --tridactyl-status-font-family: var(--tridactyl-font-family);
     --tridactyl-status-font-bg: var(--tridactyl-cmdl-bg);
     --tridactyl-status-border: 2px solid black;
     --tridactyl-status-border-radius: 4px;
@@ -18,31 +14,89 @@
     --tridactyl-of-bg: hsl(210, 100%, 80%);
     --tridactyl-url-fg: hsl(210, 100%, 70%);
 
+    --tridactyl-hintspan-font-family: var(--tridactyl-font-family);
     --tridactyl-hintspan-fg: white;
     --tridactyl-hintspan-bg: #204e8a;
 
     --tridactyl-hint-active-fg: #333;
-    --tridactyl-hint-active-bg: #006e51;
+    --tridactyl-hint-active-bg: hsl(210, 100%, 80%);
     --tridactyl-hint-active-outline: 1px solid #000;
 
     --tridactyl-hint-bg: rgba(13, 31, 54, 0.25);
     --tridactyl-hint-outline: 1px solid var(--tridactyl-hintspan-bg);
 
+    --tridactyl-cmdl-bg: var(--tridactyl-bg);
+    --tridactyl-cmdl-fg: var(--tridactyl-fg);
     --tridactyl-cmdl-font-size: 1.5rem;
     --tridactyl-cmplt-option-height: 1.9em;
 
     --tridactyl-border-radius: 10px;
 }
 
-:root * {
+@media (prefers-color-scheme: light) {
+    :root {
+        --tridactyl-bg: hsla(0, 0%, 95%, 100%);
+        --tridactyl-bg-border: 1px solid hsla(0, 0%, 0%, 80%);
+        --tridactyl-bg-inset: inset 0 0 0 1px hsla(0, 0%, 100%, 0%);
+        --tridactyl-fg: hsl(0, 0%, 0%);
+        --tridactyl-cmdl-shadow: hsla(0, 0%, 0%, 20%);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --tridactyl-bg: hsla(0, 0%, 25%, 100%);
+        --tridactyl-bg-border: 1px solid hsla(0, 0%, 0%, 80%);
+        --tridactyl-bg-inset: inset 0 0 0 1px hsla(0, 0%, 100%, 50%);
+        --tridactyl-fg: hsl(0, 0%, 100%);
+        --tridactyl-cmdl-shadow: hsla(0, 0%, 0%, 40%);
+    }
+}
+
+/*
+ * Main window
+ */
+
+:root.TridactylOwnNamespace.TridactylThemeMytheme * {
     box-sizing: border-box;
 }
+
+:root.TridactylOwnNamespace.TridactylThemeMytheme {
+    background: var(--tridactyl-bg);
+}
+
+:root.TridactylOwnNamespace.TridactylThemeMytheme body {
+    top: 0;
+}
+
+:root #cmdline_iframe {
+    backdrop-filter: blur(16px);
+    border-radius: var(--tridactyl-border-radius) !important;
+    position: fixed !important;
+    bottom: unset;
+    top: 25% !important;
+    left: 10% !important;
+    z-index: 2147483647 !important;
+    width: 80% !important;
+    color-scheme: light dark;
+    /* Prevent Firefox from adding a white background on dark-mode sites */
+}
+
+:root #cmdline_iframe:not(.hidden) {
+    border: var(--tridactyl-bg-border) !important;
+    box-shadow: 0 15px 30px var(--tridactyl-cmdl-shadow) !important;
+}
+
+/*
+ * Links
+ */
 
 :root.TridactylOwnNamespace {
     scrollbar-width: thin;
 }
 
 :root.TridactylOwnNamespace a {
+    background: transparent;
     color: #3b84ef;
 }
 
@@ -51,15 +105,14 @@
     padding: 3px 7px;
 }
 
-:root #command-line-holder {
-    order: 1;
-    border: var(--tridactyl-bg-border);
-    box-shadow: var(--tridactyl-bg-inset);
-}
 
-:root #command-line-holder,
-:root #tridactyl-input {
-    border-radius: var(--tridactyl-border-radius) !important;
+/*
+ * Command line
+ */
+
+:root #command-line-holder {
+    background: transparent;
+    order: 1;
 }
 
 :root #tridactyl-colon::before {
@@ -67,10 +120,14 @@
 }
 
 :root #tridactyl-input {
-    background: none;
+    background: transparent;
     width: 96%;
     padding: 1rem;
 }
+
+/*
+ * Completions
+ */
 
 :root #completions table {
     font-weight: 200;
@@ -79,18 +136,20 @@
     padding-top: 0;
 }
 
-:root #completions > div {
+:root #completions>div {
     max-height: calc(20 * var(--tridactyl-cmplt-option-height));
     min-height: calc(10 * var(--tridactyl-cmplt-option-height));
 }
 
 :root #completions {
-    border: var(--tridactyl-bg-border);
-    box-shadow: var(--tridactyl-bg-inset);
+    background: transparent;
+    border: none;
     font-family: var(--tridactyl-font-family);
     order: 2;
-    margin-top: 10px;
-    border-radius: var(--tridactyl-border-radius);
+}
+
+:root #completions a.url {
+    background: transparent;
 }
 
 :root #completions .HistoryCompletionSource table {
@@ -140,25 +199,28 @@
     font-size: 1rem;
 }
 
-:root #cmdline_iframe {
-    position: fixed !important;
-    bottom: unset;
-    top: 25% !important;
-    left: 10% !important;
-    z-index: 2147483647 !important;
-    width: 80% !important;
-    filter: drop-shadow(0px 0px 20px #000000) !important;
-    color-scheme: only light; /* Prevent Firefox from adding a white background on dark-mode sites */
-}
+/*
+ * Status indicator
+ */
 
 :root .TridactylStatusIndicator {
-    position: fixed !important;
-    bottom: 10px !important;
-    right: 10px !important;
+    background-color: var(--tridactyl-bg) !important;
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--tridactyl-bg-border) !important;
     border-radius: 20px !important;
     font-family: var(--tridactyl-font-family) !important;
     font-size: 12px !important;
     padding: 3px 8px !important;
+    position: fixed !important;
+    bottom: 10px !important;
+    right: 10px !important;
 }
 
+/*
+ * Hints
+ */
 
+span.TridactylHint {
+    border-radius: 5px 5px 0 5px !important;
+    transform: translate(-50%, -50%) !important;
+}
