@@ -1,5 +1,5 @@
 return vim.api.nvim_create_autocmd("FileType", {
-	patter = { "lua" },
+	pattern = { "lua" },
 	callback = function()
 		vim.bo.shiftwidth = 2
 		vim.bo.tabstop = 2

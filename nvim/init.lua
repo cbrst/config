@@ -4,7 +4,7 @@
 Myvi = require("myvi")
 
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+vim.g.maplocalleader = ","
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
@@ -24,7 +24,7 @@ require("keymap")
 require("autocmds")
 
 -- [[ Language Configs ]]
--- require("languages.lua")
+require("languages")
 
 -- [[ Bootstrap lazyvim ]]
 require("lazyvim")

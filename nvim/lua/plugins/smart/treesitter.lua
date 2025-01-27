@@ -1,26 +1,7 @@
 return {
 	{
 		"bezhermoso/tree-sitter-ghostty",
-		build = function(plugin)
-			-- treesitter queries dir
-			local runtime_queries_path = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/queries"
-			local target_dir = runtime_queries_path .. "/ghostty"
-			vim.fn.mkdir(target_dir, "p")
-
-			-- copy the highlights.scm from the repo to treesitter
-			local src_file = io.open(plugin.dir .. "/queries/highlights.scm", "r")
-			if src_file then
-				-- read the file from the cloned repository
-				local content = src_file:read("*all")
-				src_file:close()
-
-				local target_file = io.open(target_dir .. "/highlights.scm", "w")
-				if target_file then
-					target_file:write(content)
-					target_file:close()
-				end
-			end
-		end,
+		build = "make nvim_install",
 	},
 
 	{ -- Highlight, edit, and navigate code
@@ -57,15 +38,15 @@ return {
 				indent = { enable = true, disable = { "ruby" } },
 			})
 
-			local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-			parser_config.ghostty = {
-				install_info = {
-					url = "https://github.com/bezhermoso/tree-sitter-ghostty",
-					files = { "src/parser.c" },
-					branch = "main",
-					requires_generate_from_grammar = true,
-				},
-			}
+			-- local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+			-- parser_config.ghostty = {
+			-- 	install_info = {
+			-- 		url = "https://github.com/bezhermoso/tree-sitter-ghostty",
+			-- 		files = { "src/parser.c" },
+			-- 		branch = "main",
+			-- 		requires_generate_from_grammar = true,
+			-- 	},
+			-- }
 		end,
 	},
 }
