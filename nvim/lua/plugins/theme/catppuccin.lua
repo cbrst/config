@@ -17,6 +17,7 @@ return {
 		local create_feline_colors = function(colors)
 			return {
 				bg0 = colors.base,
+				-- bg0 = colors.crust,
 				bg1 = colors.surface2,
 				bg2 = colors.subtext1,
 				fg0 = colors.subtext0,

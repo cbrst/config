@@ -30,6 +30,7 @@ return {
 			},
 			dark = {
 				bg0 = "#191724",
+				-- bg0 = "#0e0d14",
 				bg1 = "#908caa",
 				bg2 = "#e0def4",
 				fg0 = "#908caa",

@@ -1,0 +1,27 @@
+# starship fg
+palette = 0=#fdf6e3
+palette = 1=#954d3b
+palette = 2=#386014
+palette = 3=#876820
+palette = 4=#234291
+palette = 5=#6a4abd
+palette = 6=#2b5b77
+# starship bg primary
+palette = 7=#787878
+# starship bg secondary
+palette = 8=#c7c7c7
+palette = 9=#a02020
+palette = 10=#457039
+palette = 11=#a66a10
+palette = 12=#2952a3
+palette = 13=#540063
+palette = 14=#3a596a
+palette = 15=#6c6f85
+background = fdf6e3
+foreground = 262626
+cursor-color = c6b6ee
+selection-background = 787878
+selection-foreground = fdf6e3
+# vim: set ft=ghostty:
+
+
