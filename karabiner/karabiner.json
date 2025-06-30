@@ -17,12 +17,13 @@
                                             "^org\\.alacritty$",
                                             "^net\\.kovidgoyal\\.kitty$",
                                             "^com\\.github\\.wez\\.wezterm$",
-                                            "^com\\.mitchellh\\.ghostty$"
+                                            "^com\\.mitchellh\\.ghostty$",
+                                            "^com\\.jetbrains\\.WebStorm$"
                                         ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
-                                "description": "Use capslock as left control in terminals",
+                                "description": "Use capslock as left control in terminals and editors",
                                 "from": {
                                     "key_code": "caps_lock",
                                     "modifiers": { "optional": ["any"] }
