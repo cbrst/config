@@ -1,2 +1,6 @@
 # Save in downloads folder
 -o ~/Downloads/%(title)s.%(ext)s
+
+# use aria2 with multiple connections
+--downloader aria2c
+--downloader-args "-x 16"
