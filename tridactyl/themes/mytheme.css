@@ -203,17 +203,21 @@
  * Status indicator
  */
 
+/*:root .TridactylStatusIndicator {*/
+/*    background-color: var(--tridactyl-bg) !important;*/
+/*    backdrop-filter: blur(16px);*/
+/*    border: 1px solid var(--tridactyl-bg-border) !important;*/
+/*    border-radius: 20px !important;*/
+/*    font-family: var(--tridactyl-font-family) !important;*/
+/*    font-size: 12px !important;*/
+/*    padding: 3px 8px !important;*/
+/*    position: fixed !important;*/
+/*    bottom: 10px !important;*/
+/*    right: 10px !important;*/
+/*}*/
+
 :root .TridactylStatusIndicator {
-    background-color: var(--tridactyl-bg) !important;
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--tridactyl-bg-border) !important;
-    border-radius: 20px !important;
-    font-family: var(--tridactyl-font-family) !important;
-    font-size: 12px !important;
-    padding: 3px 8px !important;
-    position: fixed !important;
-    bottom: 10px !important;
-    right: 10px !important;
+    display: none !important;
 }
 
 /*
