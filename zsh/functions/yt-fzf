@@ -1,0 +1,4 @@
+format=$(yt-dlp --list-formats $1 2>/dev/null | grep -A 1000 "ID" | tail -n +3 | fzf | awk '{print $1}')
+yt-dlp -f "${format}" $1
+
+#: vim: set ft=zsh

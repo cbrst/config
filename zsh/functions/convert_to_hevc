@@ -1,0 +1,67 @@
+# Default to current directory if no path specified
+local search_path="${1:-.}"
+
+# Ensure ffmpeg is installed
+if ! command -v ffmpeg &> /dev/null; then
+  print "Error: ffmpeg command not found. Please install ffmpeg."
+  print "You can install it with: brew install ffmpeg"
+  return 1
+fi
+
+# Process each video file
+find "$search_path" -type f \( -iname '*.mp4' -o -iname '*.mkv' -o -iname '*.avi' -o -iname '*.mov' \) -print0 | while IFS= read -r -d '' video; do
+  echo "Processing: $video"
+
+  # Check if already HEVC encoded
+  if [[ $(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$video") == "hevc" ]]; then
+    echo "Skipping: $video (already HEVC)"
+    continue
+  fi
+
+  # Get video height
+  local height=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 "$video")
+  
+  # Set quality based on resolution
+  local quality
+  if (( height <= 720 )); then
+      quality=70
+      echo "Resolution: 720p or lower - Using quality setting: $quality"
+  elif (( height <= 1080 )); then
+      quality=65
+      echo "Resolution: 1080p - Using quality setting: $quality"
+  else
+      quality=62
+      echo "Resolution: 4K or higher - Using quality setting: $quality"
+  fi
+
+  # Generate output filename
+  local output="${video%.*}_hevc.mp4"
+
+  # Convert to HEVC using VideoToolbox hardware encoding with 10-bit depth
+  if ffmpeg -i "$video" \
+    -c:v hevc_videotoolbox \
+    -q:v $quality \
+    -profile:v main10 \
+    -pix_fmt p010le \
+    -vtag hvc1 \
+    -g 250 \
+    -allow_sw 1 \
+    -alpha_quality 0.9 \
+    -colorspace bt709 \
+    -color_primaries bt709 \
+    -color_trc bt709 \
+    -c:a copy "$output" -y < /dev/null; then
+    
+    echo "Successfully converted: $video"
+    echo "Removing original file"
+    rm "$video"
+  else
+    echo "Error converting: $video"
+  fi
+done
+
+# Usage on macOS:
+# convert_to_hevc                     # Process current directory
+# convert_to_hevc ./videos            # Process specific directory
+
+# vim: set ft=zsh

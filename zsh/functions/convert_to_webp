@@ -1,0 +1,87 @@
+# Default to current directory if no path specified
+local search_path="${1:-.}"
+# Default to all CPU cores, or specify max parallel processes
+local max_procs="${2:-$(sysctl -n hw.ncpu)}"
+
+# Ensure cwebp is installed
+if ! command -v cwebp &> /dev/null; then
+print "Error: cwebp command not found. Please install WebP tools."
+print "You can install it with: brew install webp"
+return 1
+fi
+
+local total_orig=0
+local total_webp=0
+local count=0
+
+print "Converting images to WebP in $search_path using $max_procs parallel processes..."
+
+  
+# Get results from a temporary file to ensure correct counting with parallelism
+local temp_file=$(mktemp)
+
+find "$search_path" -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) -print0 | 
+  xargs -0 -P "$max_procs" -I {} zsh -c '
+    local img="$1"
+    local temp_file="$2"
+    local webp_output="${img%.*}.webp"
+    
+    # Get original file size before conversion
+    local original_size=$(stat -f "%z" "$img")
+    
+    if cwebp -quiet "$img" -o "$webp_output"; then
+      # Get new WebP file size
+      local webp_size=$(stat -f "%z" "$webp_output")
+      
+      # Calculate size difference and percentage saved
+      local size_diff=$((original_size - webp_size))
+      local pct_saved=$(( (size_diff * 100) / original_size ))
+      
+      # Format sizes for human-readable output
+      local orig_kb=$(printf "%.1f" $((original_size / 1024.0)))
+      local webp_kb=$(printf "%.1f" $((webp_size / 1024.0)))
+      local saved_kb=$(printf "%.1f" $((size_diff / 1024.0)))
+      
+      rm "$img"
+      print "Converted: $img"
+      print "  Original: ${orig_kb}KB → WebP: ${webp_kb}KB (Saved: ${saved_kb}KB, ${pct_saved}%)"
+      
+      # Write size info to temp file for total calculation
+      echo "$original_size $webp_size" >> "$temp_file"
+    else
+      print "Failed to convert: $img" >&2
+    fi
+  ' _ {} $temp_file
+  
+# Calculate totals
+if [[ -s "$temp_file" ]]; then
+  while read orig_size webp_size; do
+    ((total_orig += orig_size))
+    ((total_webp += webp_size))
+    ((count++))
+  done < "$temp_file"
+  
+  local total_saved=$((total_orig - total_webp))
+  local total_pct=$(( (total_saved * 100) / total_orig ))
+  
+  # Format totals for human-readable output
+  local total_orig_mb=$(printf "%.2f" $((total_orig / 1048576.0)))
+  local total_webp_mb=$(printf "%.2f" $((total_webp / 1048576.0)))
+  local total_saved_mb=$(printf "%.2f" $((total_saved / 1048576.0)))
+  
+  print "\nConversion summary:"
+  print "  Files processed: $count"
+  print "  Original size: ${total_orig_mb}MB"
+  print "  WebP size: ${total_webp_mb}MB"
+  print "  Total saved: ${total_saved_mb}MB (${total_pct}%)"
+fi
+
+rm "$temp_file"
+print "Conversion complete!"
+
+# Usage on macOS:
+# convert_to_webp                     # Process current directory using all CPU cores
+# convert_to_webp ./photos            # Process specific directory
+# convert_to_webp ./photos 4          # Process specific directory using 4 parallel processes
+
+# vim: set ft=zsh

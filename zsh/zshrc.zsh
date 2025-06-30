@@ -71,6 +71,7 @@ function mkcd {
 #
 
 (( $+commands[eza] )) && alias ls="eza --group-directories-first --icons=always --color=always --git"
+alias cydl="cyberdrop-dl --appdata-folder ~/Downloads/Cyberdrop-DL/"
 
 #
 # Bat
