@@ -233,4 +233,18 @@ return {
 			})
 		end,
 	},
+	{
+		"olrtg/nvim-emmet",
+		keys = {
+			{
+				"<localleader>w",
+				function()
+					require("nvim-emmet").wrap_with_abbreviation()
+				end,
+				mode = { "n", "v" },
+				ft = "html",
+				desc = "[w]rap with abbreviation",
+			},
+		},
+	},
 }
