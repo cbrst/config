@@ -4,8 +4,7 @@ return {
 	lazy = false,
 	version = false,
 	opts = {
-		provider = "claude",
-		auto_suggestions_provider = "claude",
+		provider = "copilot",
 	},
 	build = "make",
 	dependencies = {

@@ -182,7 +182,6 @@ return {
 				--
 				-- But for many setups, the LSP (`ts_ls`) will work just fine
 				-- ts_ls = {},
-				--
 
 				-- intelephense = {},
 				phpactor = {},
@@ -233,6 +232,22 @@ return {
 			})
 		end,
 	},
+
+	{
+		"pmizio/typescript-tools.nvim",
+		requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+		config = function()
+			require("typescript-tools").setup({
+				settings = {
+					jsx_close_tag = {
+						enable = true,
+						filetypes = { "javascriptreact", "typescriptreact" },
+					},
+				},
+			})
+		end,
+	},
+
 	{
 		"olrtg/nvim-emmet",
 		keys = {
@@ -245,6 +260,15 @@ return {
 				ft = "html",
 				desc = "[w]rap with abbreviation",
 			},
+		},
+	},
+
+	{
+		"folke/trouble.nvim",
+		opts = {},
+		cmd = "Trouble",
+		keys = {
+			{ "<leader>vd", "<cmd>Trouble diagnostics toggle<cr>", desc = "[V]iew [D]iagnostics" },
 		},
 	},
 }

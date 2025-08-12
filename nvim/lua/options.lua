@@ -89,4 +89,4 @@ vim.opt.scrolloff = 10
 vim.opt.laststatus = 3
 
 -- Hide cmdline
-vim.opt.cmdheight = 0
+vim.opt.cmdheight = 1

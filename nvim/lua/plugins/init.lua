@@ -93,4 +93,12 @@ return {
 			},
 		},
 	},
+	{
+		"stevearc/overseer.nvim",
+		opts = {},
+		keys = {
+			{ "<leader>or", "<cmd>OverseerRun<cr>", desc = "[O]verseer: [r]un" },
+			{ "<leader>ot", "<cmd>OverseerToggle<cr>", desc = "[O]verseer: [t]oggle" },
+		},
+	},
 }
