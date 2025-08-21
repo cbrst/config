@@ -1,0 +1,26 @@
+# Create a temporary directory named 'tmp'
+mkdir tmp
+
+# Loop through all .jpg and .webp files in the current directory and subdirectories
+# Create a symbolic link in 'tmp' for each file with a random name
+for i in **/*.(jpg|webp); do
+	ln -s "${PWD}/${i}" "tmp/${RANDOM}${RANDOM}.${i##*.}"
+done
+
+# If 'gthumb' command exists, open the 'tmp' directory in slideshow mode
+if (( $+commands[gthumb] )); then
+	gthumb -s tmp/*
+# If running macOS and Phoenix Slides is installed, use it as an alternative
+elif [[ "$OSTYPE" == "darwin"* && open -Ra "Phoenix Slides" ]]; then
+	open -a "Phoenix Slides" tmp
+else
+	echo "Couldn't find a program to display the slideshow"
+fi
+
+# Remove the temporary 'tmp' directory and its contents
+# rm -rf tmp
+
+# Usage:
+# quickslide     # create links to all image files in subfolders in one folder
+
+# vim: set ft=zsh
