@@ -10,6 +10,9 @@ tridactyl/grouprules.js
 zsh/.*
 zsh/secrets.zsh
 
+# Machine specific overrides
+ghostty/machine
+
 # Theme definitions
 # These are changed regularly and don't need to be tracked.
 # No need to dirty up the tree

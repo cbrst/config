@@ -4,7 +4,7 @@ config-file = ?keybindings
 # Font
 font-family = CartographCF Nerd Font
 font-style-italic = Demi Bold Italic
-font-size = 14
+font-size = 12
 adjust-cursor-thickness = 2
 
 # Theme
@@ -29,7 +29,13 @@ window-padding-color = extend
 macos-icon = xray
 macos-icon-frame = aluminum
 
+# GTK
+gtk-titlebar = true
+
 # Updating
 auto-update = download
+
+# Machine-specific configs
+config-file = ?machine
 
 # vim: set ft=ghostty:
