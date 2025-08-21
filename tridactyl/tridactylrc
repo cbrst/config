@@ -30,6 +30,7 @@ js -r grouprules.js
 "
 set searchurls.amazon https://www.amazon.de/s?k=%s
 set searchurls.github https://github.com/search?q=%s
+set searchurls.modrinth https://modrinth.com/mods?q=%s
 set searchurls.nzb https://nzbfinder.ws/search?search=%s
 set searchurls.wayback https://web.archive.org/web/*/%s
 
@@ -84,6 +85,9 @@ set findcase smart
 " Git{Hub,Lab} git clone via SSH yank
 bind ,g composite js "git clone " + document.location.href | clipboard yank
 bind ,G composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
+
+" Monkeytype
+autocmd DocStart monkeytype\.com mode ignore
 
 " Wallhaven
 command wh:min4k urlmodify -s atleast 3840x2160
