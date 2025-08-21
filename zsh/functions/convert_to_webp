@@ -1,7 +1,15 @@
 # Default to current directory if no path specified
 local search_path="${1:-.}"
 # Default to all CPU cores, or specify max parallel processes
-local max_procs="${2:-$(sysctl -n hw.ncpu)}"
+function _get_procs {
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    local sys_procs=$(sysctl -n hw.cpu)
+  else
+    local sys_procs=$(nproc)
+  fi
+  echo ${sys_procs}
+}
+local max_procs="${2:-$(_get_procs)}"
 
 # Ensure cwebp is installed
 if ! command -v cwebp &> /dev/null; then
@@ -27,11 +35,19 @@ find "$search_path" -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpe
     local webp_output="${img%.*}.webp"
     
     # Get original file size before conversion
-    local original_size=$(stat -f "%z" "$img")
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      local original_size=$(stat -f "%z" "$img")
+    else
+      local original_size=$(stat -c "%s" "$img")
+    fi
     
     if cwebp -quiet "$img" -o "$webp_output"; then
       # Get new WebP file size
-      local webp_size=$(stat -f "%z" "$webp_output")
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        local webp_size=$(stat -f "%z" "$webp_output")
+      else
+        local webp_size=$(stat -c "%s" "$webp_output")
+      fi
       
       # Calculate size difference and percentage saved
       local size_diff=$((original_size - webp_size))
@@ -79,7 +95,7 @@ fi
 rm "$temp_file"
 print "Conversion complete!"
 
-# Usage on macOS:
+# Usage:
 # convert_to_webp                     # Process current directory using all CPU cores
 # convert_to_webp ./photos            # Process specific directory
 # convert_to_webp ./photos 4          # Process specific directory using 4 parallel processes
