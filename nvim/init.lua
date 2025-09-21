@@ -1,7 +1,7 @@
+Myvi = require("myvi")
+
 -- Set <space> as the leader key See `:help mapleader`
 -- NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-
-Myvi = require("myvi")
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
@@ -28,6 +28,10 @@ require("languages")
 
 -- [[ Bootstrap lazyvim ]]
 require("lazyvim")
+
+-- Set the colorscheme after everything is loaded,
+-- just to make sure all plugins show the right colors
+Myvi.set_colorscheme()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
