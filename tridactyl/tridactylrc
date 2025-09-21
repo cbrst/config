@@ -5,6 +5,7 @@ set smoothscroll true
 set editorcmd /Users/cbrst/.config/tridactyl/editor.sh
 set followpagepatterns.next ^(next|newer|weiter)\b|»|>>|more
 set followpagepatterns.prev ^(prev(ious)?|older|zurück)\b|«|<<
+set completions.Tab.statusstylepretty true
 
 "
 " Hints
@@ -13,22 +14,35 @@ set followpagepatterns.prev ^(prev(ious)?|older|zurück)\b|«|<<
 bind yf hint -y
 
 "
+" Clear up some bindings that I don't use or are generally useless
+"
+
+" these do exactly the same as j/k
+unbind <C-e>
+unbind <C-y>
+
+
+" Disabled since I switched to using Sidebery
+"
 " Tab groups
 "
-unbind T
-bind Ts fillcmdline tgroupswitch
-bind Tc fillcmdline tgroupcreate
-bind Tm fillcmdline tgroupmove
-
-" Move tab to group if it is not already in the group, then switch to it
-command tgroupmove* js -p tri.browserBg.tabs.query({currentWindow: true, active: true}).then(tabs => tri.browserBg.sessions.getTabValue(tabs[0].id, "tridactyl-tgroup").then(group => { if ( group != '' && group != JS_ARG ) { tri.excmds.tgroupmove(JS_ARG).then(() => tri.excmds.tgroupswitch(JS_ARG)) } }))
-
-js -r grouprules.js
+" unbind T
+" bind Ts fillcmdline tgroupswitch
+" bind Tc fillcmdline tgroupcreate
+" bind Tm fillcmdline tgroupmove
+"
+" " Move tab to group if it is not already in the group, then switch to it
+" command tgroupmove* js -p tri.browserBg.tabs.query({currentWindow: true, active: true}).then(tabs => tri.browserBg.sessions.getTabValue(tabs[0].id, "tridactyl-tgroup").then(group => { if ( group != '' && group != JS_ARG ) { tri.excmds.tgroupmove(JS_ARG).then(() => tri.excmds.tgroupswitch(JS_ARG)) } }))
+"
+" js -r grouprules.js
 
 "
 " Search engines
 "
 set searchurls.amazon https://www.amazon.de/s?k=%s
+set searchurls.apkg https://archlinux.org/packages?q=%s
+set searchurls.aur https://aur.archlinux.org/packages?K=%s
+set searchurls.aw https://wiki.archlinux.org/index.php?search=%s
 set searchurls.github https://github.com/search?q=%s
 set searchurls.modrinth https://modrinth.com/mods?q=%s
 set searchurls.nzb https://nzbfinder.ws/search?search=%s
@@ -82,21 +96,50 @@ set findcase smart
 " Site Specifics
 "
 
-" Git{Hub,Lab} git clone via SSH yank
+"
+" Duckduckgo
+"
+
+" only hint search results
+bindurl duckduckgo\.com f hint -J* -c a[data-testid="result-title-a"][rel="noopener"]
+bindurl duckduckgo\.com F hint -t -J* -c a[data-testid="result-title-a"][rel="noopener"]
+bindurl duckduckgo\.com ,f hint
+
+" focus search box
+bindurl duckduckgo\.com ,s hint -J* -c [id="search_form_input"]
+
+" switch to image search
+command ddg:mode js -d€ let p=new URLSearchParams(window.location.search);p.set("ia",JS_ARGS[1]);p.set("iar",JS_ARGS[1]);window.location.search=p.toString()€
+bindurl duckduckgo\.com ,i ddg:mode images
+bindurl duckduckgo\.com ,v ddg:mode videos
+bindurl duckduckgo\.com ,w ddg:mode web
+
+"
+" Git{Hub,Lab}
+"
+
+" git clone via SSH yank
 bind ,g composite js "git clone " + document.location.href | clipboard yank
 bind ,G composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
 
+"
 " Monkeytype
+"
+
+" enable ignore mode
 autocmd DocStart monkeytype\.com mode ignore
 
+"
 " Wallhaven
+"
+
+" Define custom commands for toggling filters
 command wh:min4k urlmodify -s atleast 3840x2160
 command wh:min5k2k urlmodify -s atleast 5120x2160
 command wh:toggle js -d€ let u=new URL(window.location.href);let p=new URLSearchParams(window.location.search);let c=p.get(JS_ARGS[1])?.split('')||['1','1','1'];let f=JS_ARGS[2]-1;c[f]=(c[f]=="0")?"1":"0";p.set(JS_ARGS[1],c.join(''));u.search=p.toString();window.location.href=u.href€
 
 bindurl wallhaven\.cc ,m4 wh:min4k
 bindurl wallhaven\.cc ,m5 wh:min5k2k
-bindurl wallhaven\.cc/w ,d hint -!J*A #wallpaper
 bindurl wallhaven\.cc ,p1 wh:toggle purity 1
 bindurl wallhaven\.cc ,p2 wh:toggle purity 2
 bindurl wallhaven\.cc ,p3 wh:toggle purity 3
@@ -104,14 +147,24 @@ bindurl wallhaven\.cc ,c1 wh:toggle categories 1
 bindurl wallhaven\.cc ,c2 wh:toggle categories 2
 bindurl wallhaven\.cc ,c3 wh:toggle categories 3
 
+" Automatically enable landscape filter
+
 " does the same as urlmodify -s, except checks if search param is already set first
 " otherwise we'll end up with a loop using autocmd
 command wh:landscape js let u=new URL(window.location.href);let p=new URLSearchParams(window.location.search);if(!p.get('ratios')||p.get('ratios')!='landscape'){p.set('ratios','landscape');u.search=p.toString();window.location.href=u.href}
 autocmd DocStart .*wallhaven\.cc/(hot|random|search|toplist).* wh:landscape
 
+" Automatically show all results for a tag
 autocmd DocStart .*wallhaven\.cc/tag/.* composite js "wallhaven.cc/search?q=id%3A" + window.location.pathname.split('/')[2] | open 
 
+" Download wallpaper
+bindurl wallhaven\.cc/w ,d hint -!J*A #wallpaper
+
+
+"
 " Youtube
+"
+
 bindurl youtube\.com ,v hint -J* a[id="video-title-link"]
 bindurl youtube\.com/watch ,f hint -!J* .ytp-fullscreen-button
 bindurl youtube\.com/watch ,d dlvid --no-playlist
