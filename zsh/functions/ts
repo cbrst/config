@@ -73,6 +73,7 @@ declare -A local themes=(
 	[catppuccin]="catppuccin-latte catppuccin-mocha"
 	[gruvbox]="gruvbox-material-light gruvbox-material-dark"
 	[jellybeans]="jellybeans-light jellybeans-dark"
+	[kanagawa]="kanagawa-lotus kanagawa-dragon"
 	[rosepine]="rose-pine-dawn rose-pine"
 )
 
@@ -84,6 +85,6 @@ local dark=${${=themes[${selected}]}[2]}
 # Run the helper functions to do the theme switching
 _themeswitch_ghostty $light $dark
 _themeswitch_nvim $light
-_themeswitch_wallpaper $light
+# _themeswitch_wallpaper $light
 
 # vim: set ft=zsh:

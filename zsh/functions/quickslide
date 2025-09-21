@@ -3,13 +3,13 @@ mkdir tmp
 
 # Loop through all .jpg and .webp files in the current directory and subdirectories
 # Create a symbolic link in 'tmp' for each file with a random name
-for i in **/*.(jpg|webp); do
-	ln -s "${PWD}/${i}" "tmp/${RANDOM}${RANDOM}.${i##*.}"
-done
+# for i in **/*.(jpg|webp); do
+# 	ln -s "${PWD}/${i}" "tmp/${RANDOM}${RANDOM}.${i##*.}"
+# done
 
 # If 'gthumb' command exists, open the 'tmp' directory in slideshow mode
-if (( $+commands[gthumb] )); then
-	gthumb -s tmp/*
+if (( $+commands[feh] )); then
+	feh -FrzD 5 .
 # If running macOS and Phoenix Slides is installed, use it as an alternative
 elif [[ "$OSTYPE" == "darwin"* && open -Ra "Phoenix Slides" ]]; then
 	open -a "Phoenix Slides" tmp
