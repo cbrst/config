@@ -2,13 +2,11 @@
 config-file = ?keybindings
 
 # Font
-# font-family = CartographCF Nerd Font
-font-style-italic = Demi Bold Italic
-font-family = SFMono Nerd Font
+font-family = LigSFMono Nerd Font
 font-size = 12
 adjust-cursor-thickness = 2
 
-# adjustments for SFMono Nerd Font
+# adjustments for SFMono
 # increase the line height and center the text
 adjust-cell-height = 20%
 adjust-font-baseline = 20%
@@ -22,16 +20,16 @@ unfocused-split-opacity = 0.5
 mouse-hide-while-typing = true
 
 # Window
-# background-opacity = 0.95
 background-blur-radius = 32
 window-colorspace = display-p3
 window-padding-x = 2
 window-padding-y = 2
 window-padding-balance = true
 window-padding-color = extend
+window-theme = ghostty
 
 # Mac
-# macos-titlebar-style = hidden
+macos-titlebar-style = tabs
 macos-icon = xray
 macos-icon-frame = aluminum
 
