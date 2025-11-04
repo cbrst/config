@@ -1,21 +1,27 @@
-# Default to current directory if no path specified
-local search_path="${1:-.}"
-# Default to all CPU cores, or specify max parallel processes
+# get option -p specifying parallel processes to use
+zparseopts -D -E -- p:=processes
+
+# get the number of processors of the machine
 function _get_procs {
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    local sys_procs=$(sysctl -n hw.cpu)
+    local sys_procs=$(sysctl -n hw.ncpu)
   else
     local sys_procs=$(nproc)
   fi
   echo ${sys_procs}
 }
-local max_procs="${2:-$(_get_procs)}"
+
+# set max processes to the value provided or the number of processors
+local max_procs="${${processes[2]}:-$(_get_procs)}"
+
+# Default to current directory if no path specified
+local search_path="${1:-.}"
 
 # Ensure cwebp is installed
 if ! command -v cwebp &> /dev/null; then
-print "Error: cwebp command not found. Please install WebP tools."
-print "You can install it with: brew install webp"
-return 1
+  print "Error: cwebp command not found. Please install WebP tools."
+  print "You can install it with: brew install webp"
+  return 1
 fi
 
 local total_orig=0
@@ -98,6 +104,6 @@ print "Conversion complete!"
 # Usage:
 # convert_to_webp                     # Process current directory using all CPU cores
 # convert_to_webp ./photos            # Process specific directory
-# convert_to_webp ./photos 4          # Process specific directory using 4 parallel processes
+# convert_to_webp -p 4 ./photos       # Process specific directory using 4 parallel processes
 
 # vim: set ft=zsh

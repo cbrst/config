@@ -90,3 +90,18 @@ vim.opt.laststatus = 3
 
 -- Hide cmdline
 vim.opt.cmdheight = 1
+
+-- Neovide
+if vim.g.neovide then
+	local alpha = function()
+		return string.format("%x", math.floor(255 * vim.g.neovide_opacity_point or 1.0))
+	end
+
+	vim.opt.guifont = "LigSFMono Nerd Font"
+	vim.g.neovide_opacity = 1.0
+	vim.g.neovide_opacity_point = 1.0
+	vim.g.neovide_normal_opacity = 1.0
+	vim.g.neovide_background_color = "#181616" .. alpha()
+	vim.g.transparency = 0.0
+	vim.g.neovide_hide_mouse_when_typing = true
+end
