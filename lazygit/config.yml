@@ -1,16 +1,19 @@
 gui:
   theme:
     activeBorderColor:
-      - blue
+      - red
+      - bold
     inactiveBorderColor:
-      - default
-    optionsTextColor:
-      - green
+      - "#5f5a5a"
+      - bold
     selectedLineBgColor:
-      - blue
+      - "#3f3a3a"
+      - bold
   nerdFontsVersion: "3"
   showDivergenceFromBaseBranch: arrowAndNumber
   border: rounded
+  tabWidth: 2
+  expandFocusedSidePanel: true
   spinner:
     frames:
       - '󰪞'
