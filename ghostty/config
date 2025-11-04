@@ -2,7 +2,8 @@
 config-file = ?keybindings
 
 # Font
-font-family = LigSFMono Nerd Font
+font-family = ""
+font-family = "LigSFMono Nerd Font"
 font-size = 12
 adjust-cursor-thickness = 2
 

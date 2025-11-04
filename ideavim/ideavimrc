@@ -1,0 +1,16 @@
+let mapleader = " "
+
+" Plugins
+set surround
+set commentary
+set argtextobject
+
+" Common settings
+set showmode
+set so=5
+set incsearch
+set nu
+
+" Keybindings
+map <leader>r <Action>(RenameElement)
+map <leader>: <Action>(GotoAction)

@@ -18,7 +18,9 @@
                                             "^net\\.kovidgoyal\\.kitty$",
                                             "^com\\.github\\.wez\\.wezterm$",
                                             "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.jetbrains\\.WebStorm$"
+                                            "^com\\.jetbrains\\.WebStorm$",
+                                            "^com\\.neovide\\.neovide",
+                                            "^org\\.gnu\\.Emacs"
                                         ],
                                         "type": "frontmost_application_if"
                                     }
