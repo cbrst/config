@@ -12,9 +12,9 @@ return {
 				filetype_lsp = {
 					lsp_sep = vim.g.have_nerd_font and " " or ",",
 					map_lsps = vim.g.have_nerd_font and {
-						["lua_ls"] = "",
-						["typescript-tools"] = "󰛦",
-						["tailwindcss"] = "󱏿",
+						["lua_ls"] = " ",
+						["typescript-tools"] = "󰛦 ",
+						["tailwindcss"] = "󱏿 ",
 					} or {
 						["lua_ls"] = "lua",
 						["typescript-tools"] = "TS",
