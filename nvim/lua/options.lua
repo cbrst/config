@@ -17,6 +17,9 @@ vim.opt.mouse = "a"
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
+-- Allow project local configs
+vim.opt.exrc = true
+
 -- Folding
 --  Enable folding and use treesitter
 vim.opt.foldmethod = "expr"
