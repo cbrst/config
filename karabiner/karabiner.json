@@ -18,6 +18,7 @@
                                             "^net\\.kovidgoyal\\.kitty$",
                                             "^com\\.github\\.wez\\.wezterm$",
                                             "^com\\.mitchellh\\.ghostty$",
+                                            "^com\\.jetbrains\\.PyCharm$",
                                             "^com\\.jetbrains\\.WebStorm$",
                                             "^com\\.neovide\\.neovide",
                                             "^org\\.gnu\\.Emacs"
