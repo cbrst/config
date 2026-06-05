@@ -1,0 +1,46 @@
+function copy_to_server() {
+    local server=$1
+    shift
+    local items=("$@")
+
+    if [[ -z "$server" ]]; then
+        echo "Error: No server specified."
+        echo "Usage: setup_ssh <server> <file_or_directory1> <file_or_directory2> ..."
+        return 1
+    fi
+
+    if [[ ${#items[@]} -eq 0 ]]; then
+        echo "Error: No files or directories specified."
+        echo "Usage: setup_ssh <server> <file_or_directory1> <file_or_directory2> ..."
+        return 1
+    fi
+
+    echo "Copying items to server: $server"
+
+    for item in "${items[@]}"; do
+        if [[ -L "$item" ]]; then
+						target="$item"
+            # If it's a symbolic link, resolve it
+            item=$(realpath "$item")
+        fi
+
+        if [[ -f "$item" ]]; then
+            # If it's a file, use scp
+            echo "Copying file: $item"
+            ssh "$server" "mkdir -p ~/$(dirname "$target")"
+            scp "$item" "$server:~/$target"
+        elif [[ -d "$item" ]]; then
+            # If it's a directory, use rsync
+            echo "Copying directory: $item"
+            ssh "$server" "mkdir -p ~/$(dirname "$target")"
+            rsync -avz "$item" "$server:~/$(dirname "$target")"
+        else
+            echo "Warning: $item is not a valid file or directory."
+        fi
+    done
+}
+
+# Call the function with the first argument as the server and the rest as items to copy
+copy_to_server "$@"
+
+
