@@ -1,0 +1,81 @@
+# ASCII-safe fallback for terminals whose configured font lacks Powerline glyphs.
+format = '''
+ $username$directory$git_branch$git_status
+  [> ](bold)
+'''
+
+right_format = """
+$nodejs\
+$php\
+$python
+"""
+continuation_prompt = "[>](bright-black) "
+
+# Disable the blank line at the start of the prompt
+add_newline = true
+
+[username]
+show_always = true
+style_user = "green"
+style_root = "red"
+format = '[$user](bold $style)'
+disabled = false
+
+[os]
+style = "yellow"
+format = '[$symbol]($style)'
+disabled = false # Disabled by default
+
+[os.symbols]
+Arch = "arch "
+Debian = "debian "
+EndeavourOS = "endeavour "
+Linux = "linux "
+Macos = "macos "
+NixOS = "nixos "
+openSUSE = "opensuse "
+Pop = "pop "
+SUSE = "suse "
+Ubuntu = "ubuntu "
+Unknown = ""
+Windows = "windows "
+
+[directory]
+style = "bright-black"
+format = "[ $path]($style)"
+repo_root_style = "bold bright-black"
+repo_root_format = "[ $before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)"
+truncation_length = 3
+truncation_symbol = ""
+truncate_to_repo = true
+read_only = " ro"
+
+[git_branch]
+symbol = "git"
+style = "yellow"
+format = '[ | $symbol $branch]($style)'
+truncation_symbol = ""
+
+[git_status]
+style = "yellow"
+format = '[ $all_status$ahead_behind]($style)'
+conflicted = "="
+ahead = ">"
+behind = "<"
+diverged = "<>"
+up_to_date = ""
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "r"
+deleted = "x"
+
+[nodejs]
+symbol = "node "
+
+[php]
+symbol = "php "
+
+[python]
+symbol = "python "

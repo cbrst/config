@@ -20,6 +20,10 @@ config.font = wezterm.font({
 })
 config.font_size = 10
 config.line_height = 1.2
+-- This font includes Powerline/Nerd Font glyphs, so zsh can use the full prompt.
+config.set_environment_variables = {
+	CONFIG_POWERLINE_GLYPHS = "1",
+}
 config.font_rules = {
 	{
 		intensity = "Bold",

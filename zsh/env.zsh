@@ -39,12 +39,20 @@ _fzf_opts+=" --color=border:7,pointer:6,hl:6,info:6,marker:2,fg+:-1:bold,bg+:-1,
 _fzf_opts+=" --prompt=' ' --pointer=' ' --marker=' ' --info=inline:'  '"
 export FZF_DEFAULT_OPTS=$_fzf_opts
 
+# opencode
+export PATH=/Users/cbrst/.opencode/bin:$PATH
+
 # zimfw
 export ZIM_HOME=${__zsh_user_data_dir}/zim
 export ZIM_CONFIG_FILE=${ZDOTDIR:-${HOME}/.config/zsh}/zimrc.zsh
 
 # Starship
-export STARSHIP_CONFIG=${XDG_CONFIG_HOME}/starship/starship.toml
+# Fall back unless the terminal config says its font has Powerline glyphs.
+if [[ ${CONFIG_ASCII_PROMPT:-} == 1 || ${CONFIG_POWERLINE_GLYPHS:-} != 1 ]]; then
+	export STARSHIP_CONFIG=${XDG_CONFIG_HOME}/starship/ascii.toml
+else
+	export STARSHIP_CONFIG=${XDG_CONFIG_HOME}/starship/starship.toml
+fi
 
 # Secrets
 # API keys and such. Obviously I won't put this into the repo, this needs to be created by hand:

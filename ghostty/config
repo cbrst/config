@@ -1,10 +1,15 @@
 # Split config
 config-file = ?keybindings
 
+# Shell integration
+shell-integration-features = ssh-env,ssh-terminfo
+
 # Font
 font-family = ""
 font-family = "LigSFMono Nerd Font"
 font-size = 12
+# This font includes Powerline/Nerd Font glyphs, so zsh can use the full prompt.
+env = CONFIG_POWERLINE_GLYPHS=1
 adjust-cursor-thickness = 2
 
 # adjustments for SFMono
@@ -13,8 +18,9 @@ adjust-cell-height = 20%
 adjust-font-baseline = 20%
 
 # Theme
-theme = light:catppuccin-latte,dark:catppuccin-mocha
+# theme = light:catppuccin-latte,dark:catppuccin-mocha
 config-file = ?theme
+# theme = catppuccin-mocha
 unfocused-split-opacity = 0.5
 
 # Mouse
