@@ -5,6 +5,16 @@ local M = {}
 local success, ts_theme = pcall(require, "myvi.colorscheme")
 M.colorscheme = success and ts_theme or "catppuccin"
 
+local function resolve_colorscheme(theme, variant)
+	-- Monokai Pro exposes each filter as its own colorscheme, so pick the
+	-- light or Ghostty-matching dark filter while keeping "monokai-pro" as the base theme.
+	if theme == "monokai-pro" then
+		return variant == "light" and "monokai-pro-light" or "monokai-pro-octagon"
+	end
+
+	return theme
+end
+
 M.set_colorscheme = function(theme, variant)
 	theme = theme or Myvi.colorscheme
 	Myvi.colorscheme = theme
@@ -15,7 +25,7 @@ M.set_colorscheme = function(theme, variant)
 
 	-- set colorscheme
 	-- local colorscheme = vim.g.colors_name:match("(.+)%-[^-]*$")
-	vim.cmd("colorscheme " .. theme)
+	vim.cmd("colorscheme " .. resolve_colorscheme(theme, variant))
 end
 
 return M
