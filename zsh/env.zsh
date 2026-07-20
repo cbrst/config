@@ -27,8 +27,9 @@ export PATH=${PATH}:${HOME}/.local/bin
 	done
 } __zsh_{config,user_data,cache}_dir XDG_{CONFIG,CACHE,DATA,STATE}_HOME XDG_{RUNTIME,PROJECTS}_DIR
 
-# Use bat as manpager
-(( $+commands[bat] )) && export MANPAGER="bat -l man -p'"
+# Use bat as pager
+(( $+commands[bat] )) && export PAGER="bat --color=always"
+(( $+commands[bat] )) && eval "$(batman --export-env)"
 
 # Editor
 (( $+commands[nvim] )) && export EDITOR=nvim
@@ -37,6 +38,7 @@ export PATH=${PATH}:${HOME}/.local/bin
 _fzf_opts="--height 50% --layout=reverse"
 _fzf_opts+=" --color=border:7,pointer:6,hl:6,info:6,marker:2,fg+:-1:bold,bg+:-1,hl+:6"
 _fzf_opts+=" --prompt=' ' --pointer=' ' --marker=' ' --info=inline:'  '"
+_fzf_opts+=" --bind='ctrl-o:execute(${EDITOR} {})+abort'"
 export FZF_DEFAULT_OPTS=$_fzf_opts
 
 # opencode

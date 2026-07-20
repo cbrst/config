@@ -38,6 +38,7 @@ macos_system_commands=(
 # avoiding packages that would duplicate macOS or Command Line Tools commands.
 brew_formulae=(
 	bat
+	bat-extras
 	cmake
 	eza
 	fastfetch
@@ -75,6 +76,7 @@ brew_casks=(
 arch_packages=(
 	bash
 	bat
+	bat-extras
 	base-devel
 	cmake
 	curl

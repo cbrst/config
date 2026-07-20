@@ -87,6 +87,14 @@ alias cydl="cyberdrop-dl --appdata-folder ~/Downloads/Cyberdrop-DL/"
   function batdiff() {
     git diff --name-only --relative --diff-filter=d | xargs bat --diff
   }
+
+  alias bathelp='bat --plain --language=help'
+  help() {
+      "$@" --help 2>&1 | bathelp
+  }
+
+  alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
+  alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 }
 
 #
@@ -111,25 +119,36 @@ zstyle ':completion:*:*:*:hosts' ignored-patterns \
 	'broadcasthost' 'localhost' 'github.com' 'kubernetes.docker.internal'
 
 # formats
-zstyle ':completion:*'                   format '
- %F{white}%B %d%b%f'
-zstyle ':completion:*:*:*:*:corrections' format ' %F{yellow}%F{black}%K{yellow}%d%F{yellow}%K{11} %F{black}errors: %e%k%F{11}%f'
-zstyle ':completion:*:*:*:*:description' format ' %F{green}%F{black}%K{green}%d%k%F{green}%f'
-zstyle ':completion:*:list-prompt'       format ' %F{blue}%F{black}%K{blue}%M matches%k%F{blue}%f'
-zstyle ':completion:*:messages'          format ' %F{purple}%F{black}%K{purple}%d%k%F{purple}%f'
-zstyle ':completion:*:warnings'          format ' %F{red}%F{black}%K{red}no matches found%k%F{red}%f'
+if [[ ${CONFIG_ASCII_PROMPT:-} != 1 && ${CONFIG_POWERLINE_GLYPHS:-} == 1 ]]; then
+  zstyle ':completion:*'                   format '
+   %F{white}%B %d%b%f'
+  zstyle ':completion:*:*:*:*:corrections' format ' %F{yellow}%F{black}%K{yellow}%d%F{yellow}%K{11} %F{black}errors: %e%k%F{11}%f'
+  zstyle ':completion:*:*:*:*:description' format ' %F{green}%F{black}%K{green}%d%k%F{green}%f'
+  zstyle ':completion:*:list-prompt'       format ' %F{blue}%F{black}%K{blue}%M matches%k%F{blue}%f'
+  zstyle ':completion:*:messages'          format ' %F{purple}%F{black}%K{purple}%d%k%F{purple}%f'
+  zstyle ':completion:*:warnings'          format ' %F{red}%F{black}%K{red}no matches found%k%F{red}%f'
+fi
 
-_fzf_comprun() {
-	local command=$1
-	shift
 
-	case "${command}" in
-		cd) fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
-		export|unset) fzf --preview "eval 'echo \$'{}" "$@" ;;
-		ssh) fzf --preview 'dig {}' "#@" ;;
-		cat|bat) fzf --preview 'bat -n --color=always {}' "$@" ;;
-		*) fzf --preview '${__zsh_config_dir}/utils/fzf-preview.sh {}' "$@" ;;
-	esac
+#
+# FZF
+#
+
+(( $+commands[fzf] )) && () {
+  _fzf_comprun() {
+    local command=$1
+    shift
+
+    case "${command}" in
+      cd) fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
+      export|unset) fzf --preview "eval 'echo \$'{}" "$@" ;;
+      ssh) fzf --preview 'dig {}' "$@" ;;
+      cat|bat) fzf --preview 'bat -n --color=always {}' "$@" ;;
+      *) fzf --preview '${__zsh_config_dir}/utils/fzf-preview.sh {}' "$@" ;;
+    esac
+  }
+
+  alias preview="fzf --preview '${PAGER} {}'"
 }
 
 #
