@@ -1,7 +1,6 @@
 colorscheme mytheme
 
 set smoothscroll true
-"set editorcmd /opt/homebrew/bin/neovide
 set editorcmd /Users/cbrst/.config/tridactyl/editor.sh
 set followpagepatterns.next ^(next|newer|weiter)\b|»|>>|more
 set followpagepatterns.prev ^(prev(ious)?|older|zurück)\b|«|<<

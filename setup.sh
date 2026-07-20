@@ -67,7 +67,6 @@ brew_formulae=(
 brew_casks=(
 	ghostty
 	karabiner-elements
-	neovide
 	wezterm
 )
 
@@ -92,7 +91,6 @@ arch_packages=(
 	libwebp
 	lua
 	neovim
-	neovide
 	nodejs
 	npm
 	pkgconf

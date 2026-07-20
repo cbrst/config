@@ -20,7 +20,6 @@
                                             "^com\\.mitchellh\\.ghostty$",
                                             "^com\\.jetbrains\\.PyCharm$",
                                             "^com\\.jetbrains\\.WebStorm$",
-                                            "^com\\.neovide\\.neovide",
                                             "^org\\.gnu\\.Emacs"
                                         ],
                                         "type": "frontmost_application_if"

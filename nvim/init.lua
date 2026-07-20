@@ -12,11 +12,6 @@ vim.g.have_nerd_font = true
 -- [[ Basic options ]]
 require("options")
 
--- [[ Neovide specific configuration ]]
-if vim.g.neovide then
-	require("neovide")
-end
-
 -- [[ Basic Keymaps ]]
 require("keymap")
 
