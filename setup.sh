@@ -47,7 +47,6 @@ brew_formulae=(
 	go
 	jq
 	lazygit
-	libwebp
 	lua
 	neovim
 	node
@@ -59,6 +58,7 @@ brew_formulae=(
 	thefuck
 	tmux
 	unzip
+	webp
 	yt-dlp
 	zoxide
 )
