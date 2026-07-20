@@ -23,25 +23,32 @@ include_optional=0
 platform=""
 manager=""
 
-# These Homebrew formulae are inferred from the repo's zsh, Neovim, terminal,
-# tmux, lazygit, fastfetch, Tridactyl, and media helper configs.
-brew_formulae=(
+# These macOS commands are expected from macOS or Apple's Command Line Tools.
+# They are checked, not installed through Homebrew, to avoid shadowing system
+# components with duplicate Brew-managed versions.
+macos_system_commands=(
 	bash
+	curl
+	git
+	make
+	zsh
+)
+
+# These Homebrew formulae are tools this repo expects from Homebrew on macOS,
+# avoiding packages that would duplicate macOS or Command Line Tools commands.
+brew_formulae=(
 	bat
 	cmake
-	curl
 	eza
 	fastfetch
 	fd
 	ffmpeg
 	fzf
-	git
 	go
 	jq
 	lazygit
 	libwebp
 	lua
-	make
 	neovim
 	node
 	pkg-config
@@ -54,7 +61,6 @@ brew_formulae=(
 	unzip
 	yt-dlp
 	zoxide
-	zsh
 )
 
 # Homebrew casks cover the GUI apps referenced by macOS-specific configs.
@@ -381,7 +387,9 @@ missing_brew_formulae() {
 		fi
 	done
 
-	printf '%s\n' "${missing[@]}"
+	if [[ ${#missing[@]} -gt 0 ]]; then
+		printf '%s\n' "${missing[@]}"
+	fi
 }
 
 missing_brew_casks() {
@@ -395,7 +403,35 @@ missing_brew_casks() {
 		fi
 	done
 
-	printf '%s\n' "${missing[@]}"
+	if [[ ${#missing[@]} -gt 0 ]]; then
+		printf '%s\n' "${missing[@]}"
+	fi
+}
+
+missing_commands() {
+	# System prerequisites are command checks instead of package checks.
+	local missing=()
+	local command
+
+	for command in "$@"; do
+		if ! command_exists "${command}"; then
+			missing+=("${command}")
+		fi
+	done
+
+	if [[ ${#missing[@]} -gt 0 ]]; then
+		printf '%s\n' "${missing[@]}"
+	fi
+}
+
+warn_missing_commands() {
+	# macOS/CLT tools should come from Apple, not duplicate Brew formulae.
+	local missing=("$@")
+
+	if [[ ${#missing[@]} -gt 0 ]]; then
+		warn "Missing system commands: ${missing[*]}"
+		warn "On macOS, install or repair Apple's Command Line Tools with: xcode-select --install"
+	fi
 }
 
 missing_pacman_packages() {
@@ -409,13 +445,16 @@ missing_pacman_packages() {
 		fi
 	done
 
-	printf '%s\n' "${missing[@]}"
+	if [[ ${#missing[@]} -gt 0 ]]; then
+		printf '%s\n' "${missing[@]}"
+	fi
 }
 
 install_macos() {
 	# Homebrew formulae cover CLI tools, compilers, runtimes, and TUI apps.
 	local formulae=("${brew_formulae[@]}")
 	local casks=("${brew_casks[@]}")
+	local system_commands=("${macos_system_commands[@]}")
 
 	if [[ ${include_optional} -eq 1 ]]; then
 		formulae+=("${brew_optional_formulae[@]}")
@@ -423,11 +462,30 @@ install_macos() {
 
 	if [[ ${check_only} -eq 1 ]]; then
 		# Command substitution is used instead of mapfile for macOS Bash 3.x.
+		system_commands=($(missing_commands "${system_commands[@]}"))
 		formulae=($(missing_brew_formulae "${formulae[@]}"))
 		casks=($(missing_brew_casks "${casks[@]}"))
-		print_packages "Missing Homebrew formulae" "${formulae[@]}"
-		print_packages "Missing Homebrew casks" "${casks[@]}"
+		if [[ ${#system_commands[@]} -gt 0 ]]; then
+			print_packages "Missing macOS/CLT commands" "${system_commands[@]}"
+		else
+			print_packages "Missing macOS/CLT commands"
+		fi
+		if [[ ${#formulae[@]} -gt 0 ]]; then
+			print_packages "Missing Homebrew formulae" "${formulae[@]}"
+		else
+			print_packages "Missing Homebrew formulae"
+		fi
+		if [[ ${#casks[@]} -gt 0 ]]; then
+			print_packages "Missing Homebrew casks" "${casks[@]}"
+		else
+			print_packages "Missing Homebrew casks"
+		fi
 		return
+	fi
+
+	system_commands=($(missing_commands "${system_commands[@]}"))
+	if [[ ${#system_commands[@]} -gt 0 ]]; then
+		warn_missing_commands "${system_commands[@]}"
 	fi
 
 	info "Updating Homebrew"

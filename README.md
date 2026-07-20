@@ -24,5 +24,6 @@ Config-only commands are available too:
 ```
 
 Dependency installation currently targets macOS through Homebrew and Arch-based
-Linux through pacman, with optional AUR helper support for packages that are not
-in the official repositories.
+Linux through pacman. On macOS, system or Command Line Tools commands such as
+`bash`, `curl`, `git`, `make`, and `zsh` are checked but not installed through
+Homebrew, so Brew does not shadow Apple-managed components.
