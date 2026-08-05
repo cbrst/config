@@ -3,6 +3,9 @@
 
 karabiner/automatic_backups
 
+opencode/node_modules
+opencode/opencode.json
+
 thefuck/__pycache__
 
 tridactyl/grouprules

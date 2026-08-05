@@ -1,0 +1,71 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "enabled_providers": [
+    "headroom",
+    "ollama"
+  ],
+  "mcp": {
+    "headroom": {
+      "type": "local",
+      "command": [
+        "/Users/cbrst/.local/bin/headroom",
+        "mcp",
+        "serve"
+      ],
+      "enabled": true
+    }
+  },
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "whitelist": [
+        "qwen3:4b"
+      ],
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen3:4b": {
+          "name": "Qwen3 4B \u2014 local helper"
+        }
+      }
+    },
+    "headroom": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Headroom Proxy",
+      "whitelist": [
+        "gpt-5.6-terra",
+        "gpt-5.6-luna"
+      ],
+      "options": {
+        "baseURL": "http://127.0.0.1:8787/v1"
+      },
+      "models": {
+        "gpt-5.6-terra": {
+          "name": "GPT-5.6 Terra"
+        },
+        "gpt-5.6-luna": {
+          "name": "GPT-5.6 Luna"
+        }
+      }
+    }
+  },
+  "agent": {
+    "build": {
+      "model": "headroom/gpt-5.6-terra"
+    },
+    "plan": {
+      "model": "headroom/gpt-5.6-luna"
+    },
+    "local-quick": {
+      "mode": "primary",
+      "description": "Fast local explanations, summaries, and small code suggestions",
+      "model": "ollama/qwen3:4b",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    }
+  }
+}
