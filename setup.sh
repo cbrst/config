@@ -51,6 +51,7 @@ brew_formulae=(
 	lua
 	neovim
 	node
+	opencode
 	pkg-config
 	python
 	ripgrep
@@ -59,6 +60,7 @@ brew_formulae=(
 	thefuck
 	tmux
 	unzip
+	uv
 	webp
 	yt-dlp
 	zoxide
@@ -95,6 +97,7 @@ arch_packages=(
 	neovim
 	nodejs
 	npm
+	opencode
 	pkgconf
 	python
 	ripgrep
@@ -103,6 +106,7 @@ arch_packages=(
 	thefuck
 	tmux
 	unzip
+	uv
 	wezterm
 	yt-dlp
 	zoxide
@@ -424,6 +428,39 @@ missing_commands() {
 	fi
 }
 
+headroom_exists() {
+	# uv installs tools in ~/.local/bin even when a non-interactive shell lacks it in PATH.
+	command_exists headroom || [[ -x "${UV_TOOL_BIN_DIR:-${HOME}/.local/bin}/headroom" ]]
+}
+
+check_headroom() {
+	# Headroom is a uv-managed tool rather than an OS-package-manager package.
+	if headroom_exists; then
+		print_packages "Missing Headroom CLI"
+	else
+		print_packages "Missing Headroom CLI" "headroom-ai[all] (uv tool)"
+	fi
+}
+
+install_headroom() {
+	# Keep Headroom isolated from the system Python and use its supported interpreter version.
+	info "Installing Headroom CLI"
+	run uv tool install --upgrade --python 3.13 "headroom-ai[all]"
+}
+
+install_headroom_service() {
+	# Keep OpenCode configuration owned by this repo rather than Headroom's installer.
+	local headroom_bin
+	if command_exists headroom; then
+		headroom_bin="$(command -v headroom)"
+	else
+		headroom_bin="${UV_TOOL_BIN_DIR:-${HOME}/.local/bin}/headroom"
+	fi
+
+	info "Installing persistent Headroom proxy"
+	run "${headroom_bin}" install apply --preset persistent-service --providers manual
+}
+
 warn_missing_commands() {
 	# macOS/CLT tools should come from Apple, not duplicate Brew formulae.
 	local missing=("$@")
@@ -573,6 +610,13 @@ install_dependencies() {
 			install_arch
 			;;
 	esac
+
+	if [[ ${check_only} -eq 1 ]]; then
+		check_headroom
+	else
+		install_headroom
+		install_headroom_service
+	fi
 }
 
 link_configs() {
