@@ -41,8 +41,8 @@ _fzf_opts+=" --prompt=' ' --pointer=' ' --marker=' ' --info=inline:' �
 _fzf_opts+=" --bind='ctrl-o:execute(${EDITOR} {})+abort'"
 export FZF_DEFAULT_OPTS=$_fzf_opts
 
-# opencode
-export PATH=/Users/cbrst/.opencode/bin:$PATH
+# Keep the standalone installer location as a portable fallback behind managed packages.
+export PATH=${PATH}:${HOME}/.opencode/bin
 
 # zimfw
 export ZIM_HOME=${__zsh_user_data_dir}/zim

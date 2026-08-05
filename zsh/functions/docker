@@ -1,0 +1,40 @@
+# Ask before Docker Compose removes volumes, because this is the spicy flag.
+local docker_arg
+local docker_saw_compose=0
+local docker_saw_down=0
+local docker_removes_volumes=0
+
+# Detect `docker compose ... down ... -v/--volumes`, including compose options before `down`.
+for docker_arg in "$@"; do
+	if (( ! docker_saw_compose )); then
+		[[ ${docker_arg} == compose ]] && docker_saw_compose=1
+		continue
+	fi
+
+	if (( ! docker_saw_down )); then
+		[[ ${docker_arg} == down ]] && docker_saw_down=1
+		continue
+	fi
+
+	# Stop parsing command options once an explicit option terminator appears.
+	[[ ${docker_arg} == -- ]] && break
+
+	if [[ ${docker_arg} == -v || ${docker_arg} == --volumes ]]; then
+		docker_removes_volumes=1
+		break
+	fi
+done
+
+if (( docker_saw_compose && docker_saw_down && docker_removes_volumes )); then
+	local docker_reply
+
+	# Default to aborting unless the confirmation is explicit.
+	read -r "docker_reply?docker compose down -v will nuke your volumes. Continue? [y/N] "
+	if [[ ! ${docker_reply} == [yY] && ! ${docker_reply} == [yY][eE][sS] ]]; then
+		print -u2 "Aborted docker compose down -v."
+		return 130
+	fi
+fi
+
+# Hand every allowed invocation to the real Docker binary.
+command docker "$@"
