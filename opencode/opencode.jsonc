@@ -1,7 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "enabled_providers": [
-    "headroom",
+    // OpenCode keeps the OAuth credential under this native provider ID.
+    "openai",
     "ollama"
   ],
   "mcp": {
@@ -16,6 +17,12 @@
     }
   },
   "provider": {
+    "openai": {
+      // Send native OpenAI requests through Headroom while preserving OAuth auth.
+      "options": {
+        "baseURL": "http://127.0.0.1:8787/v1"
+      }
+    },
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Ollama (local)",
@@ -30,33 +37,14 @@
           "name": "Qwen3 4B \u2014 local helper"
         }
       }
-    },
-    "headroom": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Headroom Proxy",
-      "whitelist": [
-        "gpt-5.6-terra",
-        "gpt-5.6-luna"
-      ],
-      "options": {
-        "baseURL": "http://127.0.0.1:8787/v1"
-      },
-      "models": {
-        "gpt-5.6-terra": {
-          "name": "GPT-5.6 Terra"
-        },
-        "gpt-5.6-luna": {
-          "name": "GPT-5.6 Luna"
-        }
-      }
     }
   },
   "agent": {
     "build": {
-      "model": "headroom/gpt-5.6-terra"
+      "model": "openai/gpt-5.6-terra"
     },
     "plan": {
-      "model": "headroom/gpt-5.6-luna"
+      "model": "openai/gpt-5.6-luna"
     },
     "local-quick": {
       "mode": "primary",
