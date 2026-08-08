@@ -41,6 +41,9 @@ On the NixOS machine, apply it with:
 home-manager switch --flake /etc/nixos#cbrst
 ```
 
+For a local shared-configuration test or a full publish, lockfile update, and
+Home Manager switch, use [`dotfiles-update`](docs/dotfiles-update.md).
+
 ## Legacy Setup
 
 `setup.sh` remains for dependencies and configuration modules that are not yet
