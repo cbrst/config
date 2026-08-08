@@ -179,10 +179,10 @@ in
     profiles.default = {
       extensions = vscodeExtensions;
       userSettings = {
-        "workbench.colorTheme" = "Monokai Pro";
-        "workbench.iconTheme" = "material-icon-theme";
+        "workbench.colorTheme" = "Monokai Pro (Filter Spectrum)";
         "editor.fontFamily" = "CommitMono";
         "workbench.experimental.modernUI" = true;
+        "workbench.iconTheme" = "Monokai Pro (Filter Spectrum) Icons";
       };
     };
   };
