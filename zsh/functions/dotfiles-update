@@ -1,29 +1,31 @@
-# Publish this dotfiles checkout or test it locally, then apply the profile.
+# Publish this dotfiles checkout, refresh its pinned input, or test it locally.
 dotfiles-update() {
 	local dotfiles_dir="${DOTFILES_DIR:-${HOME}/Projects/config}"
 	local nixos_flake="${NIXOS_FLAKE:-/etc/nixos}"
 	local home_manager_profile="${HOME_MANAGER_PROFILE:-cbrst}"
 	local local_only=false
+	local no_commit=false
 	local commit_message
 
-	if [[ "$1" == "--local" ]]; then
-		local_only=true
-		shift
-	fi
+	case "$1" in
+		--local)
+			local_only=true
+			shift
+			;;
+		--no-commit)
+			no_commit=true
+			shift
+			;;
+	esac
 
 	commit_message="$*"
-	if [[ "${local_only}" == false && -z "${commit_message}" ]]; then
-		print -u2 "Usage: dotfiles-update [--local | <commit message>]"
+	if [[ "${local_only}" == false && "${no_commit}" == false && -z "${commit_message}" ]]; then
+		print -u2 "Usage: dotfiles-update [--local | --no-commit | <commit message>]"
 		return 2
 	fi
-	if [[ "${local_only}" == true && -n "${commit_message}" ]]; then
-		print -u2 "Usage: dotfiles-update --local"
+	if [[ ( "${local_only}" == true || "${no_commit}" == true ) && -n "${commit_message}" ]]; then
+		print -u2 "Usage: dotfiles-update [--local | --no-commit]"
 		return 2
-	fi
-
-	if [[ ! -d "${dotfiles_dir}" ]]; then
-		print -u2 "Dotfiles checkout not found: ${dotfiles_dir}"
-		return 1
 	fi
 
 	if [[ ! -d "${nixos_flake}" ]]; then
@@ -33,9 +35,24 @@ dotfiles-update() {
 
 	# Override the pinned input so uncommitted changes can be evaluated locally.
 	if [[ "${local_only}" == true ]]; then
+		print -P "%F{cyan}==>%f %B[1/1]%b Switch Home Manager with local dotfiles"
 		command home-manager switch --flake "${nixos_flake}#${home_manager_profile}" \
 			--override-input dotfiles "path:${dotfiles_dir}"
 		return
+	fi
+
+	# Refresh the Git input and apply it without changing the dotfiles checkout.
+	if [[ "${no_commit}" == true ]]; then
+		print -P "%F{cyan}==>%f %B[1/2]%b Update the dotfiles flake input from Git"
+		command nix flake update dotfiles --flake "${nixos_flake}" || return
+		print -P "%F{cyan}==>%f %B[2/2]%b Switch Home Manager"
+		command home-manager switch --flake "${nixos_flake}#${home_manager_profile}"
+		return
+	fi
+
+	if [[ ! -d "${dotfiles_dir}" ]]; then
+		print -u2 "Dotfiles checkout not found: ${dotfiles_dir}"
+		return 1
 	fi
 
 	if [[ ! -d "${dotfiles_dir}/.git" ]]; then
@@ -52,9 +69,14 @@ dotfiles-update() {
 	fi
 
 	# Stage only this repository, then update the lockfile after its commit is public.
+	print -P "%F{cyan}==>%f %B[1/5]%b Stage dotfiles changes"
 	command git -C "${dotfiles_dir}" add --all || return
+	print -P "%F{cyan}==>%f %B[2/5]%b Commit dotfiles changes"
 	command git -C "${dotfiles_dir}" commit -m "${commit_message}" || return
+	print -P "%F{cyan}==>%f %B[3/5]%b Push the dotfiles commit"
 	command git -C "${dotfiles_dir}" push || return
+	print -P "%F{cyan}==>%f %B[4/5]%b Update the dotfiles flake input from Git"
 	command nix flake update dotfiles --flake "${nixos_flake}" || return
+	print -P "%F{cyan}==>%f %B[5/5]%b Switch Home Manager"
 	command home-manager switch --flake "${nixos_flake}#${home_manager_profile}"
 }
