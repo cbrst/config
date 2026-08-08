@@ -3,7 +3,7 @@
 local main_mod = "SUPER"
 
 -- Define session-wide defaults once; launch-default consumes these values for keybindings.
-hl.env("TERMINAL", "Ghostty")
+hl.env("TERMINAL", "ghostty")
 hl.env("BROWSER", "firefox")
 hl.env("FILE_MANAGER", "nemo")
 hl.env("EDITOR", "nvim")
