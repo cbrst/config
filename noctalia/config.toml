@@ -1,0 +1,102 @@
+# Noctalia owns the shell surfaces so Hyprland can focus solely on window management.
+
+[shell]
+# Match Hyprland's rounded visual language without making panels oversized.
+corner_radius_scale = 1.25
+font_family = "sans-serif"
+time_format = "{:%H:%M}"
+date_format = "%A, %x"
+telemetry_enabled = false
+clipboard_enabled = true
+clipboard_keep_from_closed_apps = true
+
+[shell.animation]
+# Keep shell transitions lively but noticeably quicker than the stock pace.
+enabled = true
+speed = 1.45
+
+[shell.shadow]
+# Shadows add depth to floating shell surfaces without becoming visually heavy.
+direction = "down"
+alpha = 0.48
+
+[shell.panel]
+# Glass panels, borders, and shadows provide eye-candy consistent with window decoration.
+transparency_mode = "glass"
+borders = true
+shadow = true
+launcher_placement = "floating"
+clipboard_placement = "floating"
+control_center_placement = "floating"
+launcher_position = "center"
+clipboard_position = "center"
+
+[shell.launcher]
+# Keep the launcher practical as the primary application entry point.
+categories = true
+show_icons = true
+compact = false
+sort_by_usage = true
+
+[theme]
+# Kanagawa aligns with the terminal themes already maintained in this repository.
+mode = "dark"
+source = "builtin"
+builtin = "Kanagawa"
+pure_black_dark = false
+
+[wallpaper]
+# Noctalia manages wallpaper changes, avoiding a separate wallpaper daemon.
+enabled = true
+fill_mode = "crop"
+directory = "~/Pictures/Wallpapers"
+transition = ["fade", "zoom"]
+transition_duration = 350
+transition_on_startup = false
+
+[notification]
+# Noctalia is the sole notification daemon for this session.
+enable_daemon = true
+background_opacity = 0.94
+offset_x = 20
+offset_y = 12
+
+[osd]
+# Display compositor-driven audio changes in Noctalia's visual language.
+position = "top_right"
+background_opacity = 0.94
+offset_x = 20
+offset_y = 12
+
+[lockscreen]
+# Let Noctalia lock the session instead of starting a competing locker.
+enabled = true
+blurred_desktop = true
+blur_intensity = 0.55
+tint_intensity = 0.25
+
+[idle.behavior.lock]
+# Lock after ten minutes while leaving display power policy to the user or system service.
+timeout = 600
+action = "lock"
+enabled = true
+
+[bar.main]
+# A floating, rounded bar gives the desktop visual structure without wasting vertical space.
+position = "top"
+thickness = 34
+background_opacity = 0.9
+radius = 14
+margin_ends = 180
+margin_edge = 10
+padding = 14
+widget_spacing = 6
+shadow = true
+reserve_space = true
+start = ["launcher", "workspaces"]
+center = ["clock"]
+end = ["media", "tray", "notifications", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "control-center", "session"]
+
+[dock]
+# Hyprland's quick launcher binding makes a persistent dock unnecessary.
+enabled = false

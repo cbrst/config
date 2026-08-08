@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+
+# Launch a session default without word-splitting the configured command string.
+set -eu
+
+case "${1:-}" in
+    terminal)
+        command=${TERMINAL:-Ghostty}
+        ;;
+    browser)
+        command=${BROWSER:-firefox}
+        ;;
+    file-manager)
+        command=${FILE_MANAGER:-thunar}
+        ;;
+    *)
+        printf '%s\n' "Usage: ${0##*/} {terminal|browser|file-manager}" >&2
+        exit 64
+        ;;
+esac
+
+# sh -c intentionally supports defaults with fixed arguments, such as "firefox --private-window".
+exec sh -c "exec ${command}"

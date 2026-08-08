@@ -23,6 +23,22 @@ Config-only commands are available too:
 ./setup.sh pull ghostty
 ```
 
+## Hyprland
+
+Link the `hypr` and `noctalia` modules to use a Hyprland session with Noctalia
+as its shell:
+
+```sh
+./setup.sh link hypr noctalia
+```
+
+`hypr/hyprland.lua` is a native Hyprland Lua configuration. It sets Ghostty as
+`TERMINAL` and also defines `BROWSER`, `FILE_MANAGER`, `EDITOR`, and `VISUAL`.
+The Super+Return, Super+B, and Super+E bindings consume those values.
+Noctalia provides the bar, launcher (Super+Space), control center (Super+C),
+notifications, wallpaper, lock screen, and OSDs. Add machine-specific monitor
+rules with `hl.monitor(...)` in `hypr/hyprland.lua`.
+
 Dependency installation currently targets macOS through Homebrew and Arch-based
 Linux through pacman. On macOS, system or Command Line Tools commands such as
 `bash`, `curl`, `git`, `make`, and `zsh` are checked but not installed through
