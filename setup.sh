@@ -23,6 +23,23 @@ include_optional=0
 platform=""
 manager=""
 
+# These modules are linked declaratively by home-manager, not by this utility.
+home_manager_modules=(
+	fastfetch
+	ghostty
+	home-manager
+	hypr
+	lazygit
+	noctalia
+	nvim
+	opencode
+	starship
+	tmux
+	wezterm
+	yt-dlp
+	zsh
+)
+
 # These macOS commands are expected from macOS or Apple's Command Line Tools.
 # They are checked, not installed through Homebrew, to avoid shadowing system
 # components with duplicate Brew-managed versions.
@@ -188,12 +205,30 @@ command_exists() {
 config_names() {
 	# Shell globbing gives us a BSD/macOS and Linux friendly top-level dir list.
 	local path
+	local name
 
 	for path in "${repo_root}"/*; do
 		if [[ -d "${path}" ]]; then
-			basename "${path}"
+			name="$(basename "${path}")"
+			if ! is_home_manager_module "${name}"; then
+				printf '%s\n' "${name}"
+			fi
 		fi
 	done
+}
+
+is_home_manager_module() {
+	# Centralize ownership so explicit and default link operations agree.
+	local name=$1
+	local module
+
+	for module in "${home_manager_modules[@]}"; do
+		if [[ "${name}" == "${module}" ]]; then
+			return 0
+		fi
+	done
+
+	return 1
 }
 
 target_configs() {
@@ -243,6 +278,11 @@ link_config() {
 	local source="${repo_root}/${name}"
 	local target="${confdir}/${name}"
 
+	if is_home_manager_module "${name}"; then
+		warn "${name} is managed by home-manager; use home-manager switch instead"
+		return 1
+	fi
+
 	if [[ ! -d "${source}" ]]; then
 		warn "unknown config: ${name}"
 		return 1
@@ -274,6 +314,11 @@ pull_config() {
 	local source="${confdir}/${name}"
 	local target="${repo_root}/${name}"
 
+	if is_home_manager_module "${name}"; then
+		warn "${name} is managed by home-manager and cannot be pulled"
+		return 1
+	fi
+
 	info "Pulling ${name}"
 
 	if [[ ! -e "${source}" && ! -L "${source}" ]]; then
@@ -294,6 +339,11 @@ unlink_config() {
 	# Remove a config link from XDG_CONFIG_HOME without touching repo files.
 	local name=$1
 	local target="${confdir}/${name}"
+
+	if is_home_manager_module "${name}"; then
+		warn "${name} is managed by home-manager; use home-manager to remove it"
+		return 1
+	fi
 
 	info "Unlinking ${name}"
 
@@ -426,39 +476,6 @@ missing_commands() {
 	if [[ ${#missing[@]} -gt 0 ]]; then
 		printf '%s\n' "${missing[@]}"
 	fi
-}
-
-headroom_exists() {
-	# uv installs tools in ~/.local/bin even when a non-interactive shell lacks it in PATH.
-	command_exists headroom || [[ -x "${UV_TOOL_BIN_DIR:-${HOME}/.local/bin}/headroom" ]]
-}
-
-check_headroom() {
-	# Headroom is a uv-managed tool rather than an OS-package-manager package.
-	if headroom_exists; then
-		print_packages "Missing Headroom CLI"
-	else
-		print_packages "Missing Headroom CLI" "headroom-ai[all] (uv tool)"
-	fi
-}
-
-install_headroom() {
-	# Keep Headroom isolated from the system Python and use its supported interpreter version.
-	info "Installing Headroom CLI"
-	run uv tool install --upgrade --python 3.13 "headroom-ai[all]"
-}
-
-install_headroom_service() {
-	# Keep OpenCode configuration owned by this repo rather than Headroom's installer.
-	local headroom_bin
-	if command_exists headroom; then
-		headroom_bin="$(command -v headroom)"
-	else
-		headroom_bin="${UV_TOOL_BIN_DIR:-${HOME}/.local/bin}/headroom"
-	fi
-
-	info "Installing persistent Headroom proxy"
-	run "${headroom_bin}" install apply --preset persistent-service --providers manual
 }
 
 warn_missing_commands() {
@@ -611,12 +628,6 @@ install_dependencies() {
 			;;
 	esac
 
-	if [[ ${check_only} -eq 1 ]]; then
-		check_headroom
-	else
-		install_headroom
-		install_headroom_service
-	fi
 }
 
 link_configs() {

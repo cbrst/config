@@ -1,11 +1,54 @@
 # config
 
-## Set up
+## Home Manager
 
-Use the setup utility as the single entry point on a new machine:
+`home-manager/default.nix` is the shared Home Manager module for NixOS, other
+Linux distributions, and macOS. This repository intentionally remains a
+non-flake input; each machine flake supplies its own pinned inputs and imports
+the module:
+
+```nix
+modules = [
+  "${inputs.dotfiles}/home-manager/default.nix"
+  ./hosts/home.nix
+];
+```
+
+See `home-manager/example-flake.nix` for a complete standalone consumer.
+The consuming flake must pass `inputs` and a `machine` attrset through
+`extraSpecialArgs`. `machine.user` is required; these fields are optional:
+
+| Field | Default | Purpose |
+| --- | --- | --- |
+| `hostName` | none | Machine identity and logging. |
+| `homeDirectory` | `/home/<user>` on Linux, `/Users/<user>` on macOS | Home path. |
+| `terminal` | `ghostty` | `TERMINAL` value. |
+| `sshAuthSock` | `$HOME/.1password/agent.sock` | SSH agent socket. |
+| `ghostty` | `""` | Machine-local Ghostty text written to `ghostty/machine`. |
+| `noctalia` | `false` | Enables Noctalia on Linux. |
+| `stateVersion` | `26.05` | Home Manager state version. |
+
+Simple values come from `machine`; machine flakes can add a Home Manager module
+after the shared module for deep overrides. Shared settings use `mkDefault`.
+Linux-only features are conditional, so macOS consumers can evaluate the
+module; macOS-specific services such as `launchd.agents` belong in a machine
+override module. Keep secrets, Ghostty themes, and Ghostty machine overrides in
+the consuming machine repository.
+
+On the NixOS machine, apply it with:
 
 ```sh
-./setup.sh all
+home-manager switch --flake /etc/nixos#cbrst
+```
+
+## Legacy Setup
+
+`setup.sh` remains for dependencies and configuration modules that are not yet
+Home Manager-owned. The Home Manager-owned modules are no longer linked,
+pulled, or provisioned with a Headroom service by it.
+
+```sh
+./setup.sh install
 ```
 
 Useful non-mutating checks:
@@ -18,18 +61,17 @@ Useful non-mutating checks:
 Config-only commands are available too:
 
 ```sh
-./setup.sh link nvim zsh tmux opencode
+./setup.sh link tridactyl thefuck userscripts
 ./setup.sh unlink
-./setup.sh pull ghostty
 ```
 
 ## Hyprland
 
-Link the `hypr` and `noctalia` modules to use a Hyprland session with Noctalia
-as its shell:
+Home Manager deploys the `hypr` and `noctalia` modules. Set `machine.noctalia =
+true` in the consuming machine flake to enable Noctalia as the Hyprland shell:
 
 ```sh
-./setup.sh link hypr noctalia
+home-manager switch --flake /etc/nixos#cbrst
 ```
 
 `hypr/hyprland.lua` is a native Hyprland Lua configuration. It sets Ghostty as
@@ -46,9 +88,12 @@ Homebrew, so Brew does not shadow Apple-managed components.
 
 ## AI coding
 
-`setup.sh install` installs OpenCode, `uv`, Headroom, and a persistent
-user-level Headroom proxy. In zsh, `opencode` starts that proxy if necessary,
-waits for it to become healthy, then launches the unmodified OpenCode binary.
+The Linux Home Manager module installs the Headroom CLI with `uv` and provisions
+its persistent user service. OpenCode itself is installed independently as a
+Nix package, so it remains available if Headroom is unavailable. macOS machines
+can add an equivalent `launchd.agents` definition in their machine-specific
+override. In zsh, `opencode` starts that proxy if necessary, waits for it to
+become healthy, and falls back to direct OpenCode if the proxy cannot run.
 
 OpenCode routing and its Headroom MCP server are defined only in the checked-in
 `opencode/opencode.jsonc`; the launcher never lets Headroom rewrite OpenCode
@@ -66,3 +111,6 @@ Do not run `headroom wrap opencode` or target OpenCode with `headroom install`:
 both flows can rewrite OpenCode configuration. The `opencode` module contains
 the portable provider and MCP settings; local credentials and plugin
 dependencies are intentionally ignored.
+
+See [`docs/opencode.md`](docs/opencode.md) for the OpenCode and Headroom
+architecture, operation, recovery, and maintenance commands.

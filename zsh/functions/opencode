@@ -1,8 +1,9 @@
 # Start the persistent Headroom proxy before launching the unmodified OpenCode CLI.
 opencode() {
 	if (( ! $+commands[headroom] )); then
-		print -u2 "opencode requires Headroom; run ./setup.sh install first."
-		return 127
+		print -u2 "Headroom is unavailable; starting OpenCode without its proxy."
+		command opencode "$@"
+		return
 	fi
 
 	local proxy_url="http://127.0.0.1:8787/readyz"
@@ -13,8 +14,9 @@ opencode() {
 
 	# The persistent service avoids Headroom's config-mutating `wrap opencode` flow.
 	if ! command headroom install start >/dev/null; then
-		print -u2 "Headroom's persistent proxy is unavailable; run ./setup.sh install first."
-		return 1
+		print -u2 "Headroom's persistent proxy could not start; starting OpenCode without its proxy."
+		command opencode "$@"
+		return
 	fi
 
 	local attempt
@@ -25,6 +27,6 @@ opencode() {
 		sleep 0.25
 	done
 
-	print -u2 "Headroom's proxy did not become healthy at ${proxy_url}."
-	return 1
+	print -u2 "Headroom's proxy did not become healthy at ${proxy_url}; starting OpenCode without its proxy."
+	command opencode "$@"
 }

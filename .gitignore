@@ -12,6 +12,7 @@ tridactyl/grouprules
 tridactyl/grouprules.js
 
 zsh/.*
+!zsh/.zprofile
 zsh/secrets.zsh
 
 # Machine specific overrides

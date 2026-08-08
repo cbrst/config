@@ -29,7 +29,8 @@ export PATH=${PATH}:${HOME}/.local/bin
 
 # Use bat as pager
 (( $+commands[bat] )) && export PAGER="bat --color=always"
-(( $+commands[bat] )) && eval "$(batman --export-env)"
+# batman is optional, unlike bat itself, so do not abort shell setup when absent.
+(( $+commands[bat] && $+commands[batman] )) && eval "$(batman --export-env)"
 
 # Editor
 (( $+commands[nvim] )) && export EDITOR=nvim
