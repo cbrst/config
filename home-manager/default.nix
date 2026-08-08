@@ -174,14 +174,15 @@ in
   programs.vscode = {
     # VSCode and its extensions are shared across every Home Manager consumer.
     enable = true;
-    package = pkgs.vscode;
+    # Consumers can select a newer package set for VSCode without changing their base system.
+    package = lib.mkDefault pkgs.vscode;
     profiles.default = {
       extensions = vscodeExtensions;
       userSettings = {
         "workbench.colorTheme" = "Monokai Pro";
         "workbench.iconTheme" = "material-icon-theme";
         "editor.fontFamily" = "CommitMono";
-        "workbench.experimental.modernUI.enabled" = true;
+        "workbench.experimental.modernUI" = true;
       };
     };
   };

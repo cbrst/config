@@ -56,6 +56,47 @@ home-manager switch --flake /etc/nixos#cbrst \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 
+## Isolated VSCode Upgrades
+
+The NixOS flake can keep its base `nixpkgs` input on a stable release while
+using a separate unstable input solely for VSCode. Declare the extra input in
+the consuming flake, then import it only in the machine-specific Home Manager
+override:
+
+```nix
+# Keep system packages on the stable NixOS release.
+nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+# Use this input only for applications that need newer releases.
+nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+```
+
+```nix
+# hosts/home.nix
+{ inputs, lib, pkgs, ... }:
+let
+  # This package set is isolated from the system and Home Manager base package set.
+  unstablePkgs = import inputs.nixpkgs-unstable {
+    system = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+  };
+in
+{
+  # Override the shared module's stable package selection.
+  programs.vscode.package = lib.mkForce unstablePkgs.vscode;
+}
+```
+
+Update and apply only that input when a newer VSCode release is needed:
+
+```sh
+# Refresh the isolated source, then install the resulting Home Manager profile.
+nix flake update nixpkgs-unstable --flake /etc/nixos
+home-manager switch --flake /etc/nixos#cbrst
+```
+
+This does not update the NixOS system package set. The unstable VSCode closure
+is installed alongside the stable Home Manager packages.
+
 ## Change Settings
 
 Add settings to `programs.vscode.profiles.default.userSettings` in
