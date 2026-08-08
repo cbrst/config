@@ -82,7 +82,9 @@ home-manager switch --flake /etc/nixos#cbrst
 The Super+Return, Super+B, and Super+E bindings consume those values.
 Noctalia provides the bar, launcher (Super+Space), control center (Super+C),
 notifications, wallpaper, lock screen, and OSDs. Add machine-specific monitor
-rules with `hl.monitor(...)` in `hypr/hyprland.lua`.
+rules with `hl.monitor(...)` in `hypr/hyprland.lua`. The shared Linux profile
+uses the Bibata Modern Ice cursor; see [`docs/hyprland.md`](docs/hyprland.md)
+for cursor maintenance and session reload steps.
 
 Dependency installation currently targets macOS through Homebrew and Arch-based
 Linux through pacman. On macOS, system or Command Line Tools commands such as

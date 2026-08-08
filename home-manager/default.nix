@@ -210,6 +210,12 @@ in
 
   gtk = lib.mkIf isLinux {
     enable = lib.mkDefault true;
+    # Keep GTK applications aligned with the session-wide Bibata pointer theme.
+    cursorTheme = {
+      name = lib.mkDefault "Bibata-Modern-Ice";
+      package = lib.mkDefault pkgs.bibata-cursors;
+      size = lib.mkDefault 24;
+    };
     theme = {
       name = lib.mkDefault "Adwaita-dark";
       package = lib.mkDefault pkgs.gnome-themes-extra;
@@ -222,5 +228,14 @@ in
       name = lib.mkDefault "Noto Sans";
       size = lib.mkDefault 11;
     };
+  };
+
+  # Install Bibata and use its familiar blue arrow in XWayland and GTK applications.
+  home.pointerCursor = lib.mkIf isLinux {
+    package = pkgs.bibata-cursors;
+    name = "Bibata-Modern-Ice";
+    size = 24;
+    gtk.enable = true;
+    x11.enable = true;
   };
 }

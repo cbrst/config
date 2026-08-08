@@ -19,6 +19,9 @@ hl.env("QT_QPA_PLATFORMTHEME", "gtk3")
 hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
+-- Use Bibata's familiar blue desktop cursor in Hyprland and inherited clients.
+hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
+hl.env("XCURSOR_SIZE", "24")
 
 -- Use the display's preferred mode until a user adds a machine-specific monitor rule.
 hl.monitor({
