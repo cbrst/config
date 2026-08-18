@@ -1,19 +1,7 @@
 [bar.main]
 background_opacity = 0.90000000000000002
 center = [ "clock" ]
-end = [
-    "media",
-    "tray",
-    "notifications",
-    "clipboard",
-    "network",
-    "bluetooth",
-    "volume",
-    "brightness",
-    "battery",
-    "control-center",
-    "session"
-]
+end = [ "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
 margin_edge = 0
 margin_ends = 180
 padding = 14
@@ -21,9 +9,9 @@ position = "top"
 radius = 8
 reserve_space = true
 shadow = true
-start = [ "launcher", "workspaces" ]
+start = [ "workspaces" ]
 thickness = 34
-widget_spacing = 6
+widget_spacing = 18
 
 [dock]
 enabled = true
@@ -96,7 +84,7 @@ clipboard_enabled = true
 clipboard_keep_from_closed_apps = true
 corner_radius_scale = 1.25
 date_format = "%A, %x"
-font_family = "sans-serif"
+font_family = "CommitMono"
 telemetry_enabled = false
 time_format = "{:%H:%M}"
 

@@ -94,6 +94,9 @@ Noctalia as its shell. The Niri profile starts Noctalia and applies a background
 blur to its layer surfaces and pop-ups. See [`docs/niri.md`](docs/niri.md) for
 bindings, reload instructions, and monitor overrides.
 
+Noctalia's shared bar layout and appearance are documented in
+[`docs/noctalia.md`](docs/noctalia.md).
+
 Dependency installation currently targets macOS through Homebrew and Arch-based
 Linux through pacman. On macOS, system or Command Line Tools commands such as
 `bash`, `curl`, `git`, `make`, and `zsh` are checked but not installed through
