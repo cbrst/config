@@ -119,7 +119,9 @@ switch instead.
 ## Add Extensions
 
 The `vscodeExtensions` list near the top of `home-manager/default.nix` is the
-single shared extension list.
+single shared extension list. It includes Even Better TOML
+(`tamasfe.even-better-toml`) for TOML syntax support, validation, and
+formatting on every configured machine.
 
 For an extension available in `pkgs.vscode-extensions`, add its attribute to
 the list. The Nix REPL can inspect available names:

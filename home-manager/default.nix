@@ -28,6 +28,8 @@ let
   vscodeExtensions = with pkgs.vscode-extensions; [
     vscodevim.vim
     jnoortheen.nix-ide
+    # Provide TOML syntax support, validation, and formatting across shared VSCode profiles.
+    tamasfe.even-better-toml
     # These extensions are not packaged in nixpkgs, so their VSIX releases are pinned below.
     (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
       mktplcRef = {
