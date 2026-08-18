@@ -37,6 +37,12 @@ niri msg layers
 and `Super+Shift+L` locks through Noctalia. Use Super plus arrow keys or H/J/K/L to
 focus windows; add Control to move columns.
 
+Use `Super+-` and `Super+=` to shrink or grow the focused column by 10%. Add
+Shift to resize the focused window's height instead.
+
+Use `Super+,` to stack the window to the right below the focused window.
+`Super+.` removes the bottom window from that stack into its own column.
+
 ## Machine Overrides
 
 Add monitor-specific `output` blocks in the consuming machine's
