@@ -25,6 +25,7 @@ The consuming flake must pass `inputs` and a `machine` attrset through
 | `terminal` | `ghostty` | `TERMINAL` value. |
 | `sshAuthSock` | `$HOME/.1password/agent.sock` | SSH agent socket. |
 | `ghostty` | `""` | Machine-local Ghostty text written to `ghostty/machine`. |
+| `niri` | `false` | Installs and deploys the Niri session with Noctalia on Linux. |
 | `noctalia` | `false` | Enables Noctalia on Linux. |
 | `stateVersion` | `26.05` | Home Manager state version. |
 
@@ -85,6 +86,13 @@ notifications, wallpaper, lock screen, and OSDs. Add machine-specific monitor
 rules with `hl.monitor(...)` in `hypr/hyprland.lua`. The shared Linux profile
 uses the Bibata Modern Ice cursor; see [`docs/hyprland.md`](docs/hyprland.md)
 for cursor maintenance and session reload steps.
+
+## Niri
+
+Set `machine.niri = true` to install Niri, deploy `niri/config.kdl`, and enable
+Noctalia as its shell. The Niri profile starts Noctalia and applies a background
+blur to its layer surfaces and pop-ups. See [`docs/niri.md`](docs/niri.md) for
+bindings, reload instructions, and monitor overrides.
 
 Dependency installation currently targets macOS through Homebrew and Arch-based
 Linux through pacman. On macOS, system or Command Line Tools commands such as

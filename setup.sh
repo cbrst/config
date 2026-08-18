@@ -29,6 +29,7 @@ home_manager_modules=(
 	ghostty
 	home-manager
 	hypr
+	niri
 	lazygit
 	noctalia
 	nvim

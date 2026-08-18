@@ -1,0 +1,157 @@
+// Niri manages windows while Noctalia provides the bar, launcher, notifications, and lock screen.
+
+environment {
+    // Keep applications on their Wayland backends while preserving XWayland compatibility.
+    XDG_CURRENT_DESKTOP "niri"
+    XDG_SESSION_DESKTOP "niri"
+    XDG_SESSION_TYPE "wayland"
+    GDK_BACKEND "wayland,x11,*"
+    QT_QPA_PLATFORM "wayland;xcb"
+    QT_QPA_PLATFORMTHEME "gtk3"
+    SDL_VIDEODRIVER "wayland"
+    MOZ_ENABLE_WAYLAND "1"
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+    // Use the same cursor theme configured for GTK and XWayland by Home Manager.
+    XCURSOR_THEME "Bibata-Modern-Ice"
+    XCURSOR_SIZE "24"
+}
+
+input {
+    keyboard {
+        // Make the shared US layout explicit rather than inheriting host defaults.
+        xkb {
+            layout "us"
+        }
+    }
+
+    touchpad {
+        // Sensible laptop defaults without imposing a device-specific acceleration profile.
+        tap
+        natural-scroll
+        drag-lock
+    }
+
+    // Focus the output under the pointer without warping it during keyboard navigation.
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+layout {
+    // Leave a small frame around dynamic columns and keep focused work readable.
+    gaps 12
+    center-focused-column "on-overflow"
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    focus-ring {
+        width 2
+        active-gradient from="#cba6f7" to="#89b4fa" angle=45
+        inactive-color "#45475a"
+    }
+
+    border {
+        off
+    }
+
+    shadow {
+        // Niri knows window geometry from the rule below, avoiding CSD shadow artifacts.
+        on
+        softness 24
+        spread 3
+        offset x=0 y=4
+        color "#00000080"
+    }
+}
+
+// Let applications omit client-side decorations so Niri can render clean rounded geometry.
+prefer-no-csd
+
+// Noctalia is the only shell process launched by the compositor.
+spawn-at-startup "noctalia"
+
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+animations {
+    // A modest speed-up preserves feedback without making workspace movement sluggish.
+    slowdown 0.8
+}
+
+window-rule {
+    // Rounded geometry also clips the content and makes the compositor shadow accurate.
+    geometry-corner-radius 14
+    clip-to-geometry true
+}
+
+window-rule {
+    // Keep common utility dialogs out of the scrolling tiled layout.
+    match app-id=r#"^(pavucontrol|blueman-manager|nm-connection-editor)$"#
+    open-floating true
+}
+
+layer-rule {
+    // Noctalia names all shell layer surfaces with this prefix.
+    match namespace="^noctalia-.*"
+    background-effect {
+        // Blur Noctalia panels and overlays while retaining their theme's glass transparency.
+        blur true
+        xray false
+        noise 0.015
+        saturation 1.1
+    }
+    popups {
+        // Apply the same readable glass treatment to menus opened from the shell.
+        background-effect {
+            blur true
+            xray false
+            noise 0.015
+            saturation 1.1
+        }
+    }
+}
+
+binds {
+    // Default programs and shell controls match the shared Hyprland profile.
+    Mod+Return { spawn "ghostty"; }
+    Mod+B { spawn "firefox"; }
+    Mod+E { spawn "nemo"; }
+    Mod+Space { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
+    Mod+C { spawn "noctalia" "msg" "panel-toggle" "control-center"; }
+    Mod+Shift+L { spawn "noctalia" "msg" "session" "lock"; }
+    Mod+Q repeat=false { close-window; }
+    Mod+Shift+Space { toggle-window-floating; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+O { toggle-overview; }
+
+    // Use both arrows and home-row keys for directional focus and column movement.
+    Mod+Left { focus-column-left; }
+    Mod+Down { focus-window-down; }
+    Mod+Up { focus-window-up; }
+    Mod+Right { focus-column-right; }
+    Mod+H { focus-column-left; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+L { focus-column-right; }
+    Mod+Ctrl+Left { move-column-left; }
+    Mod+Ctrl+Down { move-window-down; }
+    Mod+Ctrl+Up { move-window-up; }
+    Mod+Ctrl+Right { move-column-right; }
+    Mod+Ctrl+H { move-column-left; }
+    Mod+Ctrl+J { move-window-down; }
+    Mod+Ctrl+K { move-window-up; }
+    Mod+Ctrl+L { move-column-right; }
+
+    // Keep media controls functional while the Noctalia lock screen is active.
+    XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1.5" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioMicMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+
+    Print { screenshot; }
+    Ctrl+Print { screenshot-screen; }
+    Alt+Print { screenshot-window; }
+    Mod+Shift+E { quit; }
+}
