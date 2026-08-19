@@ -49,13 +49,17 @@ layout {
     default-column-width { proportion 0.5; }
 
     focus-ring {
+        off
         width 2
         active-gradient from="#cba6f7" to="#89b4fa" angle=45
         inactive-color "#45475a"
     }
 
     border {
-        off
+        on
+        width 2
+        active-gradient from="#cba6f7" to="#89b4fa" angle=45
+        inactive-color "#45475a"
     }
 
     shadow {
@@ -83,7 +87,7 @@ animations {
 
 window-rule {
     // Rounded geometry also clips the content and makes the compositor shadow accurate.
-    geometry-corner-radius 14
+    geometry-corner-radius 8
     clip-to-geometry true
 }
 
@@ -94,8 +98,7 @@ window-rule {
 }
 
 layer-rule {
-    // Noctalia names all shell layer surfaces with this prefix.
-    match namespace="^noctalia-.*"
+    match namespace="^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd)$"
     background-effect {
         // Blur Noctalia panels and overlays while retaining their theme's glass transparency.
         blur true
@@ -112,6 +115,11 @@ layer-rule {
             saturation 1.1
         }
     }
+}
+
+layer-rule {
+    match namespace="^noctalia-backdrop"
+    place-within-backdrop true
 }
 
 binds {
