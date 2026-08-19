@@ -13,10 +13,10 @@ nixie() {
 		print 'Usage: nixie [all | update | system | home [--local]]'
 		print
 		print 'Actions:'
-		print '  all       Update flake inputs, switch NixOS when available, then switch Home Manager.'
+		print '  all       Update all flake inputs, switch NixOS when available, then switch Home Manager.'
 		print '  update    Update all pinned inputs in the selected flake.'
 		print '  system    Switch the active NixOS system profile.'
-		print '  home      Switch the active Home Manager profile.'
+		print '  home      Update the dotfiles input, then switch the active Home Manager profile.'
 		print '  home --local  Switch Home Manager using the local dotfiles checkout.'
 		print
 		print 'Without an action, an interactive menu is shown.'
@@ -30,12 +30,26 @@ nixie() {
 			print -u2 'Usage: nixie [all | update | system | home [--local]]'
 			return 2
 		fi
-		print 'Choose a Nix workflow:'
-		select action in all update system home quit; do
+		# Use a compact keyboard menu instead of zsh's unstyled `select` output.
+		while true; do
+			print
+			print -P '%F{magenta}+----------------------------------------+%f'
+			print -P '%F{magenta}|%f  %B%F{white}NIXIE%f%b  %F{244}daily configuration console%f  %F{magenta}|%f'
+			print -P '%F{magenta}+----------------------------------------+%f'
+			print -P '  %F{cyan}1%f  %BFull refresh%b  %F{244}inputs + system + home%f'
+			print -P '  %F{blue}2%f  %BUpdate inputs%b  %F{244}refresh flake.lock only%f'
+			print -P '  %F{yellow}3%f  %BSystem switch%b  %F{244}apply the NixOS profile%f'
+			print -P '  %F{green}4%f  %BHome switch%b    %F{244}refresh dotfiles + apply home%f'
+			print -P '  %F{244}q%f  Quit'
+			print -n -P '%F{magenta}Select [1-4, q]:%f '
+			read -r action || return 1
 			case "${action}" in
-				all|update|system|home) break ;;
-				quit) return 0 ;;
-				*) print -u2 'Choose a numbered action.' ;;
+				1) action=all; break ;;
+				2) action=update; break ;;
+				3) action=system; break ;;
+				4) action=home; break ;;
+				q|Q) return 0 ;;
+				*) print -P '%F{red}Choose 1-4 or q.%f' ;;
 			esac
 		done
 	fi
@@ -66,7 +80,7 @@ nixie() {
 		return 1
 	fi
 
-	# Updating always precedes switches so every layer uses the same locked inputs.
+	# Full refreshes update every input so system and home share one lockfile revision.
 	if [[ "${action}" == "all" || "${action}" == "update" ]]; then
 		print -P '%F{cyan}==>%f %BUpdate flake inputs%b'
 		command nix flake update "${nixie_flake}" || return
@@ -74,6 +88,12 @@ nixie() {
 
 	if [[ "${action}" == "update" ]]; then
 		return 0
+	fi
+
+	# A normal home switch must refresh shared dotfiles; local mode intentionally bypasses the lockfile.
+	if [[ "${action}" == "home" && "${local_dotfiles}" == false ]]; then
+		print -P '%F{green}==>%f %BUpdate dotfiles input%b'
+		command nix flake update dotfiles --flake "${nixie_flake}" || return
 	fi
 
 	# Resolve the host before either switch so `home` also gets its machine-specific profile.

@@ -11,10 +11,10 @@ nixie
 # Update inputs, apply the system configuration, then apply Home Manager.
 nixie all
 
-# Run one layer at a time.
-nixie update
-nixie system
-nixie home
+# Run one layer at a time. `home` refreshes only the dotfiles input first.
+nixie update  # all flake inputs
+nixie system  # NixOS only
+nixie home    # dotfiles input, then Home Manager
 
 # Display built-in usage documentation.
 nixie --help
@@ -28,8 +28,10 @@ sudo nixos-rebuild switch --flake /etc/nixos#asgard
 home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
-Each action stops at the first failure. `update` changes only the flake lock;
-commit its `flake.lock` change from the consuming flake when you want other
+Each action stops at the first failure. `update` changes only the flake lock.
+`home` updates only the `dotfiles` input, then switches Home Manager, so shared
+dotfile changes are fetched and applied without rebuilding NixOS. Commit the
+resulting `flake.lock` change from the consuming flake when you want other
 machines to use the same pinned revisions.
 
 ## Runtime profile selection
@@ -69,7 +71,8 @@ shell setups, but new configuration should use the `NIXIE_*` names.
 ## Local dotfiles testing
 
 Use `home --local` to evaluate the local dotfiles checkout without updating the
-consumer flake's lockfile. `DOTFILES_DIR` defaults to `$HOME/Projects/config`.
+consumer flake's lockfile. Unlike `nixie home`, it does not fetch the remote
+`dotfiles` input. `DOTFILES_DIR` defaults to `$HOME/Projects/config`.
 
 ```sh
 # Apply uncommitted shared dotfile changes to the active home profile.
