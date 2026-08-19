@@ -110,6 +110,12 @@ Noctalia's shared bar layout and appearance are documented in
 The shared Linux GTK defaults and machine-specific font override pattern are
 documented in [`docs/gtk.md`](docs/gtk.md).
 
+## Themes
+
+OpenCode, Ghostty, and Neovim share Monokai Pro Spectrum in dark mode and
+Monokai Pro Light in light mode. See [`docs/themes.md`](docs/themes.md) for
+palette sources, deployment, and maintenance.
+
 Dependency installation currently targets macOS through Homebrew and Arch-based
 Linux through pacman. On macOS, system or Command Line Tools commands such as
 `bash`, `curl`, `git`, `make`, and `zsh` are checked but not installed through

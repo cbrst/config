@@ -3,12 +3,8 @@ return {
 	lazy = false,
 	priority = 1000,
 	config = function()
+		-- Myvi selects the explicit Spectrum or Light colorscheme for the system appearance.
 		require("monokai-pro").setup({
-			day_night = {
-				enable = true,
-				day_filter = "light",
-				night_filter = "spectrum",
-			},
 		})
 	end,
 }

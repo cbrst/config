@@ -19,9 +19,8 @@ adjust-cell-height = 20%
 adjust-font-baseline = 20%
 
 # Theme
-# theme = light:catppuccin-latte,dark:catppuccin-mocha
-config-file = ?theme
-# theme = catppuccin-mocha
+# Use the same Monokai Pro variants selected by the operating system appearance.
+theme = light:monokai-pro-light,dark:monokai-pro-spectrum
 unfocused-split-opacity = 0.5
 
 # Mouse

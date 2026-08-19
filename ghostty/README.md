@@ -19,21 +19,10 @@ These are custom keybindings. Mostly to handle splits.
 Machine-specific settings. Everything set here overwrites settings made in
 `config`. This file is not included in the git repo.
 
-### `theme`
-
-This sets the theme. Theme switching is handled by a ZSH function that sets both
-Ghostty and Neovim themes. Doing this in a seperate file makes it easier to
-handle, plus it's also ignored in the repo
-
 ### `themes` Folder
 
-Just a collection of themes which are either not included in or modified from upstream.
-
----
-
-## Setup
-
-This config module automatically runs `setup.sh` to fetch some themes.
+Contains the two tracked Monokai Pro palettes. Ghostty selects Spectrum in dark
+mode and Light in light mode through the `theme` setting in `config`.
 
 ---
 

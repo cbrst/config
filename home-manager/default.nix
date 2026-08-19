@@ -248,6 +248,9 @@ in
       "zsh/zimrc.zsh".source = lib.mkDefault "${dotfiles}/zsh/zimrc.zsh";
       "zsh/zshrc.zsh".source = lib.mkDefault "${dotfiles}/zsh/zshrc.zsh";
       "opencode/opencode.jsonc".text = lib.mkDefault opencodeConfig;
+      # Keep OpenCode's selected theme and color definitions declarative.
+      "opencode/tui.json".source = lib.mkDefault "${dotfiles}/opencode/tui.json";
+      "opencode/themes/monokai-pro.json".source = lib.mkDefault "${dotfiles}/opencode/themes/monokai-pro.json";
     };
     desktopEntries.firefox = {
       # Prefer the session-aware profile selector over the package's stock desktop entry.
