@@ -105,6 +105,12 @@ bindings, reload instructions, and monitor overrides.
 Noctalia's shared bar layout and appearance are documented in
 [`docs/noctalia.md`](docs/noctalia.md).
 
+## 1Password
+
+The Linux Home Manager profile starts the 1Password desktop client after the
+graphical session is ready. See [`docs/1password.md`](docs/1password.md) for
+activation, verification, and recovery commands.
+
 ## GTK
 
 The shared Linux GTK defaults and machine-specific font override pattern are

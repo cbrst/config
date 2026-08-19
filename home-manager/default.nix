@@ -391,6 +391,18 @@ in
       };
       Install.WantedBy = [ "default.target" ];
     };
+    # Quote the numeric-leading name so systemd generates 1password.service.
+    user.services."1password" = {
+      Unit = {
+        Description = "1Password Linux desktop client";
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs._1password-gui}/bin/1password --silent";
+        Restart = "on-abnormal";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
   };
 
   gtk = lib.mkIf isLinux {
