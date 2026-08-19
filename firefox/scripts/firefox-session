@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+
+# Select the compact profile only in compositors that provide the intended window workflow.
+set -eu
+
+case ":${XDG_CURRENT_DESKTOP:-}:" in
+    *:niri:* | *:Hyprland:* | *:hyprland:*)
+        profile=wayland
+        ;;
+    *)
+        profile=default
+        ;;
+esac
+
+# Hyprland exports this even when XDG_CURRENT_DESKTOP was not inherited by a launcher.
+if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+    profile=wayland
+fi
+
+# The wrapper has a distinct name, so this resolves Firefox rather than recursing.
+exec firefox --P "$profile" "$@"

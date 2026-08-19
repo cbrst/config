@@ -1,0 +1,12 @@
+/* This stylesheet is installed only in Firefox's Niri/Hyprland profile. */
+
+/* Compositors provide window management, so Firefox's navigation chrome is unnecessary. */
+#nav-bar {
+  display: none !important;
+}
+
+/* Keep compositor decorations authoritative instead of duplicating window controls. */
+.titlebar-buttonbox-container,
+.titlebar-buttonbox {
+  display: none !important;
+}

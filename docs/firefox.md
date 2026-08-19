@@ -18,22 +18,54 @@ Find the current profile path in
 machine where Home Manager should install Firefox. Omit `firefoxProfilePath`
 only for a new profile; it defaults to `default`.
 
-Home Manager installs uBlock Origin, Tridactyl, 1Password, Violentmonkey, and
-Stylus into the selected profile. Firefox is configured to enable those profile
-extensions automatically. Home Manager fetches the latest signed XPI for each
-addon from Mozilla Add-ons during an impure evaluation, so each Home Manager
-switch checks for addon updates. This intentionally makes the result
-non-reproducible and requires `--impure`.
+Home Manager installs uBlock Origin, 1Password, Violentmonkey, and Stylus into
+both managed profiles, and Tridactyl into the Niri/Hyprland profile only.
+Firefox is configured to enable those profile extensions automatically. Home
+Manager fetches the latest signed XPI for each addon from Mozilla Add-ons during
+an impure evaluation, so each Home Manager switch checks for addon updates. This
+intentionally makes the result non-reproducible and requires `--impure`.
+
+Home Manager writes these XPIs under Firefox's profile extension UUID directory;
+do not replace the generated `extensions` symlink in the Firefox profile.
+
+The managed `default` profile restores the previous window and tabs on normal
+startup. Home Manager also creates a `wayland` profile for Niri and Hyprland.
+The `firefox-session` launcher selects `wayland` when `XDG_CURRENT_DESKTOP`
+contains `niri` or `Hyprland` (or when Hyprland's instance variable is present)
+and otherwise selects `default`. The local `firefox.desktop` entry and the Niri
+and Hyprland browser bindings use this launcher.
+
+The Wayland profile loads `userChrome.css`, which hides the navigation bar and
+Firefox window controls. Its Downloads and Extensions toolbar buttons are placed
+on the tab bar. Tridactyl is installed only in this compact profile; uBlock
+Origin, 1Password, Violentmonkey, and Stylus are installed in both profiles.
+
+## Firefox Sync
+
+Firefox Account authentication cannot be stored in this repository. On first
+launch in each profile, sign in to the same Firefox Account at
+`about:preferences#sync`. The managed preferences preselect Bookmarks and
+History, while Add-ons, Settings, Open tabs, Passwords, Addresses, and Payment
+methods are disabled. Confirm those selections before enabling Sync.
+
+Do not share Firefox profile directories or copy `places.sqlite` between them:
+Firefox Sync safely synchronizes bookmarks and history, while Home Manager owns
+the extensions installed in each profile.
+
+Tridactyl uses its Home Manager-installed native messaging host to load
+`$XDG_CONFIG_HOME/tridactyl/tridactylrc`. After applying this configuration,
+restart Firefox, then run `:native` in Tridactyl to confirm the host responds.
 
 ## Apply changes
 
 ```sh
-# Apply extensions, the Firefox profile, and Tridactyl configuration.
+# Apply extensions, both Firefox profiles, and Tridactyl configuration.
 home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
-Restart Firefox after the switch and confirm the enabled addons at
-`about:addons`.
+Restart Firefox after the switch. In a Niri or Hyprland session, run
+`firefox-session` and confirm the compact toolbar and Tridactyl. In another
+session, confirm the normal toolbar and common extensions at `about:addons`.
 
 `nixie home`, `nixie home --local`, and the Home Manager phase of `nixie all`
 pass `--impure` automatically. A switch can therefore change addon versions

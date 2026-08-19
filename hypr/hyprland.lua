@@ -4,7 +4,8 @@ local main_mod = "SUPER"
 
 -- Define session-wide defaults once; launch-default consumes these values for keybindings.
 hl.env("TERMINAL", "ghostty")
-hl.env("BROWSER", "firefox")
+-- Choose Firefox's compact profile only when Hyprland owns the session.
+hl.env("BROWSER", "firefox-session")
 hl.env("FILE_MANAGER", "nemo")
 hl.env("EDITOR", "nvim")
 hl.env("VISUAL", "nvim")

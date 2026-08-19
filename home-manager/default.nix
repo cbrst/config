@@ -25,6 +25,8 @@ let
       [ "/Users/cbrst/.local/bin/headroom" ]
       [ "${config.home.homeDirectory}/.local/bin/headroom" ]
       (builtins.readFile "${dotfiles}/opencode/opencode.jsonc");
+  # Home Manager expects per-profile Firefox extensions below this profile UUID.
+  firefoxExtensionProfile = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
   mkFirefoxAddon =
     {
       name,
@@ -38,20 +40,16 @@ let
       dontUnpack = true;
       installPhase = ''
         # Home Manager discovers profile extensions by their Mozilla addon ID.
-        install -Dm444 "$src" "$out/share/mozilla/extensions/${addonId}.xpi"
+        install -Dm444 "$src" "$out/share/mozilla/extensions/${firefoxExtensionProfile}/${addonId}.xpi"
       '';
       passthru = { inherit addonId; };
     };
-  firefoxExtensions = [
+  # All profiles receive these extensions; Tridactyl is intentionally compositor-profile only.
+  commonFirefoxExtensions = [
     (mkFirefoxAddon {
       name = "ublock-origin";
       addonId = "uBlock0@raymondhill.net";
       slug = "ublock-origin";
-    })
-    (mkFirefoxAddon {
-      name = "tridactyl";
-      addonId = "tridactyl.vim@cmcaine.co.uk";
-      slug = "tridactyl-vim";
     })
     (mkFirefoxAddon {
       name = "1password";
@@ -69,6 +67,36 @@ let
       slug = "styl-us";
     })
   ];
+  tridactylExtension = mkFirefoxAddon {
+    name = "tridactyl";
+    addonId = "tridactyl.vim@cmcaine.co.uk";
+    slug = "tridactyl-vim";
+  };
+  firefoxSyncSettings = {
+    # Firefox Account credentials stay private; these select its Sync engines after sign-in.
+    "services.sync.engine.addons" = false;
+    "services.sync.engine.addresses" = false;
+    "services.sync.engine.bookmarks" = true;
+    "services.sync.engine.creditcards" = false;
+    "services.sync.engine.history" = true;
+    "services.sync.engine.passwords" = false;
+    "services.sync.engine.prefs" = false;
+    "services.sync.engine.tabs" = false;
+  };
+  firefoxSession = pkgs.writeShellScriptBin "firefox-session" (
+    # Keep session detection in a versioned script instead of embedding it in generated Nix.
+    builtins.readFile "${dotfiles}/firefox/scripts/firefox-session"
+  );
+  mkFirefoxProfile = path: extensions: {
+    inherit path;
+    settings = firefoxSyncSettings // {
+      # Enable the extensions copied into the profile without a first-run prompt.
+      "extensions.autoDisableScopes" = 0;
+      # Restore the prior window and tabs when Firefox starts normally.
+      "browser.startup.page" = 3;
+    };
+    extensions.packages = extensions;
+  };
   mkLatestVscodeExtension =
     {
       publisher,
@@ -120,7 +148,8 @@ in
     sessionVariables = {
       EDITOR = lib.mkDefault "nvim";
       TERMINAL = lib.mkDefault (machine.terminal or "ghostty");
-      BROWSER = lib.mkDefault "firefox";
+      # Select the profile that matches the desktop session for shell-launched browsers.
+      BROWSER = lib.mkDefault "firefox-session";
       SSH_AUTH_SOCK = lib.mkDefault (machine.sshAuthSock or "$HOME/.1password/agent.sock");
     }
     // lib.optionalAttrs isLinux {
@@ -168,6 +197,8 @@ in
         nerd-fonts.jetbrains-mono
         commit-mono
         inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
+        # Route terminal and launcher browser requests through the active-session selector.
+        firefoxSession
       ]
     );
   };
@@ -206,10 +237,29 @@ in
       "zsh/zshrc.zsh".source = lib.mkDefault "${dotfiles}/zsh/zshrc.zsh";
       "opencode/opencode.jsonc".text = lib.mkDefault opencodeConfig;
     };
+    desktopEntries.firefox = {
+      # Prefer the session-aware profile selector over the package's stock desktop entry.
+      name = "Firefox";
+      genericName = "Web Browser";
+      exec = "${lib.getExe firefoxSession} %U";
+      terminal = false;
+      type = "Application";
+      categories = [ "Network" "WebBrowser" ];
+      mimeType = [
+        "text/html"
+        "x-scheme-handler/http"
+        "x-scheme-handler/https"
+      ];
+      startupWMClass = "firefox";
+    };
   }
   // lib.optionalAttrs isLinux {
     mimeApps.defaultApplications = {
       "inode/directory" = lib.mkDefault [ "nemo.desktop" ];
+      # Open links through the launcher so each session gets its matching Firefox profile.
+      "text/html" = lib.mkDefault [ "firefox.desktop" ];
+      "x-scheme-handler/http" = lib.mkDefault [ "firefox.desktop" ];
+      "x-scheme-handler/https" = lib.mkDefault [ "firefox.desktop" ];
     };
   };
 
@@ -229,14 +279,46 @@ in
     # NixOS may own the browser package while Home Manager owns its profile.
     enable = true;
     package = lib.mkDefault (if machine.firefoxSystem or false then null else pkgs.firefox);
-    profiles.default = {
-      # Preserve the profile created by Firefox before Home Manager manages it.
-      path = machine.firefoxProfilePath or "default";
-      settings = {
-        # Enable the extensions copied into the profile without a first-run prompt.
-        "extensions.autoDisableScopes" = 0;
+    # Allow Tridactyl to read the XDG configuration deployed by Home Manager.
+    nativeMessagingHosts = [ pkgs.tridactyl-native ];
+    profiles = {
+      default = mkFirefoxProfile (machine.firefoxProfilePath or "default") commonFirefoxExtensions;
+      wayland = (mkFirefoxProfile "wayland" (commonFirefoxExtensions ++ [ tridactylExtension ])) // {
+        settings = firefoxSyncSettings // {
+          # Put persistent browser actions beside tabs before the navigation bar is hidden.
+          "browser.uiCustomization.state" = builtins.toJSON {
+            currentVersion = 22;
+            placements = {
+              "TabsToolbar" = [
+                "tabbrowser-tabs"
+                "new-tab-button"
+                "alltabs-button"
+                "downloads-button"
+                "unified-extensions-button"
+              ];
+              "nav-bar" = [
+                "back-button"
+                "forward-button"
+                "stop-reload-button"
+                "urlbar-container"
+              ];
+              "PersonalToolbar" = [ "import-button" "personal-bookmarks" ];
+            };
+            seen = [
+              "save-to-pocket-button"
+              "developer-button"
+              "screenshot-button"
+              "fxa-toolbar-menu-button"
+            ];
+            dirtyAreaCache = [ "nav-bar" "TabsToolbar" "PersonalToolbar" ];
+            newElementCount = 5;
+          };
+          # Firefox otherwise ignores userChrome.css in new profiles.
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        };
+        # This profile alone removes the navigation bar and native window controls.
+        userChrome = builtins.readFile "${dotfiles}/firefox/userChrome-wayland.css";
       };
-      extensions.packages = firefoxExtensions;
     };
   };
 

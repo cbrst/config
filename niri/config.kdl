@@ -125,7 +125,8 @@ layer-rule {
 binds {
     // Default programs and shell controls match the shared Hyprland profile.
     Mod+Return { spawn "ghostty"; }
-    Mod+B { spawn "firefox"; }
+    // Select Firefox's compact profile for this compositor session.
+    Mod+B { spawn "firefox-session"; }
     Mod+E { spawn "nemo"; }
     Mod+Space { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
     Mod+C { spawn "noctalia" "msg" "panel-toggle" "control-center"; }
