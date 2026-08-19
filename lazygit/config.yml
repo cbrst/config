@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+
 gui:
   theme:
     activeBorderColor:
@@ -30,5 +32,7 @@ update:
   method: never
 
 git:
-  paging:
-    pager: "DELTA_FEATURES=lazygit delta --dark --paging=never"
+  # `diffRenderers` replaces the removed `git.paging.pager` configuration.
+  diffRenderers:
+    - name: delta
+      command: "DELTA_FEATURES=lazygit delta --dark --paging=never"
