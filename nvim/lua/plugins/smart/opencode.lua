@@ -2,11 +2,31 @@ local opencode_cmd = "opencode --port"
 
 -- Keep the OpenCode TUI beside the editor while opencode.nvim supplies editor context.
 local terminal_opts = {
+	-- A fixed terminal identity prevents a mapping count from creating another server.
+	count = 1,
 	win = {
 		position = "right",
 		enter = false,
+		on_buf = function(terminal)
+			-- Terminal mode sends Ctrl-W to the TUI; return to Neovim before window commands.
+			vim.keymap.set("t", "<C-w>", "<C-\\><C-n><C-w>", {
+				buffer = terminal.buf,
+				desc = "OpenCode window command",
+			})
+		end,
 	},
 }
+
+local function get_terminal()
+	return require("snacks").terminal.get(opencode_cmd, terminal_opts)
+end
+
+local function toggle_terminal()
+	local terminal, created = get_terminal()
+	if not created then
+		terminal:toggle()
+	end
+end
 
 return {
 	"nickjvandyke/opencode.nvim",
@@ -16,10 +36,21 @@ return {
 		vim.g.opencode_opts = {
 			server = {
 				start = function()
-					require("snacks").terminal.open(opencode_cmd, terminal_opts)
+					-- Reuse the visible terminal instead of opening a second OpenCode server.
+					get_terminal()
 				end,
 			},
 		}
+
+		-- Reload OpenCode edits when Neovim regains focus, while preserving unsaved buffers.
+		vim.o.autoread = true
+		vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained" }, {
+			group = vim.api.nvim_create_augroup("OpencodeChecktime", { clear = true }),
+			callback = function()
+				vim.cmd("checktime")
+			end,
+			desc = "Refresh unmodified buffers changed outside Neovim",
+		})
 
 		-- Reveal OpenCode whenever a prompt is submitted from the editor.
 		vim.api.nvim_create_autocmd("User", {
@@ -44,6 +75,27 @@ return {
 			desc = "[A]sk OpenCode",
 		},
 		{
+			"<leader>ab",
+			function()
+				require("opencode").ask("@buffer: ")
+			end,
+			desc = "Ask OpenCode about [B]uffer",
+		},
+		{
+			"<leader>ad",
+			function()
+				require("opencode").ask("@diagnostics: ")
+			end,
+			desc = "Ask OpenCode about [D]iagnostics",
+		},
+		{
+			"<leader>av",
+			function()
+				require("opencode").ask("@visible: ")
+			end,
+			desc = "Ask OpenCode about [V]isible code",
+		},
+		{
 			"<leader>as",
 			function()
 				require("opencode").select()
@@ -54,7 +106,7 @@ return {
 		{
 			"<leader>at",
 			function()
-				require("snacks").terminal.toggle(opencode_cmd, terminal_opts)
+				toggle_terminal()
 			end,
 			desc = "[T]oggle OpenCode terminal",
 		},
@@ -89,7 +141,7 @@ return {
 		{
 			"<C-.>",
 			function()
-				require("snacks").terminal.toggle(opencode_cmd, terminal_opts)
+				toggle_terminal()
 			end,
 			mode = { "n", "t" },
 			desc = "Toggle OpenCode terminal",

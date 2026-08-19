@@ -28,24 +28,40 @@ usable when the optional proxy is unavailable.
 
 ## Use OpenCode In Neovim
 
-Neovim uses `opencode.nvim` and starts OpenCode as `opencode --port` in a
+Neovim uses `opencode.nvim` and starts OpenCode as `opencode --port` in one
 right-side Snacks terminal. The plugin sends buffer and visual-selection
-context to that server, and Neovim presents OpenCode edit requests for review.
+context to that server, presents OpenCode edit requests for review, and reloads
+unmodified buffers when OpenCode changes files.
 
 | Mapping | Modes | Action |
 | --- | --- | --- |
 | `<leader>aa` | Normal, visual | Ask OpenCode about the cursor or selection |
+| `<leader>ab` | Normal | Ask OpenCode about the current buffer |
+| `<leader>ad` | Normal | Ask OpenCode about current diagnostics |
 | `<leader>as` | Normal, visual | Select an OpenCode action |
 | `<leader>at` | Normal | Toggle the OpenCode terminal |
+| `<leader>av` | Normal | Ask OpenCode about visible code |
 | `<leader>an` | Normal | Start a new OpenCode session |
 | `<leader>ai` | Normal | Interrupt the active OpenCode request |
 | `<leader>au` | Normal | Undo the last OpenCode change |
 | `<leader>ar` | Normal | Redo the last undone OpenCode change |
 | `<C-.>` | Normal, terminal | Toggle the OpenCode terminal |
+| `<C-w>` | OpenCode terminal | Exit terminal mode and start a Neovim window command |
 
 The `<leader>a` group is listed as **AI / OpenCode** by which-key. When
 OpenCode requests an edit, use its diff view to accept (`da`), reject (`dr`),
 or work hunk-by-hunk (`dp`/`do`).
+
+Ask supports placeholders with completion: `@this` refers to the cursor or the
+visual selection, `@buffer` is the current file, `@visible` is visible text,
+and `@diagnostics`, `@buffers`, `@marks`, and `@quickfix` add their respective
+editor context. OpenCode reads referenced files from disk, so save local edits
+before submitting a prompt.
+
+OpenCode file-edit events and Neovim focus or buffer-entry checks run
+`:checktime`. With `autoread` enabled, an unmodified buffer reloads
+automatically. Neovim does not replace a buffer with unsaved changes; write,
+discard, or reconcile those changes before reloading it.
 
 ## Use Snacks Terminals
 
@@ -169,6 +185,9 @@ nvim --headless "+Lazy sync" +qa
 
 # Confirm that opencode.nvim can reach or start its OpenCode server.
 nvim "+checkhealth opencode"
+
+# Inspect the OpenCode terminal and verify that only one server is running.
+pgrep -af "opencode.*--port"
 
 # Inspect Blink completion providers, including the OpenCode Ask source.
 nvim "+BlinkCmp status"

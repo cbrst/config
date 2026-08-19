@@ -82,9 +82,14 @@ set. The most useful configured mappings are:
 - `]c`, `[c`: Move to the next or previous Git hunk.
 - `<Space>tt`, `<Space>tn`, `<Space>tf`: Toggle, open, or focus a shell
   terminal.
-- `<Space>aa`, `<Space>as`: Ask OpenCode about the current context or select an
-  OpenCode action.
+- `<Space>aa`, `<Space>ab`, `<Space>ad`, `<Space>av`: Ask OpenCode about the
+  cursor or selection, buffer, diagnostics, or visible code.
+- `<Space>as`: Select an OpenCode action. Ask accepts `@this`, `@buffer`,
+  `@visible`, `@diagnostics`, `@buffers`, `@marks`, and `@quickfix` context
+  placeholders.
 - `<Space>at`, `<C-.>`: Toggle the OpenCode terminal on the right.
+- `<C-w>` in the OpenCode terminal: Exit terminal mode, then enter a Neovim
+  window command such as `h` to return to the editor.
 - `<Space>an`, `<Space>ai`, `<Space>au`, `<Space>ar`: Start, interrupt, undo,
   or redo an OpenCode session action.
 - `<Space>q`, `<Space>QQ`: Populate diagnostics in the location list or quit
