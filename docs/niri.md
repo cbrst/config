@@ -15,6 +15,10 @@ is matched separately and placed within the backdrop layer. This needs Niri
 Niri exports `SSH_AUTH_SOCK` as `$HOME/.1password/agent.sock`, allowing
 graphical applications to use the 1Password SSH agent.
 
+Firefox windows open in a tiled column that occupies 80% of the output width.
+This is an initial width; use `Super+-` or `Super+=` to adjust the focused
+column after it opens.
+
 ## Apply And Reload
 
 Apply the Home Manager generation, then choose the Niri session in the display

@@ -97,6 +97,12 @@ window-rule {
     open-floating true
 }
 
+window-rule {
+    // Keep Firefox readable by opening its tiled column at four fifths of the output.
+    match app-id="firefox"
+    default-column-width { proportion 0.8; }
+}
+
 layer-rule {
     match namespace="^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd)$"
     background-effect {
