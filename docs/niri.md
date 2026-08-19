@@ -8,6 +8,9 @@ notifications, wallpaper, lock screen, and OSDs.
 The shared configuration applies Niri's `background-effect` blur to every
 `noctalia-*` layer surface and its pop-ups. This needs Niri 26.04 or newer.
 
+Niri exports `SSH_AUTH_SOCK` as `$HOME/.1password/agent.sock`, allowing
+graphical applications to use the 1Password SSH agent.
+
 ## Apply And Reload
 
 Apply the Home Manager generation, then choose the Niri session in the display
@@ -50,3 +53,6 @@ Add monitor-specific `output` blocks in the consuming machine's
 `xdg.configFile."niri/config.kdl"` from its final Home Manager module. Keep
 the `noctalia-*` layer rule when overriding the shared file so the shell
 continues to receive blur.
+
+For a different SSH agent socket, set `machine.sshAuthSock` in the consuming
+machine configuration; it overrides the shared Home Manager default.

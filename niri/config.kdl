@@ -11,6 +11,8 @@ environment {
     SDL_VIDEODRIVER "wayland"
     MOZ_ENABLE_WAYLAND "1"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
+    // Make the 1Password SSH agent available to graphical applications.
+    SSH_AUTH_SOCK "$HOME/.1password/agent.sock"
     // Use the same cursor theme configured for GTK and XWayland by Home Manager.
     XCURSOR_THEME "Bibata-Modern-Ice"
     XCURSOR_SIZE "24"
@@ -164,4 +166,9 @@ binds {
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
     Mod+Shift+E { quit; }
+}
+
+// Don't show hotkeys every startup
+hotkey-overlay {
+    skip-at-startup
 }
