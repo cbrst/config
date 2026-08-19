@@ -42,8 +42,8 @@ On the NixOS machine, apply it with:
 home-manager switch --flake /etc/nixos#cbrst
 ```
 
-For a local shared-configuration test or a full publish, lockfile update, and
-Home Manager switch, use [`dotfiles-update`](docs/dotfiles-update.md).
+For local shared-configuration tests and daily NixOS or Home Manager workflows,
+use [`nixie`](docs/nixie.md).
 
 ## Legacy Setup
 

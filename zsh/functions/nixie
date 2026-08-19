@@ -1,0 +1,162 @@
+# Run the daily Nix workflow for the active NixOS or Home Manager profile.
+nixie() {
+	local nixie_flake="${NIXIE_FLAKE:-${NIXOS_FLAKE:-/etc/nixos}}"
+	local host_profile="${NIXIE_HOST_PROFILE:-}"
+	local home_profile="${NIXIE_HOME_PROFILE:-${HOME_MANAGER_PROFILE:-}}"
+	local action="$1"
+	local local_dotfiles=false
+	local current_hostname eval_host_name candidate
+	local -a host_profiles home_profiles matching_profiles
+
+	# Keep the command self-documenting because it is available on every managed shell.
+	if [[ "${action}" == "--help" || "${action}" == "-h" ]]; then
+		print 'Usage: nixie [all | update | system | home [--local]]'
+		print
+		print 'Actions:'
+		print '  all       Update flake inputs, switch NixOS when available, then switch Home Manager.'
+		print '  update    Update all pinned inputs in the selected flake.'
+		print '  system    Switch the active NixOS system profile.'
+		print '  home      Switch the active Home Manager profile.'
+		print '  home --local  Switch Home Manager using the local dotfiles checkout.'
+		print
+		print 'Without an action, an interactive menu is shown.'
+		print 'Overrides: NIXIE_FLAKE, NIXIE_HOST_PROFILE, NIXIE_HOME_PROFILE, DOTFILES_DIR.'
+		return 0
+	fi
+
+	# Avoid blocking scripts when no subcommand was supplied outside an interactive shell.
+	if [[ -z "${action}" ]]; then
+		if [[ ! -o interactive ]]; then
+			print -u2 'Usage: nixie [all | update | system | home [--local]]'
+			return 2
+		fi
+		print 'Choose a Nix workflow:'
+		select action in all update system home quit; do
+			case "${action}" in
+				all|update|system|home) break ;;
+				quit) return 0 ;;
+				*) print -u2 'Choose a numbered action.' ;;
+			esac
+		done
+	fi
+
+	case "${action}" in
+		all|update|system|home) ;;
+		*)
+			print -u2 "Unknown nixie action: ${action}"
+			print -u2 'Run nixie --help for usage.'
+			return 2
+			;;
+	esac
+
+	shift
+	if [[ "${action}" == "home" && "$1" == "--local" && "$#" -eq 1 ]]; then
+		local_dotfiles=true
+	elif [[ "$#" -ne 0 ]]; then
+		print -u2 'Usage: nixie [all | update | system | home [--local]]'
+		return 2
+	fi
+
+	if [[ ! -f "${nixie_flake}/flake.nix" ]]; then
+		print -u2 "Nix flake not found: ${nixie_flake}"
+		return 1
+	fi
+	if (( ! $+commands[nix] )); then
+		print -u2 'Nix is not available in PATH.'
+		return 1
+	fi
+
+	# Updating always precedes switches so every layer uses the same locked inputs.
+	if [[ "${action}" == "all" || "${action}" == "update" ]]; then
+		print -P '%F{cyan}==>%f %BUpdate flake inputs%b'
+		command nix flake update "${nixie_flake}" || return
+	fi
+
+	if [[ "${action}" == "update" ]]; then
+		return 0
+	fi
+
+	# Resolve the host before either switch so `home` also gets its machine-specific profile.
+	if [[ -e /etc/NIXOS && -z "${host_profile}" && ( "${action}" != "home" || -z "${home_profile}" ) ]]; then
+		current_hostname="$(command hostname -s)" || return
+		host_profiles=("${(@f)$(command nix eval --raw --apply 'configs: builtins.concatStringsSep "\n" (builtins.attrNames configs)' "${nixie_flake}#nixosConfigurations")}") || return
+		for candidate in "${host_profiles[@]}"; do
+			if [[ "${candidate:l}" == "${current_hostname:l}" ]]; then
+				host_profile="${candidate}"
+				break
+			fi
+			eval_host_name="$(command nix eval --raw "${nixie_flake}#nixosConfigurations.${candidate}.config.networking.hostName")" || return
+			if [[ "${eval_host_name:l}" == "${current_hostname:l}" ]]; then
+				host_profile="${candidate}"
+				break
+			fi
+		done
+		if [[ -z "${host_profile}" ]]; then
+			print -u2 "No NixOS profile matches hostname: ${current_hostname}"
+			print -u2 'Set NIXIE_HOST_PROFILE to select one explicitly.'
+			return 1
+		fi
+	fi
+
+	# System profiles exist only on NixOS; standalone Home Manager skips this layer.
+	if [[ "${action}" == "all" || "${action}" == "system" ]]; then
+		if [[ ! -e /etc/NIXOS ]]; then
+			if [[ "${action}" == "system" ]]; then
+				print -u2 'The system action requires NixOS.'
+				return 1
+			fi
+			print -P '%F{yellow}==>%f Skip NixOS system switch (not running NixOS)'
+		else
+			if (( ! $+commands[nixos-rebuild] )); then
+				print -u2 'nixos-rebuild is not available in PATH.'
+				return 1
+			fi
+			print -P "%F{cyan}==>%f %BSwitch NixOS profile %b${host_profile}"
+			command sudo nixos-rebuild switch --flake "${nixie_flake}#${host_profile}" || return
+		fi
+	fi
+
+	if [[ "${action}" == "system" ]]; then
+		return 0
+	fi
+
+	if (( ! $+commands[home-manager] )); then
+		print -u2 'home-manager is not available in PATH.'
+		return 1
+	fi
+	if [[ -z "${home_profile}" ]]; then
+		home_profiles=("${(@f)$(command nix eval --raw --apply 'configs: builtins.concatStringsSep "\n" (builtins.attrNames configs)' "${nixie_flake}#homeConfigurations")}") || return
+		if [[ -n "${host_profile}" ]]; then
+			for candidate in "${home_profiles[@]}"; do
+				[[ "${candidate}" == *"@${host_profile}" ]] && matching_profiles+=("${candidate}")
+			done
+		else
+			current_hostname="$(command hostname -s)" || return
+			for candidate in "${home_profiles[@]}"; do
+				[[ "${candidate}" == "${USER}" || "${candidate:l}" == "${USER:l}@${current_hostname:l}" ]] && matching_profiles+=("${candidate}")
+			done
+		fi
+		if [[ "${#matching_profiles[@]}" -eq 1 ]]; then
+			home_profile="${matching_profiles[1]}"
+		else
+			print -u2 'Unable to select one Home Manager profile automatically.'
+			print -u2 'Set NIXIE_HOME_PROFILE to a homeConfigurations key.'
+			return 1
+		fi
+	fi
+
+	# Local mode retains the old dotfiles test workflow without changing flake.lock.
+	if [[ "${local_dotfiles}" == true ]]; then
+		local dotfiles_dir="${DOTFILES_DIR:-${HOME}/Projects/config}"
+		if [[ ! -d "${dotfiles_dir}" ]]; then
+			print -u2 "Dotfiles checkout not found: ${dotfiles_dir}"
+			return 1
+		fi
+		print -P "%F{cyan}==>%f %BSwitch Home Manager profile %b${home_profile}%B with local dotfiles%b"
+		command home-manager switch --flake "${nixie_flake}#${home_profile}" --override-input dotfiles "path:${dotfiles_dir}"
+		return
+	fi
+
+	print -P "%F{cyan}==>%f %BSwitch Home Manager profile %b${home_profile}"
+	command home-manager switch --flake "${nixie_flake}#${home_profile}"
+}
