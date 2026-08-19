@@ -26,6 +26,50 @@ The wrapper reports a warning and falls back to direct OpenCode if Headroom is
 not installed, cannot start, or does not become healthy. This keeps OpenCode
 usable when the optional proxy is unavailable.
 
+## Use OpenCode In Neovim
+
+Neovim uses `opencode.nvim` and starts OpenCode as `opencode --port` in a
+right-side Snacks terminal. The plugin sends buffer and visual-selection
+context to that server, and Neovim presents OpenCode edit requests for review.
+
+| Mapping | Modes | Action |
+| --- | --- | --- |
+| `<leader>aa` | Normal, visual | Ask OpenCode about the cursor or selection |
+| `<leader>as` | Normal, visual | Select an OpenCode prompt, command, or server |
+| `<leader>at` | Normal | Toggle the OpenCode terminal |
+| `<leader>an` | Normal | Start a new OpenCode session |
+| `<leader>ai` | Normal | Interrupt the active OpenCode request |
+| `<leader>au` | Normal | Undo the last OpenCode change |
+| `<leader>ar` | Normal | Redo the last undone OpenCode change |
+| `<C-.>` | Normal, terminal | Toggle the OpenCode terminal without a leader key |
+
+The `<leader>a` group is listed as **AI / OpenCode** by which-key. When
+OpenCode requests an edit, use its diff view to accept (`da`), reject (`dr`),
+or work hunk-by-hunk (`dp`/`do`).
+
+## Use Snacks Terminals
+
+Snacks supplies the terminal UI for OpenCode and general shell work. The
+`<leader>t` which-key group contains the terminal mappings:
+
+| Mapping | Modes | Action |
+| --- | --- | --- |
+| `<leader>tt` | Normal, terminal | Toggle the default shell terminal |
+| `<leader>tn` | Normal | Open a new shell terminal |
+| `<leader>tf` | Normal, terminal | Focus or hide the default shell terminal |
+
+## Completion In Neovim
+
+The Neovim configuration uses `blink.cmp` rather than `nvim-cmp`. Blink
+provides LSP, path, LuaSnip, buffer, and lazydev completion; its standard
+`<C-n>`, `<C-p>`, `<C-y>`, and `<C-Space>` mappings remain available. `<C-l>`
+and `<C-h>` move forward and backward through LuaSnip placeholders.
+
+OpenCode's Ask input uses Blink's LSP and buffer sources through the
+`opencode_ask` filetype. Snacks input and picker provide the prompt and action
+selection interfaces, so do not disable either module while using
+`opencode.nvim`.
+
 ## Check Headroom
 
 On Linux, inspect the bootstrap and persistent services with:
@@ -88,3 +132,17 @@ home-manager switch --flake /etc/nixos#cbrst \
 
 Do not use `headroom wrap opencode` or use `headroom install` to target
 OpenCode. Those flows can rewrite the declarative OpenCode configuration.
+
+After changing the Neovim plugin specifications, synchronize plugins and check
+the OpenCode integration:
+
+```sh
+# Install, remove, and lock Neovim plugins from this configuration.
+nvim --headless "+Lazy sync" +qa
+
+# Confirm that opencode.nvim can reach or start its OpenCode server.
+nvim "+checkhealth opencode"
+
+# Inspect Blink completion providers, including the OpenCode Ask source.
+nvim "+BlinkCmp status"
+```

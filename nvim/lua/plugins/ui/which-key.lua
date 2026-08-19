@@ -41,13 +41,14 @@ return {
 
 		-- Document existing key chains
 		spec = {
+			{ "<leader>a", group = "[A]I / OpenCode", mode = { "n", "x" } },
 			{ "<leader>c", group = "[C]ode", mode = { "n", "x" } },
 			{ "<leader>d", group = "[D]ocument" },
 			{ "<leader>o", group = "[O]verseer" },
 			{ "<leader>r", group = "[R]ename" },
 			{ "<leader>s", group = "[S]earch" },
 			{ "<leader>w", group = "[W]orkspace" },
-			{ "<leader>t", group = "[T]oggle" },
+			{ "<leader>t", group = "[T]erminal / Toggle", mode = { "n", "t" } },
 			{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
 			{ "<leader>v", group = "[V]iew" },
 			{ "<leader>Q", group = "[Q]uit", mode = { "n" } },
