@@ -35,13 +35,13 @@ context to that server, and Neovim presents OpenCode edit requests for review.
 | Mapping | Modes | Action |
 | --- | --- | --- |
 | `<leader>aa` | Normal, visual | Ask OpenCode about the cursor or selection |
-| `<leader>as` | Normal, visual | Select an OpenCode prompt, command, or server |
+| `<leader>as` | Normal, visual | Select an OpenCode action |
 | `<leader>at` | Normal | Toggle the OpenCode terminal |
 | `<leader>an` | Normal | Start a new OpenCode session |
 | `<leader>ai` | Normal | Interrupt the active OpenCode request |
 | `<leader>au` | Normal | Undo the last OpenCode change |
 | `<leader>ar` | Normal | Redo the last undone OpenCode change |
-| `<C-.>` | Normal, terminal | Toggle the OpenCode terminal without a leader key |
+| `<C-.>` | Normal, terminal | Toggle the OpenCode terminal |
 
 The `<leader>a` group is listed as **AI / OpenCode** by which-key. When
 OpenCode requests an edit, use its diff view to accept (`da`), reject (`dr`),
