@@ -87,3 +87,12 @@ nixie home --local
 
 This mode passes `--override-input dotfiles path:<DOTFILES_DIR>` to
 `home-manager switch`; it does not modify Git history or `flake.lock`.
+
+## Impure Home Manager evaluation
+
+`nixie` passes `--impure` to both Home Manager switch paths. The shared Firefox
+configuration downloads the current signed AMO release for its managed addons,
+and unpackaged VS Code extensions are fetched from Open VSX's latest release
+metadata while Home Manager evaluates. `nixie home`, `nixie home --local`, and
+`nixie all` can therefore update those extensions without changing the dotfiles
+revision. This makes Home Manager generations non-reproducible by design.

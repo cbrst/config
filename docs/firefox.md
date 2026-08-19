@@ -20,29 +20,25 @@ only for a new profile; it defaults to `default`.
 
 Home Manager installs uBlock Origin, Tridactyl, 1Password, Violentmonkey, and
 Stylus into the selected profile. Firefox is configured to enable those profile
-extensions automatically. The AMO XPIs are version- and hash-pinned in
-`home-manager/default.nix`; Firefox does not self-update those Nix-managed
-extensions.
+extensions automatically. Home Manager fetches the latest signed XPI for each
+addon from Mozilla Add-ons during an impure evaluation, so each Home Manager
+switch checks for addon updates. This intentionally makes the result
+non-reproducible and requires `--impure`.
 
 ## Apply changes
 
 ```sh
 # Apply extensions, the Firefox profile, and Tridactyl configuration.
-home-manager switch --flake /etc/nixos#cbrst@asgard
+home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
 Restart Firefox after the switch and confirm the enabled addons at
 `about:addons`.
 
-To upgrade an extension, update its versioned AMO URL and SHA-256 hash in
-`firefoxExtensions`, then run the Home Manager switch again. Get the current
-artifact details from the AMO API:
-
-```sh
-# Print the current version, XPI URL, and SHA-256 for an addon.
-curl --fail --silent https://addons.mozilla.org/api/v5/addons/addon/ublock-origin/ \
-  | jq -r '.current_version | [.version, .file.url, .file.hash] | @tsv'
-```
+`nixie home`, `nixie home --local`, and the Home Manager phase of `nixie all`
+pass `--impure` automatically. A switch can therefore change addon versions
+without a dotfiles commit; rerun it if an AMO download or a Firefox startup
+fails after an upstream addon release.
 
 ## Userscripts and userstyles
 

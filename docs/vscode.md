@@ -140,30 +140,25 @@ vscodeExtensions = with pkgs.vscode-extensions; [
 ];
 ```
 
-For an extension missing from Nixpkgs, pin a VSIX release with
-`pkgs.vscode-utils.buildVscodeMarketplaceExtension`. Use the extension's
-publisher and name for `mktplcRef`, pin the exact version in both the URL and
-metadata, then calculate the SRI hash:
+For an extension missing from Nixpkgs, use `mkLatestVscodeExtension`. It gets
+the current release metadata and VSIX from Open VSX during an impure Home
+Manager evaluation, matching the shared Firefox addon update behavior.
 
 ```sh
-# Download a fixed VSIX release and print its Nix-compatible content hash.
-nix store prefetch-file --json 'https://open-vsx.org/api/PUBLISHER/NAME/VERSION/file/PUBLISHER.NAME-VERSION.vsix'
+# Inspect the release Open VSX will select during the next Home Manager switch.
+curl --fail --silent https://open-vsx.org/api/PUBLISHER/NAME/latest \
+  | jq -r '[.version, .files.download] | @tsv'
 ```
 
 ```nix
-# Pin an unpackaged extension so builds remain reproducible.
-(pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-  mktplcRef = {
-    publisher = "publisher";
-    name = "extension-name";
-    version = "1.2.3";
-  };
-  vsix = pkgs.fetchurl {
-    url = "https://open-vsx.org/api/publisher/extension-name/1.2.3/file/publisher.extension-name-1.2.3.vsix";
-    hash = "sha256-REPLACE-WITH-PREFETCH-HASH=";
-  };
+# Fetch the Open VSX latest release during impure Home Manager evaluation.
+(mkLatestVscodeExtension {
+  publisher = "publisher";
+  name = "extension-name";
 })
 ```
 
-Keep the version, URL, and hash together when upgrading an external extension.
-Run `home-manager switch` to verify the revised configuration.
+The result is deliberately non-reproducible: a `home-manager switch --impure`
+or `nixie home` can install a newer extension without a dotfiles change. Run a
+switch to apply it and rerun it if an upstream extension release causes a
+problem.

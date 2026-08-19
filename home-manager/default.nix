@@ -29,12 +29,12 @@ let
     {
       name,
       addonId,
-      url,
-      hash,
+      slug,
     }:
     pkgs.stdenvNoCC.mkDerivation {
       inherit name;
-      src = pkgs.fetchurl { inherit url hash; };
+      # Impure evaluation retrieves AMO's current signed addon release on each switch.
+      src = builtins.fetchurl "https://addons.mozilla.org/firefox/downloads/latest/${slug}/latest.xpi";
       dontUnpack = true;
       installPhase = ''
         # Home Manager discovers profile extensions by their Mozilla addon ID.
@@ -44,63 +44,63 @@ let
     };
   firefoxExtensions = [
     (mkFirefoxAddon {
-      name = "ublock-origin-1.73.0";
+      name = "ublock-origin";
       addonId = "uBlock0@raymondhill.net";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4940584/ublock_origin-1.73.0.xpi";
-      hash = "sha256-vMxRp3MVCvSvbh/WLHv963I4t5/yOBuZj6ny449keGo=";
+      slug = "ublock-origin";
     })
     (mkFirefoxAddon {
-      name = "tridactyl-1.24.6";
+      name = "tridactyl";
       addonId = "tridactyl.vim@cmcaine.co.uk";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4854935/tridactyl_vim-1.24.6.xpi";
-      hash = "sha256-E6vW/vK10TouynCt21SFpPuggAQ29qEsV6uwPzz5kgU=";
+      slug = "tridactyl-vim";
     })
     (mkFirefoxAddon {
-      name = "1password-8.12.32.33";
+      name = "1password";
       addonId = "{d634138d-c276-4fc8-924b-40a0ea21d284}";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4951729/1password_x_password_manager-8.12.32.33.xpi";
-      hash = "sha256-uVL7YXAn94tWSf/diPWLwH2pLSHcc8xrtuKIeeXi4ws=";
+      slug = "1password-x-password-manager";
     })
     (mkFirefoxAddon {
-      name = "violentmonkey-2.47.0";
+      name = "violentmonkey";
       addonId = "{aecec67f-0d10-4fa7-b7c7-609a2db280cf}";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4941753/violentmonkey-2.47.0.xpi";
-      hash = "sha256-zOgbiucGTn1wqAX2HnMZD71Ua908eEg9O3Ar4AOxMW8=";
+      slug = "violentmonkey";
     })
     (mkFirefoxAddon {
-      name = "stylus-2.4.10";
+      name = "stylus";
       addonId = "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4947910/styl_us-2.4.10.xpi";
-      hash = "sha256-kHwevP6qp4iQ74LrsaAE+OYH/kgglRZc0bgwk3MRISk=";
+      slug = "styl-us";
     })
   ];
+  mkLatestVscodeExtension =
+    {
+      publisher,
+      name,
+    }:
+    let
+      # Open VSX resolves the current version before Nix fetches its VSIX.
+      metadata = builtins.fromJSON (
+        builtins.readFile (builtins.fetchurl "https://open-vsx.org/api/${publisher}/${name}/latest")
+      );
+    in
+    pkgs.vscode-utils.buildVscodeMarketplaceExtension {
+      mktplcRef = {
+        inherit publisher name;
+        version = metadata.version;
+      };
+      # Impure evaluation retrieves the VSIX selected by the latest metadata.
+      vsix = builtins.fetchurl metadata.files.download;
+    };
   vscodeExtensions = with pkgs.vscode-extensions; [
     vscodevim.vim
     jnoortheen.nix-ide
     # Provide TOML syntax support, validation, and formatting across shared VSCode profiles.
     tamasfe.even-better-toml
-    # These extensions are not packaged in nixpkgs, so their VSIX releases are pinned below.
-    (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-      mktplcRef = {
-        publisher = "monokai";
-        name = "theme-monokai-pro-vscode";
-        version = "2.0.14";
-      };
-      vsix = pkgs.fetchurl {
-        url = "https://open-vsx.org/api/monokai/theme-monokai-pro-vscode/2.0.14/file/monokai.theme-monokai-pro-vscode-2.0.14.vsix";
-        hash = "sha256-4YdGtgdxCaRzpwXR2tyoJJxjGjgpimS3nub8mSeMIsw=";
-      };
+    # Open VSX's latest metadata keeps unpackaged extensions current on each switch.
+    (mkLatestVscodeExtension {
+      publisher = "monokai";
+      name = "theme-monokai-pro-vscode";
     })
-    (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-      mktplcRef = {
-        publisher = "sst-dev";
-        name = "opencode";
-        version = "0.0.13";
-      };
-      vsix = pkgs.fetchurl {
-        url = "https://open-vsx.org/api/sst-dev/opencode/0.0.13/file/sst-dev.opencode-0.0.13.vsix";
-        hash = "sha256-6adXUaoh/OP5yYItH3GAQ7GpupfmTGaxkKP6hYUMYNQ=";
-      };
+    (mkLatestVscodeExtension {
+      publisher = "sst-dev";
+      name = "opencode";
     })
   ];
 in

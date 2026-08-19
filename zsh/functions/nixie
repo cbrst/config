@@ -175,10 +175,12 @@ nixie() {
 			return 1
 		fi
 		print -P "%F{cyan}==>%f %BSwitch Home Manager profile %b${home_profile}%B with local dotfiles%b"
-		command home-manager switch --flake "${nixie_flake}#${home_profile}" --override-input dotfiles "path:${dotfiles_dir}"
+		# Firefox extensions fetch AMO's latest XPIs during impure Home Manager evaluation.
+		command home-manager switch --impure --flake "${nixie_flake}#${home_profile}" --override-input dotfiles "path:${dotfiles_dir}"
 		return
 	fi
 
 	print -P "%F{cyan}==>%f %BSwitch Home Manager profile %b${home_profile}"
-	command home-manager switch --flake "${nixie_flake}#${home_profile}"
+	# Firefox extensions fetch AMO's latest XPIs during impure Home Manager evaluation.
+	command home-manager switch --impure --flake "${nixie_flake}#${home_profile}"
 }
