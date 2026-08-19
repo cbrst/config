@@ -66,6 +66,12 @@ let
       addonId = "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}";
       slug = "styl-us";
     })
+    # SponsorBlock is shared so YouTube sponsor skipping works in every profile.
+    (mkFirefoxAddon {
+      name = "sponsorblock";
+      addonId = "sponsorBlocker@ajay.app";
+      slug = "sponsorblock";
+    })
   ];
   tridactylExtension = mkFirefoxAddon {
     name = "tridactyl";
@@ -83,18 +89,24 @@ let
     "services.sync.engine.prefs" = false;
     "services.sync.engine.tabs" = false;
   };
+  firefoxProfileSettings = firefoxSyncSettings // {
+    # Enable the extensions copied into the profile without a first-run prompt.
+    "extensions.autoDisableScopes" = 0;
+    # Restore the prior window and tabs when Firefox starts normally.
+    "browser.startup.page" = 3;
+  };
   firefoxSession = pkgs.writeShellScriptBin "firefox-session" (
     # Keep session detection in a versioned script instead of embedding it in generated Nix.
     builtins.readFile "${dotfiles}/firefox/scripts/firefox-session"
   );
+  firefoxDefaultProfilePath = machine.firefoxProfilePath or "default";
+  firefoxProfilePaths = [
+    firefoxDefaultProfilePath
+    "wayland"
+  ];
   mkFirefoxProfile = path: extensions: {
     inherit path;
-    settings = firefoxSyncSettings // {
-      # Enable the extensions copied into the profile without a first-run prompt.
-      "extensions.autoDisableScopes" = 0;
-      # Restore the prior window and tabs when Firefox starts normally.
-      "browser.startup.page" = 3;
-    };
+    settings = firefoxProfileSettings;
     extensions.packages = extensions;
   };
   mkLatestVscodeExtension =
@@ -250,7 +262,7 @@ in
         "x-scheme-handler/http"
         "x-scheme-handler/https"
       ];
-      startupWMClass = "firefox";
+      # Home Manager's desktop-entry module does not expose StartupWMClass.
     };
   }
   // lib.optionalAttrs isLinux {
@@ -282,10 +294,17 @@ in
     # Allow Tridactyl to read the XDG configuration deployed by Home Manager.
     nativeMessagingHosts = [ pkgs.tridactyl-native ];
     profiles = {
-      default = mkFirefoxProfile (machine.firefoxProfilePath or "default") commonFirefoxExtensions;
+      # Firefox requires unique IDs and exactly one default profile.
+      default = (mkFirefoxProfile firefoxDefaultProfilePath commonFirefoxExtensions) // {
+        id = 0;
+        isDefault = true;
+      };
       wayland = (mkFirefoxProfile "wayland" (commonFirefoxExtensions ++ [ tridactylExtension ])) // {
-        settings = firefoxSyncSettings // {
-          # Put persistent browser actions beside tabs before the navigation bar is hidden.
+        id = 1;
+        isDefault = false;
+        # Preserve the shared extension and startup preferences in the compact profile.
+        settings = firefoxProfileSettings // {
+          # Keep the Downloads action beside tabs in the compact Wayland layout.
           "browser.uiCustomization.state" = builtins.toJSON {
             currentVersion = 22;
             placements = {
@@ -294,7 +313,6 @@ in
                 "new-tab-button"
                 "alltabs-button"
                 "downloads-button"
-                "unified-extensions-button"
               ];
               "nav-bar" = [
                 "back-button"
@@ -321,6 +339,17 @@ in
       };
     };
   };
+
+  home.activation.removeStaleFirefoxExtensionLinks = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
+    # Recreate only old Home Manager links before the new extension tree is linked.
+    extensions_root=${lib.escapeShellArg config.programs.firefox.profilesPath}
+    for profile_path in ${lib.concatMapStringsSep " " lib.escapeShellArg firefoxProfilePaths}; do
+      extensions_path="$extensions_root/$profile_path/extensions"
+      if [[ -L "$extensions_path" ]]; then
+        rm -- "$extensions_path"
+      fi
+    done
+  '';
 
   programs.vscode = {
     # VSCode and its extensions are shared across every Home Manager consumer.
@@ -352,8 +381,8 @@ in
       Service = {
         Type = "oneshot";
         RemainAfterExit = true;
-        # Headroom is not packaged in Nixpkgs; uv isolates it from system Python.
-        ExecStart = "${pkgs.runtimeShell} -c 'if [[ ! -x ${config.home.homeDirectory}/.local/bin/headroom ]]; then ${pkgs.uv}/bin/uv tool install --python 3.13 \"headroom-ai[all]\"; fi; ${config.home.homeDirectory}/.local/bin/headroom install apply --preset persistent-service --providers manual'";
+        # Reinstall the uv tool when its Python interpreter was garbage-collected or replaced.
+        ExecStart = "${pkgs.runtimeShell} -c 'if ! ${config.home.homeDirectory}/.local/bin/headroom --version >/dev/null 2>&1; then ${pkgs.uv}/bin/uv tool install --reinstall --python 3.13 \"headroom-ai[all]\"; fi; ${config.home.homeDirectory}/.local/bin/headroom install apply --preset persistent-service --providers manual'";
       };
       Install.WantedBy = [ "default.target" ];
     };

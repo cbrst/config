@@ -1,12 +1,26 @@
 /* This stylesheet is installed only in Firefox's Niri/Hyprland profile. */
 
-/* Compositors provide window management, so Firefox's navigation chrome is unnecessary. */
+/* Hide some stuff */
 #nav-bar {
+  visibility: collapse;
+}
+#navigator-toolbox:hover #nav-bar {
+  visibility: visible;
+}
+
+.titlebar-buttonbox-container,
+.titlebar-buttonbox,
+.titlebar-spacer[type="post-tabs"] {
   display: none !important;
 }
 
-/* Keep compositor decorations authoritative instead of duplicating window controls. */
-.titlebar-buttonbox-container,
-.titlebar-buttonbox {
-  display: none !important;
+/* Shrink tabs */
+:root {
+  @media not -moz-pref("browser.nova.enabled") {
+    --tab-min-height: 26px !important;
+  }
+}
+
+#tabbrowser-tabs {
+  padding-left: 2px;
 }

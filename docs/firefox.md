@@ -18,12 +18,13 @@ Find the current profile path in
 machine where Home Manager should install Firefox. Omit `firefoxProfilePath`
 only for a new profile; it defaults to `default`.
 
-Home Manager installs uBlock Origin, 1Password, Violentmonkey, and Stylus into
-both managed profiles, and Tridactyl into the Niri/Hyprland profile only.
-Firefox is configured to enable those profile extensions automatically. Home
-Manager fetches the latest signed XPI for each addon from Mozilla Add-ons during
-an impure evaluation, so each Home Manager switch checks for addon updates. This
-intentionally makes the result non-reproducible and requires `--impure`.
+Home Manager installs uBlock Origin, 1Password, Violentmonkey, Stylus, and
+SponsorBlock into both managed profiles, and Tridactyl into the Niri/Hyprland
+profile only. Firefox is configured to enable those profile extensions
+automatically. Home Manager fetches the latest signed XPI for each addon from
+Mozilla Add-ons during an impure evaluation, so each Home Manager switch checks
+for addon updates. This intentionally makes the result non-reproducible and
+requires `--impure`.
 
 Home Manager writes these XPIs under Firefox's profile extension UUID directory;
 do not replace the generated `extensions` symlink in the Firefox profile.
@@ -35,10 +36,30 @@ contains `niri` or `Hyprland` (or when Hyprland's instance variable is present)
 and otherwise selects `default`. The local `firefox.desktop` entry and the Niri
 and Hyprland browser bindings use this launcher.
 
-The Wayland profile loads `userChrome.css`, which hides the navigation bar and
-Firefox window controls. Its Downloads and Extensions toolbar buttons are placed
-on the tab bar. Tridactyl is installed only in this compact profile; uBlock
-Origin, 1Password, Violentmonkey, and Stylus are installed in both profiles.
+The profiles use fixed Home Manager IDs: `default` is ID `0` and the sole
+default profile; `wayland` is ID `1`. Keep these IDs unique when adding a
+machine-specific Firefox profile.
+
+## Extension Link Recovery
+
+When switching from an earlier shared configuration, Home Manager removes a
+stale `extensions` symlink before linking the managed add-on tree for each
+profile. This migration runs automatically with `nixie home --local` and normal
+Home Manager switches. It removes only symlinks; an existing real `extensions`
+directory is preserved and Home Manager will report any ownership conflict.
+
+The generated desktop entry intentionally omits `StartupWMClass`: Home
+Manager's `xdg.desktopEntries` option does not support that field. Firefox still
+uses its normal window class.
+
+The Wayland profile loads `userChrome.css`, which collapses the navigation bar
+until the Firefox toolbox is hovered and hides Firefox window controls. Its
+Downloads button remains on the tab bar; extension action buttons and Firefox's
+unified extensions menu remain in the navigation bar and are available on hover.
+Tridactyl is installed only in this compact profile; uBlock Origin, 1Password,
+Violentmonkey, Stylus, and SponsorBlock are installed in both profiles.
+Both profiles set `extensions.autoDisableScopes = 0`, so Firefox enables their
+Home Manager-provided extensions instead of treating them as disabled sideloads.
 
 ## Firefox Sync
 
@@ -66,6 +87,8 @@ home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 Restart Firefox after the switch. In a Niri or Hyprland session, run
 `firefox-session` and confirm the compact toolbar and Tridactyl. In another
 session, confirm the normal toolbar and common extensions at `about:addons`.
+If Firefox was already running, close every Firefox window before starting the
+Wayland profile so it reloads the managed toolbar layout.
 
 `nixie home`, `nixie home --local`, and the Home Manager phase of `nixie all`
 pass `--impure` automatically. A switch can therefore change addon versions

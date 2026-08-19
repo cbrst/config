@@ -52,6 +52,10 @@ systemctl --user restart headroom-bootstrap.service
 journalctl --user -u headroom-bootstrap.service -b
 ```
 
+The bootstrap checks `headroom --version` before every configuration switch. If
+the uv-managed wrapper has a missing Python interpreter, it reinstalls Headroom
+automatically; rerun the service only when that reinstall itself fails.
+
 ## Maintain The Integration
 
 The OpenCode executable belongs in `home.packages` in
