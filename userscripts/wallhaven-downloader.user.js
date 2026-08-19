@@ -4,6 +4,8 @@
 // @version      2.0.1
 // @description  Add wallpaper download buttons with optional WebP conversion.
 // @author       cbrst
+// @downloadURL  https://raw.githubusercontent.com/cbrst/config/main/userscripts/wallhaven-downloader.user.js
+// @updateURL    https://raw.githubusercontent.com/cbrst/config/main/userscripts/wallhaven-downloader.user.js
 // @match        https://wallhaven.cc/*
 // @run-at       document-idle
 // @require      https://unpkg.com/@saschazar/wasm-webp@3.0.1/wasm_webp.js

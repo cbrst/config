@@ -4,6 +4,8 @@
 // @version      1.2.3
 // @description  Intercept NZB downloads and send them directly to SABnzbd.
 // @author       cbrst
+// @downloadURL  https://raw.githubusercontent.com/cbrst/config/main/userscripts/send-nzb-to-sabnzbd.user.js
+// @updateURL    https://raw.githubusercontent.com/cbrst/config/main/userscripts/send-nzb-to-sabnzbd.user.js
 // @match        *://*/*
 // @run-at       document-start
 // @grant        GM.xmlHttpRequest

@@ -27,6 +27,8 @@ The consuming flake must pass `inputs` and a `machine` attrset through
 | `ghostty` | `""` | Machine-local Ghostty text written to `ghostty/machine`. |
 | `niri` | `false` | Installs and deploys the Niri session with Noctalia on Linux. |
 | `noctalia` | `false` | Enables Noctalia on Linux. |
+| `firefoxSystem` | `false` | Leaves Firefox package ownership to NixOS while Home Manager configures its profile. |
+| `firefoxProfilePath` | `"default"` | Existing Firefox profile path to preserve. |
 | `stateVersion` | `26.05` | Home Manager state version. |
 
 Simple values come from `machine`; machine flakes can add a Home Manager module
@@ -86,6 +88,12 @@ notifications, wallpaper, lock screen, and OSDs. Add machine-specific monitor
 rules with `hl.monitor(...)` in `hypr/hyprland.lua`. The shared Linux profile
 uses the Bibata Modern Ice cursor; see [`docs/hyprland.md`](docs/hyprland.md)
 for cursor maintenance and session reload steps.
+
+## Firefox
+
+Firefox extensions, the Tridactyl configuration, and GitHub-backed userscript
+updates are documented in [`docs/firefox.md`](docs/firefox.md). NixOS systems
+that install Firefox themselves should set `machine.firefoxSystem = true`.
 
 ## Niri
 

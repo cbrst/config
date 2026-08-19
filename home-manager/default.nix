@@ -25,6 +25,55 @@ let
       [ "/Users/cbrst/.local/bin/headroom" ]
       [ "${config.home.homeDirectory}/.local/bin/headroom" ]
       (builtins.readFile "${dotfiles}/opencode/opencode.jsonc");
+  mkFirefoxAddon =
+    {
+      name,
+      addonId,
+      url,
+      hash,
+    }:
+    pkgs.stdenvNoCC.mkDerivation {
+      inherit name;
+      src = pkgs.fetchurl { inherit url hash; };
+      dontUnpack = true;
+      installPhase = ''
+        # Home Manager discovers profile extensions by their Mozilla addon ID.
+        install -Dm444 "$src" "$out/share/mozilla/extensions/${addonId}.xpi"
+      '';
+      passthru = { inherit addonId; };
+    };
+  firefoxExtensions = [
+    (mkFirefoxAddon {
+      name = "ublock-origin-1.73.0";
+      addonId = "uBlock0@raymondhill.net";
+      url = "https://addons.mozilla.org/firefox/downloads/file/4940584/ublock_origin-1.73.0.xpi";
+      hash = "sha256-vMxRp3MVCvSvbh/WLHv963I4t5/yOBuZj6ny449keGo=";
+    })
+    (mkFirefoxAddon {
+      name = "tridactyl-1.24.6";
+      addonId = "tridactyl.vim@cmcaine.co.uk";
+      url = "https://addons.mozilla.org/firefox/downloads/file/4854935/tridactyl_vim-1.24.6.xpi";
+      hash = "sha256-E6vW/vK10TouynCt21SFpPuggAQ29qEsV6uwPzz5kgU=";
+    })
+    (mkFirefoxAddon {
+      name = "1password-8.12.32.33";
+      addonId = "{d634138d-c276-4fc8-924b-40a0ea21d284}";
+      url = "https://addons.mozilla.org/firefox/downloads/file/4951729/1password_x_password_manager-8.12.32.33.xpi";
+      hash = "sha256-uVL7YXAn94tWSf/diPWLwH2pLSHcc8xrtuKIeeXi4ws=";
+    })
+    (mkFirefoxAddon {
+      name = "violentmonkey-2.47.0";
+      addonId = "{aecec67f-0d10-4fa7-b7c7-609a2db280cf}";
+      url = "https://addons.mozilla.org/firefox/downloads/file/4941753/violentmonkey-2.47.0.xpi";
+      hash = "sha256-zOgbiucGTn1wqAX2HnMZD71Ua908eEg9O3Ar4AOxMW8=";
+    })
+    (mkFirefoxAddon {
+      name = "stylus-2.4.10";
+      addonId = "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}";
+      url = "https://addons.mozilla.org/firefox/downloads/file/4947910/styl_us-2.4.10.xpi";
+      hash = "sha256-kHwevP6qp4iQ74LrsaAE+OYH/kgglRZc0bgwk3MRISk=";
+    })
+  ];
   vscodeExtensions = with pkgs.vscode-extensions; [
     vscodevim.vim
     jnoortheen.nix-ide
@@ -143,6 +192,8 @@ in
       "nvim".source = lib.mkDefault "${dotfiles}/nvim";
       "starship".source = lib.mkDefault "${dotfiles}/starship";
       "tmux".source = lib.mkDefault "${dotfiles}/tmux";
+      # Tridactyl loads its configuration from the user's XDG config directory.
+      "tridactyl".source = lib.mkDefault "${dotfiles}/tridactyl";
       "wezterm".source = lib.mkDefault "${dotfiles}/wezterm";
       "yt-dlp".source = lib.mkDefault "${dotfiles}/yt-dlp";
       # Keep the zsh entry files and autoloaded OpenCode wrapper together.
@@ -172,6 +223,21 @@ in
     initContent = ''
       source "$ZDOTDIR/dotfiles.zshrc"
     '';
+  };
+
+  programs.firefox = {
+    # NixOS may own the browser package while Home Manager owns its profile.
+    enable = true;
+    package = lib.mkDefault (if machine.firefoxSystem or false then null else pkgs.firefox);
+    profiles.default = {
+      # Preserve the profile created by Firefox before Home Manager manages it.
+      path = machine.firefoxProfilePath or "default";
+      settings = {
+        # Enable the extensions copied into the profile without a first-run prompt.
+        "extensions.autoDisableScopes" = 0;
+      };
+      extensions.packages = firefoxExtensions;
+    };
   };
 
   programs.vscode = {

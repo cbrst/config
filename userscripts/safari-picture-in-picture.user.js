@@ -4,6 +4,8 @@
 // @version      1.0.0
 // @description  Enable Picture in Picture for HTML5 videos, with first-class YouTube controls.
 // @author       cbrst
+// @downloadURL  https://raw.githubusercontent.com/cbrst/config/main/userscripts/safari-picture-in-picture.user.js
+// @updateURL    https://raw.githubusercontent.com/cbrst/config/main/userscripts/safari-picture-in-picture.user.js
 // @match        http://*/*
 // @match        https://*/*
 // @run-at       document-idle
