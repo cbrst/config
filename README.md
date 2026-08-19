@@ -105,6 +105,11 @@ bindings, reload instructions, and monitor overrides.
 Noctalia's shared bar layout and appearance are documented in
 [`docs/noctalia.md`](docs/noctalia.md).
 
+## GTK
+
+The shared Linux GTK defaults and machine-specific font override pattern are
+documented in [`docs/gtk.md`](docs/gtk.md).
+
 Dependency installation currently targets macOS through Homebrew and Arch-based
 Linux through pacman. On macOS, system or Command Line Tools commands such as
 `bash`, `curl`, `git`, `make`, and `zsh` are checked but not installed through
