@@ -112,6 +112,33 @@ Manager's generated `.zshrc` always sources the shared wrapper. Use an explicit
 machine-level definition or `lib.mkForce` only when a machine must replace that
 shared shell initialization.
 
+## Group Unstaged Commits
+
+The shared `group-unstaged-commits` skill organizes the current repository's
+unstaged work into small, related commits. It preserves existing staged changes
+unless explicitly asked to include them, reviews untracked files before staging
+them, and never discards work. Ask OpenCode to "group and commit my unstaged
+changes" or explicitly invoke the `group-unstaged-commits` skill.
+
+Each commit receives a concise conventional-style subject and a detailed body
+based on the reviewed diff. The body explains the behavior changed,
+implementation details, and actual validation; it must not use placeholder
+text, repeat the subject, or make unsupported claims. Ambiguous groups or files
+that contain mixed concerns require confirmation before anything is staged.
+
+The skill is stored at `opencode/skills/group-unstaged-commits/SKILL.md` and
+Home Manager deploys it to `$XDG_CONFIG_HOME/opencode/skills`. To change its
+workflow, edit that source file and apply the shared module:
+
+```sh
+# Test the updated shared OpenCode configuration from this checkout.
+home-manager switch --flake /etc/nixos#cbrst \
+  --override-input dotfiles path:/home/cbrst/Projects/config
+```
+
+Quit and restart OpenCode after the switch; skills are loaded only when
+OpenCode starts.
+
 The shared `.zshrc` loads `env.zsh` before Zim initialization so the wrapper's
 runtime directories are available in interactive shells as well as login shells.
 

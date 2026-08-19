@@ -235,6 +235,8 @@ in
       "nvim".source = lib.mkDefault "${dotfiles}/nvim";
       "starship".source = lib.mkDefault "${dotfiles}/starship";
       "tmux".source = lib.mkDefault "${dotfiles}/tmux";
+      # Make shared OpenCode skills available in every configured project.
+      "opencode/skills".source = lib.mkDefault "${dotfiles}/opencode/skills";
       # Tridactyl loads its configuration from the user's XDG config directory.
       "tridactyl".source = lib.mkDefault "${dotfiles}/tridactyl";
       "wezterm".source = lib.mkDefault "${dotfiles}/wezterm";
