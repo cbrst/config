@@ -33,15 +33,17 @@ nixie() {
 		# Use a compact keyboard menu instead of zsh's unstyled `select` output.
 		while true; do
 			print
-			print -P '%F{magenta}+----------------------------------------+%f'
-			print -P '%F{magenta}|%f  %B%F{white}NIXIE%f%b  %F{244}daily configuration console%f  %F{magenta}|%f'
-			print -P '%F{magenta}+----------------------------------------+%f'
-			print -P '  %F{cyan}1%f  %BFull refresh%b  %F{244}inputs + system + home%f'
-			print -P '  %F{blue}2%f  %BUpdate inputs%b  %F{244}refresh flake.lock only%f'
-			print -P '  %F{yellow}3%f  %BSystem switch%b  %F{244}apply the NixOS profile%f'
-			print -P '  %F{green}4%f  %BHome switch%b    %F{244}refresh dotfiles + apply home%f'
-			print -P '  %F{244}q%f  Quit'
-			print -n -P '%F{magenta}Select [1-4, q]:%f '
+			print -P '%F{magenta}╭────────────────────────────────────────╮%f'
+			print -P '%F{magenta}│%f  %B%F{white}NIXIE%f%b  %F{244}daily configuration console%f    %F{magenta}│%f'
+			print -P '%F{magenta}├────────────────────────────────────────╯%f'
+			print -P '%F{magenta}│%f'
+			print -P '%F{magenta}│%f %F{cyan}1%f  %BFull refresh%b  %F{244}inputs + system + home%f'
+			print -P '%F{magenta}│%f %F{blue}2%f  %BUpdate inputs%b  %F{244}refresh flake.lock only%f'
+			print -P '%F{magenta}│%f %F{yellow}3%f  %BSystem switch%b  %F{244}apply the NixOS profile%f'
+			print -P '%F{magenta}│%f %F{green}4%f  %BHome switch%b    %F{244}refresh dotfiles + apply home%f'
+			print -P '%F{magenta}│%f %F{244}q%f  Quit'
+			print -P '%F{magenta}│%f'
+			print -n -P '%F{magenta}╰╸ Select [1-4, q]:%f '
 			read -r action || return 1
 			case "${action}" in
 				1) action=all; break ;;
