@@ -312,33 +312,6 @@ in
         isDefault = false;
         # Preserve the shared extension and startup preferences in the compact profile.
         settings = firefoxProfileSettings // {
-          # Keep the Downloads action beside tabs in the compact Wayland layout.
-          "browser.uiCustomization.state" = builtins.toJSON {
-            currentVersion = 22;
-            placements = {
-              "TabsToolbar" = [
-                "tabbrowser-tabs"
-                "new-tab-button"
-                "alltabs-button"
-                "downloads-button"
-              ];
-              "nav-bar" = [
-                "back-button"
-                "forward-button"
-                "stop-reload-button"
-                "urlbar-container"
-              ];
-              "PersonalToolbar" = [ "import-button" "personal-bookmarks" ];
-            };
-            seen = [
-              "save-to-pocket-button"
-              "developer-button"
-              "screenshot-button"
-              "fxa-toolbar-menu-button"
-            ];
-            dirtyAreaCache = [ "nav-bar" "TabsToolbar" "PersonalToolbar" ];
-            newElementCount = 5;
-          };
           # Firefox otherwise ignores userChrome.css in new profiles.
           "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         };
