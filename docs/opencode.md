@@ -28,40 +28,23 @@ usable when the optional proxy is unavailable.
 
 ## Use OpenCode In Neovim
 
-Neovim uses `opencode.nvim` and starts OpenCode as `opencode --port` in one
-right-side Snacks terminal. The plugin sends buffer and visual-selection
-context to that server, presents OpenCode edit requests for review, and reloads
-unmodified buffers when OpenCode changes files.
+Neovim uses the Nix-packaged `codecompanion.nvim` plugin with its built-in
+OpenCode ACP adapter. CodeCompanion starts and communicates with the OpenCode
+CLI directly, retaining its normal authentication, MCP servers, skills,
+sub-agents, and session behavior. It does not start an OpenCode server or embed
 
 | Mapping | Modes | Action |
 | --- | --- | --- |
-| `<leader>aa` | Normal, visual | Ask OpenCode about the cursor or selection |
-| `<leader>ab` | Normal | Ask OpenCode about the current buffer |
-| `<leader>ad` | Normal | Ask OpenCode about current diagnostics |
-| `<leader>as` | Normal, visual | Select an OpenCode action |
-| `<leader>at` | Normal | Toggle the OpenCode terminal |
-| `<leader>av` | Normal | Ask OpenCode about visible code |
-| `<leader>an` | Normal | Start a new OpenCode session |
-| `<leader>ai` | Normal | Interrupt the active OpenCode request |
-| `<leader>au` | Normal | Undo the last OpenCode change |
-| `<leader>ar` | Normal | Redo the last undone OpenCode change |
-| `<C-.>` | Normal, terminal | Toggle the OpenCode terminal |
-| `<C-w>` | OpenCode terminal | Exit terminal mode and start a Neovim window command |
+| `<leader>aa` | Normal | Toggle CodeCompanion's OpenCode chat |
+| `<leader>aa` | Visual | Add the selection to the active chat |
+| `<leader>as` | Normal, visual | Open the CodeCompanion action palette |
+| `<leader>ac` | Normal, visual | Start an inline CodeCompanion action |
+| `<leader>ar` | Normal | Open CodeCompanion's code-review workflow |
 
-The `<leader>a` group is listed as **AI / OpenCode** by which-key. When
-OpenCode requests an edit, use its diff view to accept (`da`), reject (`dr`),
-or work hunk-by-hunk (`dp`/`do`).
-
-Ask supports placeholders with completion: `@this` refers to the cursor or the
-visual selection, `@buffer` is the current file, `@visible` is visible text,
-and `@diagnostics`, `@buffers`, `@marks`, and `@quickfix` add their respective
-editor context. OpenCode reads referenced files from disk, so save local edits
-before submitting a prompt.
-
-OpenCode file-edit events and Neovim focus or buffer-entry checks run
-`:checktime`. With `autoread` enabled, an unmodified buffer reloads
-automatically. Neovim does not replace a buffer with unsaved changes; write,
-discard, or reconcile those changes before reloading it.
+The `<leader>a` group is listed as **AI / CodeCompanion** by which-key. Use
+`:CodeCompanionChat` to open a chat and `:CodeCompanionChat Toggle` to show the
+active session. OpenCode ACP slash commands are available from the chat, while
+CodeCompanion supplies editor context, actions, diff approval, and code review.
 
 ## Use Snacks Terminals
 
@@ -81,10 +64,9 @@ provides LSP, path, LuaSnip, buffer, and lazydev completion; its standard
 `<C-n>`, `<C-p>`, `<C-y>`, and `<C-Space>` mappings remain available. `<C-l>`
 and `<C-h>` move forward and backward through LuaSnip placeholders.
 
-OpenCode's Ask input uses Blink's LSP and buffer sources through the
-`opencode_ask` filetype. Snacks input and picker provide the prompt and action
-selection interfaces, so do not disable either module while using
-`opencode.nvim`.
+CodeCompanion uses its own chat and prompt buffers. It can use the configured
+Telescope action palette without requiring an OpenCode-specific completion
+source or Snacks terminal integration.
 
 ## Check Headroom
 
@@ -148,7 +130,7 @@ workflow, edit that source file and apply the shared module:
 
 ```sh
 # Test the updated shared OpenCode configuration from this checkout.
-home-manager switch --flake /etc/nixos#cbrst \
+home-manager switch --flake /etc/nixos#cbrst@asgard \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 
@@ -176,19 +158,16 @@ home-manager switch --flake /etc/nixos#cbrst \
 Do not use `headroom wrap opencode` or use `headroom install` to target
 OpenCode. Those flows can rewrite the declarative OpenCode configuration.
 
-After changing the Neovim plugin specifications, synchronize plugins and check
-the OpenCode integration:
+After changing Neovim's CodeCompanion configuration, apply Home Manager and
+check the ACP integration:
 
 ```sh
-# Install, remove, and lock Neovim plugins from this configuration.
-nvim --headless "+Lazy sync" +qa
+# Rebuild the Home Manager generation after editing the Nix plugin list.
+home-manager switch --flake /etc/nixos#cbrst@asgard
 
-# Confirm that opencode.nvim can reach or start its OpenCode server.
-nvim "+checkhealth opencode"
+# Confirm CodeCompanion can initialize its OpenCode ACP adapter.
+nvim "+checkhealth codecompanion"
 
-# Inspect the OpenCode terminal and verify that only one server is running.
-pgrep -af "opencode.*--port"
-
-# Inspect Blink completion providers, including the OpenCode Ask source.
+# Inspect Blink completion providers.
 nvim "+BlinkCmp status"
 ```

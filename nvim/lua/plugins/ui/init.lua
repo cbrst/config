@@ -1,50 +1,16 @@
-return {
-	{ "danilamihailov/beacon.nvim" },
-	{ "MeanderingProgrammer/render-markdown.nvim" },
-	{
-		"sschleemilch/slimline.nvim",
-		init = function()
-			vim.api.nvim_set_hl(0, "Slimline", { bg = "#1e1e2e" })
-		end,
-		opts = {
-			bold = true,
-			configs = {
-				filetype_lsp = {
-					lsp_sep = vim.g.have_nerd_font and " " or ",",
-					map_lsps = vim.g.have_nerd_font and {
-						["lua_ls"] = " ",
-						["typescript-tools"] = "󰛦 ",
-						["tailwindcss"] = "󱏿 ",
-					} or {
-						["lua_ls"] = "lua",
-						["typescript-tools"] = "TS",
-						["tailwindcss"] = "TW",
-					},
-				},
+local M = {}
+
+function M.setup()
+	-- Explicit setup enables rendering with the package's default behavior.
+	require("render-markdown").setup({})
+	require("dropbar").setup({
+		icons = {
+			enable = vim.g.have_nerd_font,
+			ui = {
+				bar = { separator = "  " },
 			},
 		},
-	},
-	{
-		"bekaboo/dropbar.nvim",
-		opts = {
-			icons = {
-				enable = vim.g.have_nerd_font,
-				ui = {
-					bar = {
-						separator = "  ",
-					},
-				},
-			},
-		},
-	},
-	{
-		"nvim-mini/mini.indentscope",
-		version = false,
-		opts = {
-			options = {
-				try_as_border = true,
-			},
-			symbol = "│",
-		},
-	},
-}
+	})
+end
+
+return M

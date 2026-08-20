@@ -1,12 +1,15 @@
-return vim.api.nvim_create_autocmd("FileType", {
-	pattern = "markdown",
-	callback = function()
-		-- Set conceallevel=2 for markdown files
-		-- 0: No concealing
-		-- 1: Concealed text shows as one character
-		-- 2: Concealed text is hidden unless it has replacement character
-		-- 3: Concealed text is hidden
-		vim.bo.conceallevel = 2
-	end,
-	desc = "Set concealment level for markdown files",
-})
+local M = {}
+
+function M.setup()
+	vim.api.nvim_create_autocmd("FileType", {
+		group = vim.api.nvim_create_augroup("ConfigMarkdownFiletype", { clear = true }),
+		pattern = "markdown",
+		desc = "Hide concealed Markdown syntax",
+		callback = function()
+			-- Rendered Markdown markers stay hidden while replacement characters remain visible.
+			vim.bo.conceallevel = 2
+		end,
+	})
+end
+
+return M

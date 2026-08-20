@@ -1,12 +1,9 @@
-return {
-	"folke/which-key.nvim",
-	event = "VimEnter", -- Sets the loading event to 'VimEnter'
-	opts = {
+local M = {}
+
+function M.setup()
+	require("which-key").setup({
 		icons = {
-			-- set icon mappings to true if you have a Nerd Font
 			mappings = vim.g.have_nerd_font,
-			-- If you are using a Nerd Font: set icons.keys to an empty table which will use the
-			-- default whick-key.nvim defined Nerd Font icons, otherwise define a string table
 			keys = vim.g.have_nerd_font and {} or {
 				Up = "<Up> ",
 				Down = "<Down> ",
@@ -38,10 +35,8 @@ return {
 				F12 = "<F12>",
 			},
 		},
-
-		-- Document existing key chains
 		spec = {
-			{ "<leader>a", group = "[A]I / OpenCode", mode = { "n", "x" } },
+			{ "<leader>a", group = "[A]I / CodeCompanion", mode = { "n", "x" } },
 			{ "<leader>c", group = "[C]ode", mode = { "n", "x" } },
 			{ "<leader>d", group = "[D]ocument" },
 			{ "<leader>o", group = "[O]verseer" },
@@ -51,7 +46,9 @@ return {
 			{ "<leader>t", group = "[T]erminal / Toggle", mode = { "n", "t" } },
 			{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
 			{ "<leader>v", group = "[V]iew" },
-			{ "<leader>Q", group = "[Q]uit", mode = { "n" } },
+			{ "<leader>Q", group = "[Q]uit", mode = "n" },
 		},
-	},
-}
+	})
+end
+
+return M

@@ -1,12 +1,14 @@
-return {
-	"f-person/auto-dark-mode.nvim",
-	priority = 1,
-	opts = {
+local M = {}
+
+function M.setup()
+	require("auto-dark-mode").setup({
 		set_dark_mode = function()
-			Myvi.set_colorscheme("dark")
+			require("config.theme").set_colorscheme("dark")
 		end,
 		set_light_mode = function()
-			Myvi.set_colorscheme("light")
+			require("config.theme").set_colorscheme("light")
 		end,
-	},
-}
+	})
+end
+
+return M

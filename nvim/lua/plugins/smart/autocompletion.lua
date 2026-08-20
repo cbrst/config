@@ -1,21 +1,9 @@
-return { -- Autocompletion
-	"saghen/blink.cmp",
-	event = "InsertEnter",
-	version = "1.*",
-	dependencies = {
-		-- LuaSnip remains the snippet engine used by the existing configuration.
-		{
-			"L3MON4D3/LuaSnip",
-			build = (function()
-				-- Regex support is unavailable without make and on Windows.
-				if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-					return
-				end
-				return "make install_jsregexp"
-			end)(),
-		},
-	},
-	opts = {
+local M = {}
+
+function M.setup()
+	-- LuaSnip is built by Nix, so no runtime make invocation is required.
+	require("luasnip").config.setup({})
+	require("blink.cmp").setup({
 		keymap = {
 			preset = "default",
 			["<C-l>"] = { "snippet_forward", "fallback" },
@@ -32,9 +20,6 @@ return { -- Autocompletion
 		snippets = { preset = "luasnip" },
 		sources = {
 			default = { "lazydev", "lsp", "path", "snippets", "buffer" },
-			per_filetype = {
-				opencode_ask = { "lsp", "buffer" },
-			},
 			providers = {
 				lazydev = {
 					name = "LazyDev",
@@ -44,10 +29,7 @@ return { -- Autocompletion
 			},
 		},
 		fuzzy = { implementation = "prefer_rust_with_warning" },
-	},
-	config = function(_, opts)
-		-- Configure LuaSnip before Blink requests snippets from it.
-		require("luasnip").config.setup({})
-		require("blink.cmp").setup(opts)
-	end,
-}
+	})
+end
+
+return M

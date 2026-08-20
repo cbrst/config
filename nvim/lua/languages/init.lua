@@ -1,8 +1,12 @@
-local path = vim.fn.stdpath("config") .. "/lua/languages"
+local M = {}
 
-for _, file in ipairs(vim.fn.readdir(path)) do
-	-- Filter in Lua so every language module loads independently of Vim regex escaping.
-	if file ~= "init.lua" and file:sub(-4) == ".lua" then
-		require("languages." .. file:gsub("%.lua$", ""))
-	end
+-- ┌─────────────────────────────┐
+-- │ Explicit filetype setup     │
+-- └─────────────────────────────┘
+function M.setup()
+	-- Keep this list explicit so enabled filetype behavior is discoverable and stable.
+	require("languages.lua").setup()
+	require("languages.markdown").setup()
 end
+
+return M

@@ -1,32 +1,19 @@
-Myvi = require("myvi")
-
--- Set <space> as the leader key See `:help mapleader`
--- NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-
-vim.g.mapleader = " "
-vim.g.maplocalleader = ","
-
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = true
-
--- [[ Basic options ]]
+-- ┌────────────────────────┐
+-- │ Core editor setup      │
+-- └────────────────────────┘
+require("config.globals").setup()
 require("options")
-
--- [[ Basic Keymaps ]]
 require("keymap")
-
--- [[ Basic Autocommands ]]
 require("autocmds")
+require("languages").setup()
 
--- [[ Language Configs ]]
-require("languages")
+-- ┌────────────────────────┐
+-- │ Plugins and appearance │
+-- └────────────────────────┘
+require("plugins").setup()
 
--- [[ Bootstrap lazyvim ]]
-require("lazyvim")
-
--- Set the colorscheme after everything is loaded,
--- just to make sure all plugins show the right colors
-Myvi.set_colorscheme()
+-- Apply the theme after every startup plugin has defined its highlight groups.
+require("config.theme").set_colorscheme()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

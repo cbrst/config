@@ -1,18 +1,7 @@
-return { -- Autoformat
-	"stevearc/conform.nvim",
-	event = { "BufWritePre" },
-	cmd = { "ConformInfo" },
-	keys = {
-		{
-			"<leader>f",
-			function()
-				require("conform").format({ async = true, lsp_format = "fallback" })
-			end,
-			mode = "",
-			desc = "[F]ormat buffer",
-		},
-	},
-	opts = {
+local M = {}
+
+function M.setup()
+	require("conform").setup({
 		notify_on_error = false,
 		format_on_save = function(bufnr)
 			-- Disable "format_on_save lsp_fallback" for languages that don't
@@ -39,5 +28,10 @@ return { -- Autoformat
 			-- You can use 'stop_after_first' to run the first available formatter from the list
 			-- javascript = { "prettierd", "prettier", stop_after_first = true },
 		},
-	},
-}
+	})
+	vim.keymap.set({ "n", "v" }, "<leader>f", function()
+		require("conform").format({ async = true, lsp_format = "fallback" })
+	end, { desc = "[F]ormat buffer" })
+end
+
+return M
