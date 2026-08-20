@@ -1,26 +1,51 @@
-[bar.main]
-background_opacity = 0.24999999441206455
-center = [ "clock" ]
-end = [ "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
-margin_edge = 0
-margin_ends = 0
-padding = 14
-panel_overlap = 0
-position = "top"
-radius = 8
-radius_top_left = 0
-radius_top_right = 0
-reserve_space = true
-shadow = true
-start = [ "workspaces" ]
-thickness = 34
-widget_spacing = 18
+[bar]
+order = [ "main" ]
+
+    [bar.main]
+    background_opacity = 0.24999999441206455
+    center = [ "clock" ]
+    end = [ "group:g1", "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
+    margin_edge = 0
+    margin_ends = 0
+    padding = 14
+    panel_overlap = 0
+    position = "top"
+    radius = 8
+    radius_top_left = 0
+    radius_top_right = 0
+    reserve_space = true
+    shadow = true
+    start = [ "group:g2" ]
+    thickness = 34
+    widget_spacing = 18
+
+        [[bar.main.capsule_group]]
+        accordion = false
+        accordion_direction = "end"
+        enabled = true
+        fill = "surface_variant"
+        id = "g1"
+        members = [ "cpu", "ram", "temp" ]
+        opacity = 0.10000000149011612
+        padding = 6.0
+
+        [[bar.main.capsule_group]]
+        accordion = false
+        accordion_direction = "end"
+        enabled = true
+        fill = "surface_variant"
+        id = "g2"
+        members = [ "workspaces", "active_window" ]
+        opacity = 0.10000000149011612
+        padding = 6.0
 
 [dock]
+background_opacity = 0.099999997764825821
 enabled = false
 icon_size = 34
 launcher_icon = "grain"
-launcher_position = "start"
+launcher_position = "end"
+position = "left"
 radius = 8
 show_instance_count = false
 
@@ -141,13 +166,28 @@ transition_on_startup = true
     enabled = true
 
     [wallpaper.default]
-    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-jx68rw.jpg"
+    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-e8xr9o.jpg"
 
     [wallpaper.last]
-    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-jx68rw.jpg"
+    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-e8xr9o.jpg"
 
     [wallpaper.monitors.DP-1]
-    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-jx68rw.jpg"
+    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-e8xr9o.jpg"
+
+[widget.active_window]
+display = "text_only"
+font_weight = 700
+icon_size = 38
+
+[widget.clock]
+font_weight = 700
+
+[widget.taskbar]
+only_active_workspace = true
 
 [widget.tray]
 drawer = true
+
+[widget.workspaces]
+label_source = "name"
+max_label_chars = 20

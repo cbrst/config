@@ -5,14 +5,20 @@ Niri and Hyprland sessions.
 
 ## Bar
 
-The bar keeps workspaces on the left and the clock in the center. Its right
-side contains the tray, notifications, clipboard, volume, control center, and
-session controls. Network, Bluetooth, brightness, battery, and media widgets
-are intentionally omitted to keep the bar compact; use the control center for
-those controls.
+The bar groups named workspaces and the active window on the left, keeps the
+clock in the center, and groups CPU, RAM, and temperature on the right. The
+remaining right-side controls are the tray, notifications, clipboard, volume,
+control center, and session controls. Network, Bluetooth, brightness, battery,
+and media widgets are intentionally omitted to keep the bar compact; use the
+control center for those controls.
 
 The launcher is available through `Super+Space` rather than as a persistent bar
 widget. The wider widget spacing keeps the remaining controls distinct.
+
+Update bar groups and widget options in `noctalia/config.toml`, then reload the
+active Niri configuration with `niri msg action load-config-file` or restart
+Noctalia in another supported session. Wallpaper paths are machine-local;
+choose an existing file under `~/Pictures/Wallpapers` before applying a change.
 
 ## Appearance
 

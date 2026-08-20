@@ -19,6 +19,10 @@ Firefox windows open in a tiled column that occupies 80% of the output width.
 This is an initial width; use `Super+-` or `Super+=` to adjust the focused
 column after it opens.
 
+The `Games` workspace has no gaps, struts, or borders. Steam opens there at
+full column width. A single visible column stays centered, and Noctalia shows
+named workspace labels in its bar.
+
 ## Apply And Reload
 
 Apply the Home Manager generation, then choose the Niri session in the display
@@ -57,6 +61,10 @@ Shift to resize the focused window's height instead.
 
 Use `Super+,` to stack the window to the right below the focused window.
 `Super+.` removes the bottom window from that stack into its own column.
+
+`Super+1` through `Super+8` focus their numbered workspaces; add Control to
+move the focused column instead. `Super+mouse wheel` changes workspace, with
+the directions reversed for the naturally scrolling touchpad.
 
 ## Machine Overrides
 
