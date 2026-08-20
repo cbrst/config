@@ -11,6 +11,9 @@ vim.opt.relativenumber = true
 
 vim.opt.conceallevel = 2
 
+-- Preserve the colors defined by the active colorscheme instead of approximating them to 256 colors.
+vim.opt.termguicolors = true
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = "a"
 

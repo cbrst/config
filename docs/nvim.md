@@ -38,18 +38,20 @@ The configuration enables relative and absolute line numbers, mouse support,
 system clipboard integration, persistent undo, smart case search, live
 substitution previews, cursor-line highlighting, and right/below split
 placement. Tabs display at two columns, use smart indentation, and remain
-literal tabs by default. Tree-sitter expressions provide folds without closing
-them when a file opens. `nvim-treesitter` is loaded at startup, installs the
-Bash, C, Diff, HTML, Lua, LuaDoc, Markdown, Markdown inline, query, Vim, and
-Vim help parsers asynchronously, and enables Tree-sitter highlighting and
-indentation where parsers are available. Ruby retains Neovim's default
-indentation. Home Manager supplies the `tree-sitter` CLI needed to compile and
-update parsers; apply the Home Manager configuration before running `:TSUpdate`
-or `:TSInstall <language>`. After a parser attaches, its buffer resets
+literal tabs by default. `termguicolors` preserves the full RGB palette defined
+by the active colorscheme. Tree-sitter expressions provide folds without
+closing them when a file opens. `nvim-treesitter` is loaded at startup and
+installs a parser on demand for any opened filetype that has a compatible parser
+in its registry. The parser is downloaded and compiled once per language, then
+Tree-sitter highlighting and indentation attach to every buffer waiting for it.
+Filetypes without a registered parser continue using Neovim defaults; Ruby
+retains Neovim's default indentation. Home Manager supplies the `tree-sitter`
+CLI needed to compile and update parsers; apply the Home Manager configuration
+before running `:TSUpdate` to update all installed parsers or `:TSInstall
+<language>` to install one manually. After a parser attaches, its buffer resets
 window-local expression folding so `vim.treesitter.foldexpr()` can use the
 active syntax tree immediately; `VimEnter` covers files opened during startup,
-and its fold cache is recalculated after attachment. Lua keeps indent-based
-folding.
+and its fold cache is recalculated after attachment.
 
 Monokai Pro is selected after plugins load. `auto-dark-mode.nvim` switches
 between `monokai-pro-spectrum` for dark appearances and `monokai-pro-light`
