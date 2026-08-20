@@ -25,6 +25,7 @@ let
       ln -s ${grammars.tree-sitter-html}/parser "$out/libtree-sitter-html${sharedLibrary}"
       ln -s ${grammars.tree-sitter-javascript}/parser "$out/libtree-sitter-javascript${sharedLibrary}"
       ln -s ${grammars.tree-sitter-json}/parser "$out/libtree-sitter-json${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-kdl}/parser "$out/libtree-sitter-kdl${sharedLibrary}"
       ln -s ${grammars.tree-sitter-lua}/parser "$out/libtree-sitter-lua${sharedLibrary}"
       ln -s ${grammars.tree-sitter-markdown}/parser "$out/libtree-sitter-markdown${sharedLibrary}"
       ln -s ${grammars.tree-sitter-nix}/parser "$out/libtree-sitter-nix${sharedLibrary}"
@@ -51,6 +52,7 @@ let
       evil-surround
       flycheck
       format-all
+      kdl-mode
       lsp-mode
       lsp-ui
       lua-mode
@@ -262,6 +264,7 @@ in
         go
         jetbrains.webstorm
         jq
+        kdlfmt
         lazygit
         lua
         markdownlint-cli

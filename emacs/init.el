@@ -1,12 +1,23 @@
-;; -*- lexical-binding: t; -*-
-;; This configuration mirrors the repository's Neovim workflow with native Emacs tools.
+;;; init.el --- Evil-first Emacs configuration for the shared dotfiles -*- lexical-binding: t; -*-
 
-;; Keep generated and transient files out of the configuration directory.
+;;; Commentary:
+;;
+;; A compact Monokai Pro Spectrum Emacs setup that mirrors the repository's
+;; Neovim workflow while using Emacs-native completion, project, agent, and
+;; task interfaces. Home Manager supplies every package and Tree-sitter parser.
+;;
+;;; Code:
+
+;;;; Runtime State
+
+;; Keep generated and transient files out of the declaratively managed configuration.
 (setq backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory)))
       auto-save-file-name-transforms `((".*" ,(expand-file-name "auto-save/" user-emacs-directory) t))
       create-lockfiles nil)
 (make-directory (expand-file-name "backups/" user-emacs-directory) t)
 (make-directory (expand-file-name "auto-save/" user-emacs-directory) t)
+
+;;;; Editor Foundations
 
 ;; Match Neovim's editing defaults: line numbers, two-column tabs, clipboard, and splits.
 (setq-default indent-tabs-mode t
@@ -47,6 +58,8 @@
   (setq mac-command-modifier 'meta
         mac-option-modifier nil))
 
+;;;; Theme And Frames
+
 ;; Use the same dark Monokai Pro Spectrum palette as Neovim and Ghostty.
 (require 'monokai-pro-spectrum-theme)
 (load-theme 'monokai-pro-spectrum t)
@@ -79,6 +92,8 @@
 (dolist (face '(window-divider window-divider-first-pixel window-divider-last-pixel))
   (set-face-attribute face nil :foreground "#363537" :background "#363537"))
 
+;;;; Modal Editing And Undo
+
 ;; Evil supplies Vim motions, operators, visual selection, and a familiar undo model.
 (setq evil-want-integration t
       evil-want-keybinding nil
@@ -94,6 +109,8 @@
 (global-evil-surround-mode 1)
 (require 'evil-commentary)
 (evil-commentary-mode 1)
+
+;;;; Completion And Discovery
 
 ;; Completion and minibuffer tools correspond to Telescope's fuzzy search workflow.
 (require 'vertico)
@@ -130,6 +147,8 @@
 (require 'cape)
 (add-to-list 'completion-at-point-functions #'cape-file)
 (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+
+;;;; Modeline
 
 ;; Moody keeps a compact native modeline while rendering the key states as tabs.
 (require 'moody)
@@ -173,38 +192,101 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
 (defun cbrst/mode-line-buffer-name ()
   "Return the filename tab joined directly to the preceding Evil ribbon."
   (cdr (moody-tab (concat (or (nerd-icons-icon-for-mode major-mode) "") " " (buffer-name)) 24 'down)))
+;; Cache Git's porcelain output so modeline redraws never spawn a Git process.
+(defvar cbrst/mode-line-git-status-cache (make-hash-table :test #'equal)
+  "Git worktree summaries keyed by their repository roots.")
+
+(defun cbrst/mode-line-git-status (root)
+  "Return ROOT's staged, unstaged, untracked, and conflicted file counts."
+  (or (gethash root cbrst/mode-line-git-status-cache)
+      (puthash
+       root
+       (with-temp-buffer
+         (let ((default-directory root)
+               (staged 0)
+               (unstaged 0)
+               (untracked 0)
+               (conflicts 0))
+           (when (zerop (process-file "git" nil t nil "status" "--porcelain"))
+             (dolist (line (split-string (buffer-string) "\n" t))
+               (cond
+                ((string-prefix-p "??" line) (setq untracked (1+ untracked)))
+                ((string-match-p "U" (substring line 0 2)) (setq conflicts (1+ conflicts)))
+                (t
+                 (unless (eq (aref line 0) ?\s) (setq staged (1+ staged)))
+                 (unless (eq (aref line 1) ?\s) (setq unstaged (1+ unstaged)))))))
+           (concat (unless (zerop staged) (format " +%d" staged))
+                   (unless (zerop unstaged) (format " ~%d" unstaged))
+                   (unless (zerop untracked) (format " ?%d" untracked))
+                   (unless (zerop conflicts) (format " !%d" conflicts)))))
+       cbrst/mode-line-git-status-cache)))
+
+(defun cbrst/refresh-mode-line-git-status ()
+  "Discard the current buffer's cached Git status after it changes."
+  (when-let ((root (and (buffer-file-name) (vc-root-dir))))
+    (remhash root cbrst/mode-line-git-status-cache)
+    (force-mode-line-update t)))
+
 (defun cbrst/mode-line-vc ()
-  "Return Git branch and file status as a Moody ribbon when available."
-  (when vc-mode
-    (let* ((file (buffer-file-name))
-           ;; `vc-state' is nil for an unmodified file and reports Git changes otherwise.
-           (status (and file (vc-state file)))
-           (label (concat (string-trim-left vc-mode)
-                          (pcase status
-                            ('edited " *")
-                            ('added " +")
-                            ('removed " -")
-                            ('unregistered " ?")
-                            ('conflict " !")
-                            ('needs-merge " !")
-                            (_ "")))))
-      (moody-ribbon label nil 'up))))
+  "Return Git branch and cached worktree status as a Moody ribbon."
+  (when-let ((root (and vc-mode (vc-root-dir))))
+    (moody-ribbon (concat (nerd-icons-octicon "nf-oct-git_branch" :face 'font-lock-keyword-face)
+                          " " (string-trim-left vc-mode)
+                          (cbrst/mode-line-git-status root))
+                   nil 'up)))
+(add-hook 'after-save-hook #'cbrst/refresh-mode-line-git-status)
+(add-hook 'after-revert-hook #'cbrst/refresh-mode-line-git-status)
+
+(defun cbrst/mode-line-flycheck ()
+  "Return Flycheck state with concise Nerd Font icons and diagnostic counts."
+  (when (bound-and-true-p flycheck-mode)
+    (pcase flycheck-last-status-change
+      ('finished
+       (let* ((counts (flycheck-count-errors flycheck-current-errors))
+              (errors (alist-get 'error counts))
+              (warnings (alist-get 'warning counts))
+              (infos (alist-get 'info counts)))
+         (cond
+          (errors (concat (nerd-icons-mdicon "nf-md-alert_circle" :face 'error)
+                          (format " %d" errors)))
+          (warnings (concat (nerd-icons-mdicon "nf-md-alert" :face 'warning)
+                            (format " %d" warnings)))
+          (infos (concat (nerd-icons-mdicon "nf-md-information" :face 'success)
+                         (format " %d" infos)))
+          (t (nerd-icons-mdicon "nf-md-check_circle" :face 'success)))))
+      ('running (nerd-icons-mdicon "nf-md-sync" :face 'font-lock-keyword-face))
+      ('errored (nerd-icons-mdicon "nf-md-alert_circle" :face 'error))
+      (_ ""))))
+
+(defun cbrst/mode-line-position ()
+  "Return an icon-prefixed cursor position for the right side of the modeline."
+  (concat (nerd-icons-mdicon "nf-md-crosshairs_gps" :face 'font-lock-comment-face)
+          " " (format-mode-line mode-line-position)))
+
+(defun cbrst/mode-line-right-position ()
+  "Align the current position string with the right edge of the modeline."
+  (let ((position (cbrst/mode-line-position)))
+    (concat (propertize " " 'display
+                        `(space :align-to (- right ,(1+ (string-width position)))))
+            position)))
 ;; Evil otherwise injects its own <N>/<I>/... tag beside the custom ribbon.
 (setq evil-mode-line-format nil)
 (defconst cbrst/mode-line-format
   '((:eval (cbrst/mode-line-evil-state))
     (:eval (cbrst/mode-line-buffer-name))
+    " " mode-name
     " " mode-line-process
     " " (:eval (cbrst/mode-line-vc))
-    "  " flycheck-mode-line
-    "  " mode-name
-    "  " mode-line-position)
+    " " (:eval (cbrst/mode-line-flycheck))
+    (:eval (cbrst/mode-line-right-position)))
   "Minimal Moody modeline shared by editor and tool buffers.")
 (setq-default mode-line-format cbrst/mode-line-format)
 (dolist (buffer (buffer-list))
   ;; Update early buffers that Evil initialized before this modeline was installed.
   (with-current-buffer buffer
     (setq-local mode-line-format cbrst/mode-line-format)))
+
+;;;; Projects, Files, And Version Control
 
 ;; Project, Git, tree, diagnostics, and language tooling match the Neovim plugins.
 (require 'projectile)
@@ -240,6 +322,8 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
 (global-diff-hl-mode 1)
 (require 'diff-hl-flydiff)
 (diff-hl-flydiff-mode 1)
+;;;; Language Tooling
+
 (require 'flycheck)
 (global-flycheck-mode 1)
 (require 'format-all)
@@ -258,10 +342,40 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
 (add-to-list 'treesit-extra-load-path "@emacsTreeSitterGrammars@")
 (setq treesit-auto-install nil)
 (global-treesit-auto-mode 1)
+(require 'kdl-mode)
+(defun cbrst/prevent-kdl-grammar-install ()
+  "Keep KDL grammar management declarative when its parser is unavailable."
+  (message "KDL parser is unavailable; apply the Home Manager generation"))
+;; kdl-mode normally downloads a parser at runtime; Home Manager supplies it instead.
+(advice-add 'kdl-install-tree-sitter-grammar :override #'cbrst/prevent-kdl-grammar-install)
+(defun cbrst/kdl-format-buffer ()
+  "Format the current KDL buffer with the declaratively installed kdlfmt."
+  (interactive)
+  (unless (executable-find "kdlfmt")
+    (user-error "kdlfmt is unavailable; apply the Home Manager generation"))
+  (let ((point (point))
+        (formatted (generate-new-buffer " *kdlfmt*")))
+    (unwind-protect
+        (if (zerop (call-process-region (point-min) (point-max) "kdlfmt" nil formatted nil "format" "--stdin"))
+            (let ((inhibit-read-only t))
+              ;; Replace only after kdlfmt succeeds so malformed input stays recoverable.
+              (atomic-change-group
+                (erase-buffer)
+                (insert-buffer-substring formatted))
+              (goto-char (min point (point-max))))
+          (user-error "kdlfmt could not format this buffer"))
+      (kill-buffer formatted))))
+(defun cbrst/kdl-setup ()
+  "Attach the declaratively managed KDL formatter to the current buffer."
+  (evil-define-key 'normal kdl-mode-map (kbd "SPC f") #'cbrst/kdl-format-buffer))
+(add-hook 'kdl-mode-hook #'cbrst/kdl-setup)
 (require 'smartparens-config)
 (smartparens-global-mode 1)
+(require 'rainbow-delimiters)
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'markdown-mode-hook #'visual-line-mode)
+
+;;;; Terminal And AI Agents
 
 ;; Use vterm for terminal applications and Agent Shell's ACP integration for OpenCode.
 (require 'vterm)
@@ -283,10 +397,18 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
 (require 'agent-shell-opencode)
 (setq agent-shell-opencode-authentication (agent-shell-opencode-make-authentication :none t)
       agent-shell-preferred-agent-config (agent-shell-opencode-make-agent-config)
-      agent-shell-prefer-viewport-interaction t)
+      agent-shell-prefer-viewport-interaction t
+      ;; Keep the OpenCode conversation beside its project instead of replacing an editor buffer.
+      agent-shell-display-action
+      '(display-buffer-reuse-window
+        display-buffer-in-direction
+        (direction . right)
+        (window-width . 0.42)))
 (add-hook 'agent-shell-mode-hook #'cbrst/shade-tool-buffer)
 (evil-define-key 'insert agent-shell-mode-map (kbd "RET") #'newline)
 (evil-define-key 'normal agent-shell-mode-map (kbd "RET") #'comint-send-input)
+
+;;;; Project Tasks
 
 ;; Compile Multi presents project commands through the existing Vertico interface.
 (require 'compile-multi)
@@ -313,6 +435,8 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
           (erase-buffer)))
     (user-error "No task output is available")))
 
+;;;; Shared Commands
+
 ;; Keep a small command layer so multiple leader bindings can share exact behavior.
 (defun cbrst/consult-ripgrep-at-point ()
   "Search the current project for the symbol at point."
@@ -328,6 +452,8 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
   "Start or reuse the OpenCode Agent Shell session for this project."
   (interactive)
   (agent-shell))
+
+;;;; Keymaps
 
 ;; Define Neovim-compatible leader bindings in Evil normal and visual states.
 (defvar cbrst/leader-map (make-sparse-keymap)
@@ -418,6 +544,8 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
  "o a" "rerun task"
  "o c" "clear output")
 
+;;;; Direct Navigation
+
 ;; Preserve Neovim's direct LSP and split-navigation keys.
 (evil-define-key 'normal 'global (kbd "g d") #'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "g r") #'xref-find-references)
@@ -430,8 +558,14 @@ The first modeline item needs a flat left edge, so discard Moody's left slant."
 (evil-define-key 'normal 'global (kbd "] c") #'diff-hl-next-hunk)
 (evil-define-key 'normal 'global (kbd "[ c") #'diff-hl-previous-hunk)
 
+;;;; Editing Feedback
+
 ;; Highlight yanked text just as Neovim does after a copy operation.
 (defun cbrst/highlight-yank ()
   "Briefly highlight the most recently yanked region."
   (pulse-momentary-highlight-region (region-beginning) (region-end)))
 (add-hook 'kill-ring-save-hook #'cbrst/highlight-yank)
+
+(provide 'init)
+
+;;; init.el ends here
