@@ -41,8 +41,55 @@ the consuming machine repository.
 On the NixOS machine, apply it with:
 
 ```sh
-home-manager switch --flake /etc/nixos#cbrst
+# Resolve the module's intentionally unpinned Firefox and Open VSX downloads.
+home-manager switch --impure --flake /etc/nixos#cbrst
 ```
+
+### macOS quick start
+
+Use standalone Home Manager unless the Mac already has a `nix-darwin`
+configuration. Install Apple's Command Line Tools and the official multi-user
+Nix package manager, then enable flakes:
+
+```sh
+# Git and the compiler toolchain are required by common Nix builds.
+xcode-select --install
+
+# Install Nix using the official macOS multi-user installer.
+curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh
+```
+
+Create `~/.config/nix/nix.conf` with:
+
+```ini
+# Home Manager in this repository is consumed as a flake.
+experimental-features = nix-command flakes
+```
+
+Copy `home-manager/example-flake-darwin.nix` to
+`~/.config/home-manager/flake.nix`, replace `YOUR_USERNAME` and
+`YOUR_MAC_HOSTNAME`, and select `x86_64-darwin` instead of `aarch64-darwin` on
+an Intel Mac. Bootstrap and activate it with:
+
+```sh
+# The first invocation supplies Home Manager before it exists in the profile.
+nix run home-manager/release-26.05 -- switch --impure -b backup \
+  --flake "$HOME/.config/home-manager#$(id -un)"
+
+# Later switches use the Home Manager command installed by the configuration.
+home-manager switch --impure --flake "$HOME/.config/home-manager#$(id -un)"
+```
+
+The shared module automatically uses `/Users/<user>`, skips its Linux-only
+systemd, GTK, Hyprland, Niri, and Noctalia settings, and puts graphical Nix
+applications in `~/Applications/Home Manager Apps`. Linux `.desktop` launchers
+and MIME associations are skipped too. The example also selects the native
+macOS 1Password SSH-agent socket. Install the native Ghostty app separately;
+its flake does not publish the macOS application as a Nix package. See
+[`docs/macos-home-manager.md`](docs/macos-home-manager.md) for prerequisites,
+verification, collisions, updates, Intel Macs, and optional `nix-darwin`
+integration. `--impure` is required because the shared module intentionally
+resolves the latest Firefox add-ons and Open VSX extensions during evaluation.
 
 For local shared-configuration tests and daily NixOS or Home Manager workflows,
 use [`nixie`](docs/nixie.md).
@@ -77,7 +124,8 @@ Home Manager deploys the `hypr` and `noctalia` modules. Set `machine.noctalia =
 true` in the consuming machine flake to enable Noctalia as the Hyprland shell:
 
 ```sh
-home-manager switch --flake /etc/nixos#cbrst
+# Resolve the module's intentionally unpinned Firefox and Open VSX downloads.
+home-manager switch --impure --flake /etc/nixos#cbrst
 ```
 
 `hypr/hyprland.lua` is a native Hyprland Lua configuration. It sets Ghostty as

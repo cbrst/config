@@ -208,7 +208,10 @@ in
         zsh
         nerd-fonts.jetbrains-mono
         commit-mono
-        inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
+      ]
+      # Ghostty's flake does not publish the macOS application as a Nix package.
+      ++ lib.optionals isLinux [ inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default ]
+      ++ [
         # Route terminal and launcher browser requests through the active-session selector.
         firefoxSession
       ]
@@ -254,6 +257,8 @@ in
       "opencode/tui.json".source = lib.mkDefault "${dotfiles}/opencode/tui.json";
       "opencode/themes/monokai-pro.json".source = lib.mkDefault "${dotfiles}/opencode/themes/monokai-pro.json";
     };
+  }
+  // lib.optionalAttrs isLinux {
     desktopEntries.firefox = {
       # Prefer the session-aware profile selector over the package's stock desktop entry.
       name = "Firefox";
@@ -269,8 +274,6 @@ in
       ];
       # Home Manager's desktop-entry module does not expose StartupWMClass.
     };
-  }
-  // lib.optionalAttrs isLinux {
     mimeApps.defaultApplications = {
       "inode/directory" = lib.mkDefault [ "nemo.desktop" ];
       # Open links through the launcher so each session gets its matching Firefox profile.

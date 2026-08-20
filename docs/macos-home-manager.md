@@ -1,0 +1,153 @@
+# Home Manager on macOS
+
+The recommended setup is standalone Home Manager. It owns the user's packages
+and dotfiles without requiring `nix-darwin`, and it uses the same shared module
+as the NixOS configuration. Use the Home Manager `nix-darwin` module instead
+only when the Mac already manages system settings through `nix-darwin`.
+
+## Prerequisites
+
+Install Apple's Command Line Tools and the official multi-user Nix installer:
+
+```sh
+# Provide Git, Clang, and the system SDK used by macOS builds.
+xcode-select --install
+
+# Install the Nix daemon and create the macOS /nix volume.
+curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh
+```
+
+Open a new terminal after the installer completes. Enable the commands used by
+flake-based Home Manager in `~/.config/nix/nix.conf`:
+
+```ini
+# Enable the modern Nix CLI and flake input locking.
+experimental-features = nix-command flakes
+```
+
+Verify the prerequisites before creating a Home Manager generation:
+
+```sh
+# Both commands should print a version without sudo.
+nix --version
+git --version
+```
+
+## Standalone configuration
+
+Create `~/.config/home-manager`, then copy
+`home-manager/example-flake-darwin.nix` from this repository to its
+`flake.nix`. Replace both placeholders and choose the platform:
+
+- Apple Silicon: `aarch64-darwin`
+- Intel: `x86_64-darwin`
+
+The example enables unfree packages because the shared module contains VSCode
+and WebStorm. It also uses the native 1Password SSH-agent socket. Change or
+remove `machine.sshAuthSock` when 1Password's SSH agent is not in use. Keep
+private values and machine-only overrides in this consumer flake, not in the
+shared repository.
+
+Check the evaluated configuration before activation:
+
+```sh
+# Impure evaluation resolves intentionally unpinned Firefox and Open VSX downloads.
+nix build --impure \
+  "$HOME/.config/home-manager#homeConfigurations.$(id -un).activationPackage"
+```
+
+Bootstrap Home Manager and activate the configuration:
+
+```sh
+# Back up pre-existing files that collide with Home Manager-managed paths.
+nix run home-manager/release-26.05 -- switch --impure -b backup \
+  --flake "$HOME/.config/home-manager#$(id -un)"
+```
+
+The shared Zsh configuration becomes active in a new shell. Home Manager 25.11
+and newer copies graphical packages into `~/Applications/Home Manager Apps`,
+which lets Spotlight discover them. macOS-native applications that are not in
+the shared Nix package list can continue to be installed with Homebrew or the
+App Store. In particular, install Ghostty from its signed macOS release or its
+Homebrew cask: the Ghostty flake currently publishes the application package
+only for Linux, while the shared configuration still uses `ghostty` as
+`TERMINAL`.
+
+## What differs from NixOS
+
+The shared module derives the home directory as `/Users/<user>` on Darwin. It
+does not enable systemd user services, GTK and cursor settings, Linux MIME
+associations or `.desktop` launchers, Hyprland, Niri, or Noctalia. The Headroom
+bootstrap and 1Password desktop autostart services are consequently Linux-only;
+define equivalent `launchd.agents` in a machine-specific Home Manager module if
+needed.
+
+Home Manager manages user files and packages. It does not manage macOS system
+defaults, Homebrew, users, the Nix daemon, or host-wide services in this
+standalone setup. Add `nix-darwin` later if those should be declarative.
+
+## Verification and recovery
+
+Inspect the active generation and key paths:
+
+```sh
+# Confirm that the expected generation and packages are active.
+home-manager generations
+command -v nvim
+test -L "$HOME/.config/nvim" && echo "Neovim configuration is managed"
+```
+
+The initial `-b backup` option renames conflicting unmanaged files with a
+`.backup` suffix. Inspect those files and merge anything worth preserving into
+the machine override. A switch stops rather than overwriting when that backup
+name already exists; move the earlier backup elsewhere before retrying.
+
+Roll back a bad activation with:
+
+```sh
+# Activate the generation immediately before the current one.
+home-manager generations
+"$(home-manager generations | sed -n '2s/.*-> //p')/activate"
+```
+
+If the generated command is unclear, copy the desired generation's activation
+path from `home-manager generations` and run its `activate` executable directly.
+
+## Updates and maintenance
+
+The consumer's `flake.lock` pins Nixpkgs, Home Manager, Ghostty, Noctalia, and
+this repository. Normal switches do not update those inputs.
+
+```sh
+# Review the lock-file diff after updating all pinned inputs.
+cd "$HOME/.config/home-manager"
+nix flake update
+git diff -- flake.lock
+
+# Build first, then activate the reviewed generation.
+home-manager build --impure --flake ".#$(id -un)"
+home-manager switch --impure --flake ".#$(id -un)"
+```
+
+Keep the Nixpkgs and Home Manager release branches aligned. Do not change
+`home.stateVersion` during routine upgrades; it records the compatibility level
+of the first installation rather than the currently installed release. Keep
+using `--impure`: the shared module fetches the current Firefox add-on and Open
+VSX extension releases during each evaluation.
+
+## Optional nix-darwin integration
+
+When a Mac already uses `nix-darwin`, import
+`home-manager.darwinModules.home-manager`, set
+`home-manager.useGlobalPkgs = true`, pass `inputs` and `machine` with
+`home-manager.extraSpecialArgs`, and add the shared module through
+`home-manager.sharedModules`. Activation then happens with
+`darwin-rebuild switch` instead of `home-manager switch`. Do not activate the
+same user through both standalone Home Manager and `nix-darwin`; migrate one
+owner at a time to avoid competing generations.
+
+## Upstream references
+
+- [Official Nix macOS installation](https://nixos.org/download/)
+- [Home Manager standalone flake setup](https://nix-community.github.io/home-manager/nix-flakes/standalone.html)
+- [Home Manager as a nix-darwin flake module](https://nix-community.github.io/home-manager/nix-flakes/nix-darwin.html)

@@ -28,7 +28,11 @@
     in
     {
       homeConfigurations.${machine.user} = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${system};
+        # The shared profile includes unfree applications such as VSCode and WebStorm.
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
         extraSpecialArgs = { inherit inputs machine; };
         modules = [
           "${inputs.dotfiles}/home-manager/default.nix"
