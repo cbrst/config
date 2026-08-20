@@ -7,9 +7,16 @@
   ...
 }:
 let
+  # ╭────────────────────────────╮
+  # │ Shared paths and platforms │
+  # ╰─══════════════════════════─╯
   # Keep shared paths relative to the consuming flake's non-flake dotfiles input.
   dotfiles = inputs.dotfiles;
   isLinux = pkgs.stdenv.isLinux;
+
+  # ╭───────────────────╮
+  # │ Emacs environment │
+  # ╰─═════════════════─╯
   # Linux uses the standard build; macOS gets the native macport build.
   emacsBasePackage = if isLinux then pkgs.emacs else pkgs.emacs-macport;
   emacsTreeSitterGrammars =
@@ -90,6 +97,10 @@ let
     [ "@emacsTreeSitterGrammars@" ]
     [ "${emacsTreeSitterGrammars}" ]
     (builtins.readFile "${dotfiles}/emacs/init.el");
+
+  # ╭─────────────────────────────╮
+  # │ Optional desktop components │
+  # ╰─═══════════════════════════─╯
   noctaliaEnabled = machine.noctalia or false;
   noctaliaModule =
     { pkgs, lib, ... }:
@@ -100,11 +111,19 @@ let
         systemd.enable = true;
       };
     };
+
+  # ╭──────────────────╮
+  # │ Generated config │
+  # ╰─════════════════─╯
   opencodeConfig =
     lib.replaceStrings
       [ "/Users/cbrst/.local/bin/headroom" ]
       [ "${config.home.homeDirectory}/.local/bin/headroom" ]
       (builtins.readFile "${dotfiles}/opencode/opencode.jsonc");
+
+  # ╭──────────────────╮
+  # │ Firefox profiles │
+  # ╰─════════════════─╯
   # Home Manager expects per-profile Firefox extensions below this profile UUID.
   firefoxExtensionProfile = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
   mkFirefoxAddon =
@@ -189,6 +208,10 @@ let
     settings = firefoxProfileSettings;
     extensions.packages = extensions;
   };
+
+  # ╭───────────────────╮
+  # │ VSCode extensions │
+  # ╰─═════════════════─╯
   mkLatestVscodeExtension =
     {
       publisher,
@@ -225,12 +248,18 @@ let
   ];
 in
 {
+  # ╭────────────────────╮
+  # │ Optional imports   │
+  # ╰─══════════════════─╯
   # Noctalia is opt-in; its submodule gates configuration to Linux at evaluation.
   imports = lib.optionals noctaliaEnabled [
     inputs.noctalia.homeModules.default
     noctaliaModule
   ];
 
+  # ╭─────────────────────╮
+  # │ Core home profile   │
+  # ╰─═══════════════════─╯
   home = {
     username = machine.user;
     homeDirectory = lib.mkDefault (
@@ -301,6 +330,9 @@ in
     );
   };
 
+  # ╭─────────────────────╮
+  # │ XDG configuration   │
+  # ╰─═══════════════════─╯
   xdg = {
     enable = lib.mkDefault true;
     userDirs = {
@@ -341,6 +373,9 @@ in
       "opencode/themes/monokai-pro.json".source = lib.mkDefault "${dotfiles}/opencode/themes/monokai-pro.json";
     };
   }
+  # ╭──────────────────────────╮
+  # │ Linux desktop integration │
+  # ╰─════════════════════════─╯
   // lib.optionalAttrs isLinux {
     desktopEntries.firefox = {
       # Prefer the session-aware profile selector over the package's stock desktop entry.
@@ -366,6 +401,9 @@ in
     };
   };
 
+  # ╭───────────────────╮
+  # │ Shared programs   │
+  # ╰─═════════════════─╯
   # Expose the standalone Nix workflow to shells, editors, and task runners.
   home.file.".local/bin/nixie".source = lib.mkDefault "${dotfiles}/zsh/scripts/nixie";
 
@@ -490,6 +528,9 @@ in
     };
   };
 
+  # ╭────────────────────────╮
+  # │ Linux session settings │
+  # ╰─══════════════════════─╯
   fonts = lib.mkIf isLinux {
     fontconfig.enable = lib.mkDefault true;
   };
