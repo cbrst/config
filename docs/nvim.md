@@ -23,7 +23,8 @@ then loads the modules in this order:
 `lua/options.lua` configures the editor, folding, indentation, clipboard, and
 UI settings. `lua/keymap.lua` holds general keymaps, while `lua/autocmds.lua`
 
-`lua/languages/` contains automatically loaded filetype-specific settings.
+`lua/languages/` contains automatically loaded filetype-specific settings; its
+loader imports each Lua module in that directory.
 `lua/lazyvim.lua` bootstraps `lazy.nvim` and imports plugin groups.
 `lua/myvi/` holds shared helpers, including Monokai Pro theme selection.
 
@@ -37,8 +38,18 @@ The configuration enables relative and absolute line numbers, mouse support,
 system clipboard integration, persistent undo, smart case search, live
 substitution previews, cursor-line highlighting, and right/below split
 placement. Tabs display at two columns, use smart indentation, and remain
-literal tabs by default. Treesitter expressions provide folds without closing
-them when a file opens.
+literal tabs by default. Tree-sitter expressions provide folds without closing
+them when a file opens. `nvim-treesitter` is loaded at startup, installs the
+Bash, C, Diff, HTML, Lua, LuaDoc, Markdown, Markdown inline, query, Vim, and
+Vim help parsers asynchronously, and enables Tree-sitter highlighting and
+indentation where parsers are available. Ruby retains Neovim's default
+indentation. Home Manager supplies the `tree-sitter` CLI needed to compile and
+update parsers; apply the Home Manager configuration before running `:TSUpdate`
+or `:TSInstall <language>`. After a parser attaches, its buffer resets
+window-local expression folding so `vim.treesitter.foldexpr()` can use the
+active syntax tree immediately; `VimEnter` covers files opened during startup,
+and its fold cache is recalculated after attachment. Lua keeps indent-based
+folding.
 
 Monokai Pro is selected after plugins load. `auto-dark-mode.nvim` switches
 between `monokai-pro-spectrum` for dark appearances and `monokai-pro-light`

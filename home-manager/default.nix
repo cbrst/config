@@ -198,6 +198,8 @@ in
         shellcheck
         shfmt
         starship
+        # Compile Tree-sitter parsers required by the Neovim configuration.
+        tree-sitter
         tmux
         unzip
         uv
