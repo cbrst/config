@@ -87,9 +87,10 @@ and MIME associations are skipped too. The example also selects the native
 macOS 1Password SSH-agent socket. Install the native Ghostty app separately;
 its flake does not publish the macOS application as a Nix package. See
 [`docs/macos-home-manager.md`](docs/macos-home-manager.md) for prerequisites,
-verification, collisions, updates, Intel Macs, and optional `nix-darwin`
-integration. `--impure` is required because the shared module intentionally
-resolves the latest Firefox add-ons and Open VSX extensions during evaluation.
+machine-specific Ghostty and Home Manager overrides, verification, collisions,
+updates, Intel Macs, and optional `nix-darwin` integration. `--impure` is
+required because the shared module intentionally resolves the latest Firefox
+add-ons and Open VSX extensions during evaluation.
 
 For local shared-configuration tests and daily NixOS or Home Manager workflows,
 use [`nixie`](docs/nixie.md).

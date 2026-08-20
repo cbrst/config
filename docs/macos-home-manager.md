@@ -73,6 +73,124 @@ Homebrew cask: the Ghostty flake currently publishes the application package
 only for Linux, while the shared configuration still uses `ghostty` as
 `TERMINAL`.
 
+## Machine-specific overrides
+
+The macOS consumer supports two kinds of machine-specific configuration:
+
+1. Values explicitly read from the `machine` attrset, such as `terminal`,
+   `sshAuthSock`, and the raw Ghostty override text.
+2. Arbitrary Home Manager options in a local module imported alongside the
+   shared module.
+
+For a small Ghostty override, add the text directly to `machine` in
+`~/.config/home-manager/flake.nix`:
+
+```nix
+machine = {
+  user = username;
+  hostName = "YOUR_MAC_HOSTNAME";
+
+  # Home Manager writes this text to ~/.config/ghostty/machine.
+  ghostty = ''
+    font-size = 14
+  '';
+
+  # Use the native macOS 1Password SSH-agent socket.
+  sshAuthSock = "/Users/${username}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
+  niri = false;
+  noctalia = false;
+  stateVersion = "26.05";
+};
+```
+
+The shared `ghostty/config` loads `?machine` last, so values in the generated
+file override shared values such as `font-size = 12`. For a cleaner consumer,
+keep the raw Ghostty configuration in `hosts/ghostty.conf`:
+
+```ini
+# Override shared Ghostty settings only on this Mac.
+font-size = 14
+```
+
+Then read that file from the `machine` attrset:
+
+```nix
+machine = {
+  user = username;
+  hostName = "YOUR_MAC_HOSTNAME";
+
+  # Preserve Ghostty's native configuration syntax in a separate local file.
+  ghostty = builtins.readFile ./hosts/ghostty.conf;
+
+  # Keep the remaining simple machine values beside the file reference.
+  sshAuthSock = "/Users/${username}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
+  niri = false;
+  noctalia = false;
+  stateVersion = "26.05";
+};
+```
+
+Only fields consumed by `home-manager/default.nix` belong in `machine`. For
+other Home Manager settings, create `hosts/home.nix`:
+
+```nix
+{ ... }:
+
+{
+  # Override one setting from the shared VSCode profile on this Mac.
+  programs.vscode.profiles.default.userSettings."editor.fontSize" = 14;
+
+  # Add any other macOS-only Home Manager options in this module.
+}
+```
+
+Import the local module in the consumer flake alongside the shared one:
+
+```nix
+modules = [
+  # Load the shared cross-platform packages and configuration.
+  "${inputs.dotfiles}/home-manager/default.nix"
+
+  # Apply arbitrary settings that belong only to this Mac.
+  ./hosts/home.nix
+
+  {
+    # Install the Home Manager CLI into the activated user profile.
+    programs.home-manager.enable = true;
+  }
+];
+```
+
+Most shared values use `lib.mkDefault`, so an ordinary value in
+`hosts/home.nix` overrides them. Lists such as `home.packages` merge instead of
+replacing the shared list unless the local module deliberately uses a Nix
+module priority function such as `lib.mkForce`.
+
+The resulting consumer layout is:
+
+```text
+# Keep machine-owned configuration separate from the shared repository input.
+~/.config/home-manager/
+├── flake.nix
+├── flake.lock
+└── hosts/
+    ├── ghostty.conf
+    └── home.nix
+```
+
+If the consumer directory is a Git repository, add new files to the Git index
+before evaluating the flake; Nix excludes untracked files from Git-backed flake
+sources. A commit is not required for local evaluation.
+
+```sh
+# Make new machine files visible to the Git-backed local flake source.
+git -C "$HOME/.config/home-manager" add hosts/ghostty.conf hosts/home.nix
+
+# Apply consumer-only changes without updating the remote dotfiles input.
+home-manager switch --impure \
+  --flake "$HOME/.config/home-manager#$(id -un)"
+```
+
 ## What differs from NixOS
 
 The shared module derives the home directory as `/Users/<user>` on Darwin. It
