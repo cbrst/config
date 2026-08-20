@@ -101,30 +101,6 @@ Home Manager installs standard Emacs on Linux and native Emacs Mac Port on
 macOS. The declarative Evil-based configuration and its Neovim-compatible
 keymaps are documented in [`docs/emacs.md`](docs/emacs.md).
 
-## Legacy Setup
-
-`setup.sh` remains for dependencies and configuration modules that are not yet
-Home Manager-owned. The Home Manager-owned modules are no longer linked,
-pulled, or provisioned with a Headroom service by it.
-
-```sh
-./setup.sh install
-```
-
-Useful non-mutating checks:
-
-```sh
-./setup.sh check
-./setup.sh install --dry-run --optional
-```
-
-Config-only commands are available too:
-
-```sh
-./setup.sh link tridactyl thefuck userscripts
-./setup.sh unlink
-```
-
 ## Hyprland
 
 Home Manager deploys the `hypr` and `noctalia` modules. Set `machine.noctalia =
@@ -183,11 +159,6 @@ documented in [`docs/gtk.md`](docs/gtk.md).
 OpenCode, Ghostty, and Neovim share Monokai Pro Spectrum in dark mode and
 Monokai Pro Light in light mode. See [`docs/themes.md`](docs/themes.md) for
 palette sources, deployment, and maintenance.
-
-Dependency installation currently targets macOS through Homebrew and Arch-based
-Linux through pacman. On macOS, system or Command Line Tools commands such as
-`bash`, `curl`, `git`, `make`, and `zsh` are checked but not installed through
-Homebrew, so Brew does not shadow Apple-managed components.
 
 ## AI coding
 
