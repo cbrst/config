@@ -406,6 +406,18 @@ in
       };
       Install.WantedBy = [ "graphical-session.target" ];
     };
+    user.services.tailscale-systray = {
+      Unit = {
+        Description = "Tailscale system tray client";
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        # Use the NixOS system profile so Home Manager does not install Tailscale.
+        ExecStart = "/run/current-system/sw/bin/tailscale systray";
+        Restart = "on-abnormal";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
   };
 
   gtk = lib.mkIf isLinux {
