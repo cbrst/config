@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Home Manager",
+			"type": "shell",
+			"command": "./zsh/functions/nixie home --local",
+			"group": "build",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			}
+		}
+	]
+}
