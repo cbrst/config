@@ -95,6 +95,12 @@ add-ons and Open VSX extensions during evaluation.
 For local shared-configuration tests and daily NixOS or Home Manager workflows,
 use [`nixie`](docs/nixie.md).
 
+## Emacs
+
+Home Manager installs standard Emacs on Linux and native Emacs Mac Port on
+macOS. The declarative Evil-based configuration and its Neovim-compatible
+keymaps are documented in [`docs/emacs.md`](docs/emacs.md).
+
 ## Legacy Setup
 
 `setup.sh` remains for dependencies and configuration modules that are not yet

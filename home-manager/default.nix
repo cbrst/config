@@ -10,6 +10,84 @@ let
   # Keep shared paths relative to the consuming flake's non-flake dotfiles input.
   dotfiles = inputs.dotfiles;
   isLinux = pkgs.stdenv.isLinux;
+  # Linux uses the standard build; macOS gets the native macport build.
+  emacsBasePackage = if isLinux then pkgs.emacs else pkgs.emacs-macport;
+  emacsTreeSitterGrammars =
+    let
+      grammars = pkgs.tree-sitter-grammars;
+      sharedLibrary = pkgs.stdenv.hostPlatform.extensions.sharedLibrary;
+    in
+    pkgs.runCommand "emacs-treesit-grammars" { } ''
+      # Emacs loads parsers by this filename convention from each extra load path.
+      mkdir -p "$out"
+      ln -s ${grammars.tree-sitter-bash}/parser "$out/libtree-sitter-bash${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-css}/parser "$out/libtree-sitter-css${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-html}/parser "$out/libtree-sitter-html${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-javascript}/parser "$out/libtree-sitter-javascript${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-json}/parser "$out/libtree-sitter-json${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-lua}/parser "$out/libtree-sitter-lua${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-markdown}/parser "$out/libtree-sitter-markdown${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-nix}/parser "$out/libtree-sitter-nix${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-php}/parser "$out/libtree-sitter-php${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-tsx}/parser "$out/libtree-sitter-tsx${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-typescript}/parser "$out/libtree-sitter-typescript${sharedLibrary}"
+      ln -s ${grammars.tree-sitter-yaml}/parser "$out/libtree-sitter-yaml${sharedLibrary}"
+    '';
+  emacsPackage = (pkgs.emacsPackagesFor emacsBasePackage).emacsWithPackages (
+    epkgs: with epkgs; [
+      acp
+      agent-shell
+      cape
+      compile-multi
+      consult
+      corfu
+      diff-hl
+      embark
+      embark-consult
+      emmet-mode
+      evil
+      evil-collection
+      evil-commentary
+      evil-surround
+      flycheck
+      format-all
+      lsp-mode
+      lsp-ui
+      lua-mode
+      magit
+      marginalia
+      markdown-mode
+      moody
+      monokai-pro-theme
+      nerd-icons
+      nerd-icons-completion
+      nerd-icons-corfu
+      nerd-icons-dired
+      nix-mode
+      orderless
+      projectile
+      rainbow-delimiters
+      shell-maker
+      smartparens
+      treemacs
+      treemacs-evil
+      treemacs-nerd-icons
+      treesit-auto
+      typescript-mode
+      undo-fu
+      undo-fu-session
+      vertico
+      vterm
+      vterm-toggle
+      web-mode
+      which-key
+      yaml-mode
+    ]
+  );
+  emacsConfig = lib.replaceStrings
+    [ "@emacsTreeSitterGrammars@" ]
+    [ "${emacsTreeSitterGrammars}" ]
+    (builtins.readFile "${dotfiles}/emacs/init.el");
   noctaliaEnabled = machine.noctalia or false;
   noctaliaModule =
     { pkgs, lib, ... }:
@@ -209,6 +287,7 @@ in
         zoxide
         zsh
         nerd-fonts.jetbrains-mono
+        nerd-fonts.symbols-only
         commit-mono
       ]
       # Ghostty's flake does not publish the macOS application as a Nix package.
@@ -287,6 +366,14 @@ in
 
   # Expose the standalone Nix workflow to shells, editors, and task runners.
   home.file.".local/bin/nixie".source = lib.mkDefault "${dotfiles}/zsh/scripts/nixie";
+
+  programs.emacs = {
+    # Package Emacs and every ELisp dependency through Nix instead of package.el.
+    enable = true;
+    package = emacsPackage;
+  };
+
+  home.file.".emacs.d/init.el".text = lib.mkDefault emacsConfig;
 
   programs.zsh = {
     # These definitions must merge at normal priority so generated zsh files source the wrapper.

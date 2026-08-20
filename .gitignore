@@ -17,3 +17,4 @@ zsh/secrets.zsh
 
 # Machine specific overrides
 ghostty/machine
+/.agent-shell/

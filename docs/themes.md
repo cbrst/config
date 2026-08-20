@@ -1,6 +1,6 @@
 # Monokai Pro Themes
 
-OpenCode, Ghostty, and Neovim use Monokai Pro variants selected from the
+OpenCode, Ghostty, Neovim, and Emacs use Monokai Pro variants selected from the
 operating system appearance:
 
 | Appearance | Variant |
@@ -11,7 +11,9 @@ operating system appearance:
 Neovim uses `auto-dark-mode.nvim` to switch between `monokai-pro-spectrum` and
 `monokai-pro-light`. Ghostty selects the matching tracked palette with its
 light/dark `theme` setting. OpenCode uses the `dark` and `light` definitions in
-`opencode/themes/monokai-pro.json`.
+`opencode/themes/monokai-pro.json`. Emacs uses `monokai-pro-spectrum` directly;
+its declarative configuration does not currently switch themes with system
+appearance.
 
 ## Palette Sources
 
@@ -40,5 +42,7 @@ verify both variants.
 
 Keep both variants aligned when updating a palette. Edit the corresponding
 Ghostty file, `opencode/themes/monokai-pro.json`, and the Monokai Pro Neovim
-configuration together. Do not add per-machine or ignored theme overrides:
-the tracked pair is the source of truth for all three applications.
+configuration together. Keep Emacs on the Spectrum palette unless its system
+appearance switching is added alongside the other applications. Do not add
+per-machine or ignored theme overrides: the tracked configuration is the source
+of truth for all applications.
