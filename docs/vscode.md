@@ -119,10 +119,12 @@ switch instead.
 ## Local Build Task
 
 `.vscode/tasks.json` provides the `Build Home Manager` task for this checkout.
-It runs `./zsh/functions/nixie home --local`, switching the Home Manager
-profile from the local repository without requiring the remote dotfiles input
-to be updated first. Run it from VSCode's task picker after changing shared
-Home Manager configuration.
+It runs the executable `zsh/scripts/nixie home --local`, switching the Home
+Manager profile from the local repository without requiring the remote
+dotfiles input to be updated first. It is a `process` task so VSCode invokes
+the executable directly instead of relying on an isolated shell to inherit a
+ZSH function. Run it from VSCode's task picker after changing shared Home
+Manager configuration.
 
 ## Add Extensions
 

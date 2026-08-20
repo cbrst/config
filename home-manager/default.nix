@@ -246,7 +246,7 @@ in
       "tridactyl".source = lib.mkDefault "${dotfiles}/tridactyl";
       "wezterm".source = lib.mkDefault "${dotfiles}/wezterm";
       "yt-dlp".source = lib.mkDefault "${dotfiles}/yt-dlp";
-      # Keep the zsh entry files and autoloaded OpenCode wrapper together.
+      # Keep the zsh entry files and autoloaded helpers together.
       "zsh/env.zsh".source = lib.mkDefault "${dotfiles}/zsh/env.zsh";
       "zsh/dotfiles.zprofile".source = lib.mkDefault "${dotfiles}/zsh/.zprofile";
       "zsh/dotfiles.zshrc".source = lib.mkDefault "${dotfiles}/zsh/.zshrc";
@@ -284,6 +284,9 @@ in
       "x-scheme-handler/https" = lib.mkDefault [ "firefox.desktop" ];
     };
   };
+
+  # Expose the standalone Nix workflow to shells, editors, and task runners.
+  home.file.".local/bin/nixie".source = lib.mkDefault "${dotfiles}/zsh/scripts/nixie";
 
   programs.zsh = {
     # These definitions must merge at normal priority so generated zsh files source the wrapper.

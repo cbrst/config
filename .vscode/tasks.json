@@ -3,8 +3,9 @@
 	"tasks": [
 		{
 			"label": "Build Home Manager",
-			"type": "shell",
-			"command": "./zsh/functions/nixie home --local",
+			"type": "process",
+			"command": "${workspaceFolder}/zsh/scripts/nixie",
+			"args": ["home", "--local"],
 			"group": "build",
 			"presentation": {
 				"reveal": "always",

@@ -1,0 +1,19 @@
+# Complete nixie actions and the Home Manager local-checkout option.
+_nixie() {
+	local context state state_descr line
+	typeset -A opt_args
+
+	_arguments -C \
+		'(-h --help)'{-h,--help}'[Display usage information]' \
+		'1:action:(all update system home)' \
+		'2:home option:->home_option' \
+		'*::arguments:_guard "^-*" "no additional arguments"'
+
+	case "${state}" in
+		home_option)
+			if [[ "${words[2]}" == "home" ]]; then
+				_arguments '--local[Use the local dotfiles checkout]'
+			fi
+			;;
+	esac
+}

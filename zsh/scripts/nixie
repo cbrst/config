@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 # Run the daily Nix workflow for the active NixOS or Home Manager profile.
 nixie() {
 	local nixie_flake="${NIXIE_FLAKE:-${NIXOS_FLAKE:-/etc/nixos}}"
@@ -184,3 +186,6 @@ nixie() {
 	# Firefox extensions fetch AMO's latest XPIs during impure Home Manager evaluation.
 	command home-manager switch --impure --flake "${nixie_flake}#${home_profile}"
 }
+
+# Invoke the workflow with the arguments supplied to this executable.
+nixie "$@"

@@ -1,8 +1,10 @@
 # Nixie
 
-`nixie` manages the daily Nix workflow from zsh. It is deployed as an
-autoloaded function by `home-manager/default.nix` and follows the commands in
-the NixOS configuration's `docs/daily-workflow.md`.
+`nixie` manages the daily Nix workflow from zsh. Home Manager links the
+executable `zsh/scripts/nixie` to `~/.local/bin/nixie`, so it works from
+interactive shells, VSCode tasks, and other processes that do not inherit ZSH
+functions. It follows the commands in the NixOS configuration's
+`docs/daily-workflow.md`.
 
 ```sh
 # Choose an action from the interactive menu.
@@ -19,6 +21,10 @@ nixie home    # dotfiles input, then Home Manager
 # Display built-in usage documentation.
 nixie --help
 ```
+
+ZSH completes the actions (`all`, `update`, `system`, and `home`) and offers
+`--local` only after `nixie home`. Open a new ZSH session after applying Home
+Manager to load the completion.
 
 `all` runs the complete daily workflow:
 
