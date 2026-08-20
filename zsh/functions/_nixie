@@ -1,4 +1,6 @@
-# Complete nixie actions and the Home Manager local-checkout option.
+#compdef nixie
+
+# Register completion for the standalone nixie executable.
 _nixie() {
 	local context state state_descr line
 	typeset -A opt_args

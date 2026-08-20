@@ -26,9 +26,9 @@ nixie() {
 		return 0
 	fi
 
-	# Avoid blocking scripts when no subcommand was supplied outside an interactive shell.
+	# Avoid blocking callers without a terminal while preserving the interactive menu for the executable.
 	if [[ -z "${action}" ]]; then
-		if [[ ! -o interactive ]]; then
+		if [[ ! -t 0 ]]; then
 			print -u2 'Usage: nixie [all | update | system | home [--local]]'
 			return 2
 		fi
