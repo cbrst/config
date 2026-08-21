@@ -443,7 +443,6 @@ in
       nvim-lint
       nvim-lspconfig
       nvim-treesitter
-      obsidian-nvim
       outline-nvim
       overseer-nvim
       plenary-nvim

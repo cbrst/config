@@ -70,8 +70,7 @@ Plugin configuration modules are grouped by responsibility:
 - `lua/plugins/smart/` contains syntax, formatting, linting, completion, and
   CodeCompanion.
 - `lua/plugins/lsp/` configures declarative LSP servers and attach-time mappings.
-- `lua/plugins/integrations/` contains external workflows such as Obsidian and
-  Overseer.
+- `lua/plugins/integrations/` contains external workflows such as Overseer.
 
 Add a plugin in two places: add its Nix package to
 `programs.neovim.plugins`, then add its eager setup module to the appropriate
