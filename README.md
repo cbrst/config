@@ -165,6 +165,13 @@ switching, deployment, and maintenance.
 ## AI coding
 
 The Linux Home Manager module installs the Headroom CLI with `uv` and provisions
+## Flatpak
+
+The shared Linux Home Manager profile configures the per-user Flathub remote and
+installs JDownloader and SONE. Host-level Flatpak prerequisites, activation,
+verification, updates, and recovery are documented in
+[`docs/flatpak.md`](docs/flatpak.md).
+
 its persistent user service. OpenCode itself is installed independently as a
 Nix package, so it remains available if Headroom is unavailable. macOS machines
 can add an equivalent `launchd.agents` definition in their machine-specific

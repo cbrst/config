@@ -573,6 +573,28 @@ in
     done
   '';
 
+  # ╭──────────────────────╮
+  # │ Flatpak applications │
+  # ╰─════════════════════─╯
+  home.activation.installFlatpakApplications = lib.mkIf isLinux (
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      # Activation omits the NixOS system profile from PATH, unlike interactive shells.
+      flatpak_bin="$(command -v flatpak || true)"
+      if [ -z "$flatpak_bin" ] && [ -x /run/current-system/sw/bin/flatpak ]; then
+        flatpak_bin=/run/current-system/sw/bin/flatpak
+      fi
+      if [ -z "$flatpak_bin" ]; then
+        echo "Flatpak is required to install shared Flatpak applications." >&2
+        exit 1
+      fi
+      "$flatpak_bin" --user remote-add --if-not-exists flathub \
+        https://dl.flathub.org/repo/flathub.flatpakrepo
+      "$flatpak_bin" --user install --noninteractive flathub \
+        org.jdownloader.JDownloader \
+        io.github.lullabyX.sone
+    ''
+  );
+
   programs.vscode = {
     # VSCode and its extensions are shared across every Home Manager consumer.
     enable = true;
