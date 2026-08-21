@@ -1,0 +1,16 @@
+# meowsoot Night palette from marekh19/meowsoot.nvim.
+[colors]
+foreground = "#e2e0df"
+background = "#171616"
+cursor_bg = "#eaa4c9"
+cursor_border = "#eaa4c9"
+cursor_fg = "#171616"
+selection_bg = "#353331"
+selection_fg = "#e2e0df"
+split = "#454240"
+scrollbar_thumb = "#282625"
+ansi = ["#171616", "#e99696", "#98cdaa", "#dfd286", "#96bddf", "#eaa4c9", "#96d8e3", "#b1ada9"]
+brights = ["#454240", "#f0b7b7", "#badec6", "#eee7c4", "#b5d0e8", "#eec4d9", "#c4e7ee", "#e2e0df"]
+
+[metadata]
+name = "meowsoot"

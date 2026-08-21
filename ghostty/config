@@ -19,8 +19,8 @@ adjust-cell-height = 20%
 adjust-font-baseline = 20%
 
 # Theme
-# Use the same Monokai Pro variants selected by the operating system appearance.
-theme = light:monokai-pro-light,dark:monokai-pro-spectrum
+# Use meowsoot unless the theme command writes a selected-family override.
+theme = light:meowsoot-dawn,dark:meowsoot
 unfocused-split-opacity = 0.5
 
 # Mouse
@@ -46,7 +46,8 @@ gtk-titlebar = true
 # Updating
 auto-update = download
 
-# Machine-specific configs
+# Optional runtime theme selection, then machine-specific configuration.
+config-file = ?theme
 config-file = ?machine
 
 # vim: set ft=ghostty:

@@ -57,34 +57,13 @@ if util.is_mac then
 	config.font_size = 14
 end
 
--- Add bright colors to themes
-local rosepine = wezterm.color.get_builtin_schemes()["rose-pine"]
-rosepine.brights = {
-	rosepine.brights[1],
-	wezterm.color.parse(rosepine.brights[2]):darken(0.2):desaturate(0.5),
-	wezterm.color.parse(rosepine.brights[3]):darken(0.2):desaturate(0.5),
-	wezterm.color.parse(rosepine.brights[4]):darken(0.2):desaturate(0.5),
-	wezterm.color.parse(rosepine.brights[5]):darken(0.2):desaturate(0.5),
-	wezterm.color.parse(rosepine.brights[6]):darken(0.2):desaturate(0.5),
-	wezterm.color.parse(rosepine.brights[7]):darken(0.2):desaturate(0.5),
-	wezterm.color.parse(rosepine.brights[8]):darken(0.2):desaturate(0.5),
+local family = util.theme_family()
+local schemes = {
+	meowsoot = { dark = "meowsoot", light = "meowsoot-dawn" },
+	["monokai-pro"] = { dark = "monokai-pro-spectrum", light = "monokai-pro-light" },
 }
-local rosepinedawn = wezterm.color.get_builtin_schemes()["rose-pine-dawn"]
-rosepinedawn.brights = {
-	rosepinedawn.brights[1],
-	wezterm.color.parse(rosepinedawn.brights[2]):lighten(0.4):desaturate(0.1),
-	wezterm.color.parse(rosepinedawn.brights[3]):lighten(0.4):desaturate(0.1),
-	wezterm.color.parse(rosepinedawn.brights[4]):lighten(0.4):desaturate(0.1),
-	wezterm.color.parse(rosepinedawn.brights[5]):lighten(0.4):desaturate(0.1),
-	wezterm.color.parse(rosepinedawn.brights[6]):lighten(0.4):desaturate(0.1),
-	wezterm.color.parse(rosepinedawn.brights[7]):lighten(0.4):desaturate(0.1),
-	wezterm.color.parse(rosepinedawn.brights[8]):lighten(0.4):desaturate(0.1),
-}
-config.color_schemes = {
-	["rose-pine"] = rosepine,
-	["rose-pine-dawn"] = rosepinedawn,
-}
-config.color_scheme = util.scheme_for_appearance("rose-pine", "rose-pine-dawn")
+-- The state file changes independently of OS appearance; WezTerm watches it for reloads.
+config.color_scheme = util.scheme_for_appearance(schemes[family].dark, schemes[family].light)
 
 -- I don't hit the quit keybind accidentally
 config.window_close_confirmation = "NeverPrompt"

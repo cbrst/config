@@ -24,6 +24,19 @@ M.scheme_for_appearance = function(dark, light)
 	return light
 end
 
+M.theme_family = function()
+	local state_home = os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")
+	local state_file = state_home .. "/config-theme/family"
+	wezterm.add_to_config_reload_watch_list(state_file)
+	local file = io.open(state_file, "r")
+	if not file then
+		return "meowsoot"
+	end
+	local family = file:read("*l")
+	file:close()
+	return family == "monokai-pro" and family or "meowsoot"
+end
+
 -- wrapper for SpawnCommand, since MacOS' default PATH is crap
 M.spawn = function(args)
 	local spawn = {

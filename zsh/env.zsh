@@ -12,7 +12,7 @@ export XDG_PROJECTS_DIR=${XDG_PROJECTS_DIR:-${HOME}/Projects}
 [ -f /opt/homebrew/bin/brew ] && eval $(/opt/homebrew/bin/brew shellenv)
 
 # PATH
-export PATH=${PATH}:${HOME}/.local/bin
+export PATH=${HOME}/.local/bin:${PATH}
 
 # Fish-like dirs
 : ${__zsh_config_dir:=${ZDOTDIR:-${XDG_CONFIG_HOME:-${HOME}/.config}/zsh}}

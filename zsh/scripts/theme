@@ -1,0 +1,46 @@
+#!/bin/sh
+# Select a theme family without modifying Home Manager-managed configuration.
+
+set -eu
+
+state_home=${XDG_STATE_HOME:-"$HOME/.local/state"}
+config_home=${XDG_CONFIG_HOME:-"$HOME/.config"}
+state_dir="$state_home/config-theme"
+state_file="$state_dir/family"
+
+family=${1:-status}
+
+case "$family" in
+  meowsoot)
+    ghostty_theme='light:meowsoot-dawn,dark:meowsoot'
+    ;;
+  monokai-pro)
+    ghostty_theme='light:monokai-pro-light,dark:monokai-pro-spectrum'
+    ;;
+  status)
+    if [ -r "$state_file" ]; then
+      IFS= read -r selected < "$state_file" || selected=meowsoot
+    else
+      selected=meowsoot
+    fi
+    case "$selected" in
+      meowsoot|monokai-pro) ;;
+      *) selected=meowsoot ;;
+    esac
+    printf '%s\n' "$selected"
+    exit 0
+    ;;
+  *)
+    printf '%s\n' 'Usage: theme {meowsoot|monokai-pro|status}' >&2
+    exit 64
+    ;;
+esac
+
+umask 077
+mkdir -p "$state_dir" "$config_home/ghostty"
+printf '%s\n' "$family" > "$state_file"
+
+# Ghostty loads this optional file after the shared default configuration.
+printf '%s\n' "theme = $ghostty_theme" > "$config_home/ghostty/theme"
+
+printf 'Selected %s. New Neovim and OpenCode sessions use it immediately; reload Ghostty windows if they are already open.\n' "$family"

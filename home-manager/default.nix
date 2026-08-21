@@ -99,6 +99,24 @@ let
     (builtins.readFile "${dotfiles}/emacs/init.el");
 
   # ╭─────────────────────────────╮
+  # │ Shared theme implementation │
+  # ╰─═══════════════════════════─╯
+  # Pin the plugin until it is packaged in the Nixpkgs version used by consumers.
+  meowsootNvim = pkgs.vimUtils.buildVimPlugin {
+    pname = "meowsoot.nvim";
+    version = "unstable-2026-07-19";
+    src = pkgs.fetchzip {
+      url = "https://github.com/marekh19/meowsoot.nvim/archive/4b76f83e364d589d901ecaada50ba0b0a81e611e.tar.gz";
+      hash = "sha256-lHdKNSu+BJFaEhOiwfn5Z1j11fhi+bdVLikV70aefOM=";
+      stripRoot = true;
+    };
+  };
+  opencodeWrapper = lib.replaceStrings
+    [ "@opencode@" ]
+    [ "${pkgs.opencode}/bin/opencode" ]
+    (builtins.readFile "${dotfiles}/zsh/scripts/opencode");
+
+  # ╭─────────────────────────────╮
   # │ Optional desktop components │
   # ╰─═══════════════════════════─╯
   noctaliaEnabled = machine.noctalia or false;
@@ -368,9 +386,10 @@ in
       "zsh/zimrc.zsh".source = lib.mkDefault "${dotfiles}/zsh/zimrc.zsh";
       "zsh/zshrc.zsh".source = lib.mkDefault "${dotfiles}/zsh/zshrc.zsh";
       "opencode/opencode.jsonc".text = lib.mkDefault opencodeConfig;
-      # Keep OpenCode's selected theme and color definitions declarative.
+      # Keep both selectable OpenCode theme definitions declarative.
       "opencode/tui.json".source = lib.mkDefault "${dotfiles}/opencode/tui.json";
       "opencode/themes/monokai-pro.json".source = lib.mkDefault "${dotfiles}/opencode/themes/monokai-pro.json";
+      "opencode/themes/meowsoot.json".source = lib.mkDefault "${dotfiles}/opencode/themes/meowsoot.json";
     };
   }
   # ╭──────────────────────────╮
@@ -404,8 +423,28 @@ in
   # ╭───────────────────╮
   # │ Shared programs   │
   # ╰─═════════════════─╯
-  # Expose the standalone Nix workflow to shells, editors, and task runners.
-  home.file.".local/bin/nixie".source = lib.mkDefault "${dotfiles}/zsh/scripts/nixie";
+  # Expose shared command-line workflows without requiring machine-local setup.
+  home.file = {
+    ".local/bin/nixie".source = lib.mkDefault "${dotfiles}/zsh/scripts/nixie";
+    ".local/bin/theme" = {
+      source = lib.mkDefault "${dotfiles}/zsh/scripts/theme";
+      executable = true;
+    };
+    ".local/bin/opencode-themed" = {
+      text = lib.mkDefault opencodeWrapper;
+      executable = true;
+    };
+  };
+
+  home.activation.initializeThemeState = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    # Meowsoot remains the stable fallback until the user explicitly selects a family.
+    state_dir=${lib.escapeShellArg "${config.xdg.stateHome}/config-theme"}
+    state_file="$state_dir/family"
+    mkdir -p "$state_dir"
+    if [ ! -e "$state_file" ]; then
+      printf '%s\n' meowsoot > "$state_file"
+    fi
+  '';
 
   programs.emacs = {
     # Package Emacs and every ELisp dependency through Nix instead of package.el.
@@ -439,6 +478,7 @@ in
       luvit-meta
       mini-nvim
       monokai-pro-nvim
+      meowsootNvim
       nvim-highlight-colors
       nvim-lint
       nvim-lspconfig

@@ -1,48 +1,54 @@
-# Monokai Pro Themes
+# Theme Families
 
-OpenCode, Ghostty, Neovim, and Emacs use Monokai Pro variants selected from the
-operating system appearance:
+`theme` selects a shared family while each application continues to choose its
+light or dark variant from the operating system appearance. Meowsoot is the
+default when no family has been selected.
 
-| Appearance | Variant |
-| --- | --- |
-| Dark | Monokai Pro Spectrum |
-| Light | Monokai Pro Light |
+| Family | Dark | Light |
+| --- | --- | --- |
+| meowsoot | Night (`meowsoot`) | Dawn (`meowsoot-dawn`) |
+| monokai-pro | Spectrum | Light |
 
-Neovim uses `auto-dark-mode.nvim` to switch between `monokai-pro-spectrum` and
-`monokai-pro-light`. Ghostty selects the matching tracked palette with its
-light/dark `theme` setting. OpenCode uses the `dark` and `light` definitions in
-`opencode/themes/monokai-pro.json`. Emacs uses `monokai-pro-spectrum` directly;
-its declarative configuration does not currently switch themes with system
-appearance.
+Run one of these commands from a shell after Home Manager has deployed the
+configuration:
+
+```sh
+# Select a family without rewriting Home Manager-managed files.
+theme meowsoot
+theme monokai-pro
+
+# Print the selected family; reports meowsoot before the first selection.
+theme status
+```
+
+The command stores the selection in
+`$XDG_STATE_HOME/config-theme/family` and writes Ghostty's optional final
+override at `$XDG_CONFIG_HOME/ghostty/theme`. Neovim reads the state at startup,
+WezTerm watches it and reloads its configuration, and the `opencode` function
+starts `opencode-themed`, which creates a private runtime `tui.json`. Restart
+existing OpenCode sessions after a switch. Existing Ghostty windows can reload through
+the default `Ctrl+Shift+,` binding.
+
+VS Code and Emacs intentionally remain on their fixed Monokai Pro themes.
 
 ## Palette Sources
 
-The Spectrum Ghostty palette comes from
-<https://cmuxthemes.com/themes/monokai-pro-spectrum/>. The Light palette and
-the OpenCode variants use the corresponding palette values from the pinned
-`loctvl842/monokai-pro.nvim` plugin. OpenCode's semantic role mapping is based
-on <https://github.com/monokai-pro/opencode>.
+Meowsoot Night and Dawn are copied from the pinned upstream source at
+<https://github.com/marekh19/meowsoot.nvim>. The local OpenCode theme maps that
+palette into OpenCode semantic roles. The retained Monokai Pro Spectrum Ghostty
+palette comes from <https://cmuxthemes.com/themes/monokai-pro-spectrum/>; its
+Light palette comes from `loctvl842/monokai-pro.nvim`.
 
 ## Apply Changes
 
-Home Manager deploys the OpenCode files and Ghostty configuration. Test local
-changes on the NixOS machine with:
+Home Manager deploys theme assets and initializes the state file only when it
+does not already exist. Test local changes on the NixOS machine with:
 
 ```sh
-# Deploy the local checkout, including the shared Monokai Pro configuration.
-home-manager switch --flake /etc/nixos#cbrst \
+# Resolve the module's intentionally unpinned evaluation fetches.
+home-manager switch --impure --flake /etc/nixos#cbrst \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 
-Restart Ghostty and OpenCode after applying the generation. Neovim picks up a
-changed configuration when it is restarted; switch the system appearance to
-verify both variants.
-
-## Maintain The Pair
-
-Keep both variants aligned when updating a palette. Edit the corresponding
-Ghostty file, `opencode/themes/monokai-pro.json`, and the Monokai Pro Neovim
-configuration together. Keep Emacs on the Spectrum palette unless its system
-appearance switching is added alongside the other applications. Do not add
-per-machine or ignored theme overrides: the tracked configuration is the source
-of truth for all applications.
+Start Neovim and OpenCode, then change the system appearance, to verify both
+variants. Restart Ghostty after changing a family.

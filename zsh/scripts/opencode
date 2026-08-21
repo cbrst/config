@@ -1,0 +1,35 @@
+#!/bin/sh
+# Give OpenCode a writable per-launch tui.json while preserving every managed file.
+
+set -eu
+
+config_home=${XDG_CONFIG_HOME:-"$HOME/.config"}
+state_file=${XDG_STATE_HOME:-"$HOME/.local/state"}/config-theme/family
+source_dir="$config_home/opencode"
+runtime_home=${XDG_RUNTIME_DIR:-"$HOME/.xdg"}/opencode-theme
+runtime_dir="$runtime_home/opencode"
+
+family=meowsoot
+if [ -r "$state_file" ]; then
+  IFS= read -r family < "$state_file" || family=meowsoot
+fi
+case "$family" in
+  meowsoot|monokai-pro) ;;
+  *) family=meowsoot ;;
+esac
+
+umask 077
+mkdir -p "$runtime_dir"
+for entry in "$source_dir"/* "$source_dir"/.[!.]*; do
+  [ -e "$entry" ] || continue
+  name=${entry##*/}
+  [ "$name" = tui.json ] && continue
+  ln -sfn "$entry" "$runtime_dir/$name"
+done
+
+printf '%s\n' \
+  '{' \
+  "  \"\$schema\": \"https://opencode.ai/tui.json\"," \
+  "  \"theme\": \"$family\"" \
+  '}' > "$runtime_dir/tui.json"
+XDG_CONFIG_HOME="$runtime_home" exec @opencode@ "$@"

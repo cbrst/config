@@ -8,29 +8,28 @@ function M.get()
 	local visual = vim.api.nvim_get_hl(0, { name = "Visual", link = false })
 	if vim.o.background == "light" then
 		return {
-			bar = "#eeeeee",
-			inactive = "#e3e3e3",
-			fg = "#34332f",
-			muted = "#77746b",
-			tab = normal.bg or "#f8f8f2",
-			label = "#e3e3e3",
-			editor = normal.bg or "#f8f8f2",
-			context = visual.fg or "#5a5a52",
-			command = "#d9d7ce",
+			bar = "#e6e0db",
+			inactive = "#f2eee9",
+			fg = "#3c312a",
+			muted = "#7e7063",
+			tab = normal.bg or "#f9f6f1",
+			label = "#e6e0db",
+			editor = normal.bg or "#f9f6f1",
+			context = visual.fg or "#911256",
+			command = "#e8e3de",
 		}
 	end
 
 	return {
-		-- Lighter than Monokai Pro's default status-bar shade while remaining subdued.
-		bar = "#3b3b3b",
-		inactive = "#2b2b2b",
-		fg = "#fbf8ff",
-		muted = "#aaa8a0",
-		tab = normal.bg or "#222222",
-		label = "#2b2b2b",
-		editor = normal.bg or "#222222",
-		context = visual.fg or "#fce566",
-		command = "#181818",
+		bar = "#201f1d",
+		inactive = "#171616",
+		fg = "#e2e0df",
+		muted = "#b1ada9",
+		tab = normal.bg or "#171616",
+		label = "#171616",
+		editor = normal.bg or "#171616",
+		context = visual.fg or "#eaa4c9",
+		command = "#100f0f",
 	}
 end
 

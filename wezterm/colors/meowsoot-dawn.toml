@@ -1,0 +1,16 @@
+# meowsoot Dawn palette from marekh19/meowsoot.nvim.
+[colors]
+foreground = "#3c312a"
+background = "#f9f6f1"
+cursor_bg = "#911256"
+cursor_border = "#911256"
+cursor_fg = "#f9f6f1"
+selection_bg = "#d7cac1"
+selection_fg = "#3c312a"
+split = "#b0998d"
+scrollbar_thumb = "#f2eee9"
+ansi = ["#f9f6f1", "#a11717", "#1f7a3d", "#917112", "#25659d", "#911256", "#187a8b", "#7e7063"]
+brights = ["#b0998d", "#c41c1c", "#2aa252", "#866709", "#2d7abe", "#820d49", "#116374", "#3c312a"]
+
+[metadata]
+name = "meowsoot-dawn"

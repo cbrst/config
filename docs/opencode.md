@@ -18,13 +18,14 @@ Open a new zsh session after applying the Home Manager configuration, then run:
 # Start through Headroom when its proxy is healthy.
 opencode
 
-# Bypass the zsh wrapper and run the Nix-provided OpenCode CLI directly.
+# Bypass Headroom and the theme selector; run the Nix-provided CLI directly.
 command opencode
 ```
 
-The wrapper reports a warning and falls back to direct OpenCode if Headroom is
-not installed, cannot start, or does not become healthy. This keeps OpenCode
-usable when the optional proxy is unavailable.
+The wrapper reports a warning and falls back to the theme-aware launcher if
+Headroom is not installed, cannot start, or does not become healthy. This keeps
+OpenCode usable when the optional proxy is unavailable. Use `command opencode`
+only when deliberately bypassing both the proxy and the selected theme.
 
 ## Use OpenCode In Neovim
 

@@ -21,8 +21,9 @@ Machine-specific settings. Everything set here overwrites settings made in
 
 ### `themes` Folder
 
-Contains the two tracked Monokai Pro palettes. Ghostty selects Spectrum in dark
-mode and Light in light mode through the `theme` setting in `config`.
+Contains the tracked meowsoot and Monokai Pro palettes. Ghostty defaults to
+meowsoot Night in dark mode and Dawn in light mode. `theme` writes the optional
+`theme` override file to switch families without modifying `config`.
 
 ---
 

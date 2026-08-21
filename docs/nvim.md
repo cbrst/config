@@ -60,7 +60,7 @@ tools, and action palette as needed.
 - `lua/languages/init.lua` explicitly enables each filetype module.
 - `lua/plugins/init.lua` configures all installed plugins in eager order:
   foundational UI, completion, LSP, then integrations.
-- `lua/config/theme.lua` selects Monokai Pro after plugin setup.
+- `lua/config/theme.lua` selects the shared theme family after plugin setup.
 - `lua/config/util.lua` contains shared helpers for visual-selection commands.
 
 Plugin configuration modules are grouped by responsibility:
@@ -93,7 +93,7 @@ group and call it from `lua/plugins/init.lua`.
 - `mini.icons` replaces `nvim-web-devicons`. It mocks the devicons API so
   Telescope continues to render file icons.
 
-The statusline uses a lighter neutral surface than Monokai Pro's default status
+The statusline uses a lighter neutral surface than the active theme's editor
 bar. Dropbar instead uses the editor background, including its active path
 items and folder icons; active context is conveyed by foreground color rather
 than a contrasting folder background. The command line uses a slightly darker
@@ -118,9 +118,10 @@ compatible parser. Parsers are compiled once per language in Neovim's writable
 data directory; use `:TSUpdate` to update installed parsers or `:TSInstall
 <language>` to install one manually.
 
-Monokai Pro is selected after plugins load. `auto-dark-mode.nvim` switches
-between `monokai-pro-spectrum` for dark appearances and `monokai-pro-light` for
-light appearances. Lua buffers retain two-column indentation and use
+The family selected by `theme` is applied after plugins load; the default is
+meowsoot. `auto-dark-mode.nvim` switches between its dark and light variants,
+using meowsoot Night and Dawn by default. Lua buffers retain two-column
+indentation and use
 indent-based folding. Markdown windows use conceal level 2, render with
 `render-markdown.nvim`, and run `markdownlint` on buffer entry, write, and
 insert leave.

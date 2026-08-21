@@ -156,9 +156,11 @@ documented in [`docs/gtk.md`](docs/gtk.md).
 
 ## Themes
 
-OpenCode, Ghostty, and Neovim share Monokai Pro Spectrum in dark mode and
-Monokai Pro Light in light mode. See [`docs/themes.md`](docs/themes.md) for
-palette sources, deployment, and maintenance.
+OpenCode, Ghostty, Neovim, and WezTerm select the meowsoot family by default;
+use `theme monokai-pro` to switch to the retained Monokai Pro family. Each
+family follows the operating system light/dark appearance. See
+[`docs/themes.md`](docs/themes.md) for palette sources, switching, deployment,
+and maintenance.
 
 ## AI coding
 
