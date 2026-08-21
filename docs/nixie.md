@@ -69,7 +69,10 @@ NIXIE_HOME_PROFILE="alice@laptop" \
 nixie all
 ```
 
-`NIXIE_FLAKE` defaults to `/etc/nixos`. `NIXIE_HOST_PROFILE` and
+On NixOS, `NIXIE_FLAKE` defaults to `/etc/nixos`. On other Linux distributions
+and macOS, it defaults to `${XDG_CONFIG_HOME:-$HOME/.config}/home-manager`,
+which is the standalone Home Manager location used by the setup guides. Set
+`NIXIE_FLAKE` when the consumer flake lives elsewhere. `NIXIE_HOST_PROFILE` and
 `NIXIE_HOME_PROFILE` override automatic selection. The legacy
 `NIXOS_FLAKE` and `HOME_MANAGER_PROFILE` variables remain accepted for existing
 shell setups, but new configuration should use the `NIXIE_*` names.
