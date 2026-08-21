@@ -4,7 +4,9 @@ order = [ "main" ]
     [bar.main]
     background_opacity = 0.24999999441206455
     center = [ "clock" ]
-    end = [ "group:g1", "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
+    color = "tertiary"
+    end = [ "media", "tray", "notifications", "clipboard", "volume", "control-center", "session" ]
+    icon_color = "tertiary"
     margin_edge = 0
     margin_ends = 0
     padding = 14
@@ -23,21 +25,11 @@ order = [ "main" ]
         accordion = false
         accordion_direction = "end"
         enabled = true
-        fill = "surface_variant"
-        id = "g1"
-        members = [ "cpu", "ram", "temp" ]
-        opacity = 0.10000000149011612
-        padding = 6.0
-
-        [[bar.main.capsule_group]]
-        accordion = false
-        accordion_direction = "end"
-        enabled = true
-        fill = "surface_variant"
+        fill = "primary"
         id = "g2"
         members = [ "workspaces", "active_window" ]
         opacity = 0.10000000149011612
-        padding = 6.0
+        padding = 8.0
 
 [dock]
 background_opacity = 0.099999997764825821
@@ -145,11 +137,12 @@ time_format = "{:%H:%M}"
     direction = "down"
 
 [theme]
-builtin = "Tokyo-Night"
-community_palette = "Cyberpunk"
+builtin = "Rosé Pine"
+community_palette = "Monochrome"
+custom_palette = "monochrome-custom"
 mode = "dark"
 pure_black_dark = false
-source = "wallpaper"
+source = "custom"
 
     [theme.templates]
     builtin_ids = [ "gtk4", "ghostty", "hyprland" ]
@@ -166,13 +159,13 @@ transition_on_startup = true
     enabled = true
 
     [wallpaper.default]
-    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-e8xr9o.jpg"
+    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-jx68rw.jpg"
 
     [wallpaper.last]
-    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-e8xr9o.jpg"
+    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-jx68rw.jpg"
 
     [wallpaper.monitors.DP-1]
-    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-e8xr9o.jpg"
+    path = "/home/cbrst/Pictures/Wallpapers/wallhaven-jx68rw.jpg"
 
 [widget.active_window]
 display = "text_only"
@@ -181,6 +174,17 @@ icon_size = 38
 
 [widget.clock]
 font_weight = 700
+
+[widget.media]
+artist_first = true
+capsule = true
+capsule_fill = "primary"
+capsule_opacity = 0.10000000000000001
+capsule_padding = 8
+font_weight = 700
+hide_when_no_media = true
+max_length = 602
+title_scroll = "on_hover"
 
 [widget.taskbar]
 only_active_workspace = true

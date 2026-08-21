@@ -27,5 +27,15 @@ machine, change `shell.font_family` in `noctalia/config.toml` to an installed
 font, then apply the Home Manager generation:
 
 ```sh
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --impure --flake /etc/nixos#cbrst
 ```
+
+Alternatively, run `nixie home`, which refreshes the `dotfiles` input before
+applying Home Manager.
+
+The shared configuration selects the editable
+`noctalia/palettes/monochrome-custom.json` palette, which begins as a copy of
+Noctalia's `Monochrome` community palette. The deployed location is
+`~/.config/noctalia/palettes/`; edit the tracked file, keep
+`theme.custom_palette = "monochrome-custom"`, and retain
+`theme.source = "custom"` to apply changes without wallpaper-derived colors.
