@@ -156,11 +156,11 @@ documented in [`docs/gtk.md`](docs/gtk.md).
 
 ## Themes
 
-OpenCode, Ghostty, Neovim, and WezTerm select the meowsoot family by default;
-use `theme monokai-pro` to switch to the retained Monokai Pro family. Each
-family follows the operating system light/dark appearance. See
-[`docs/themes.md`](docs/themes.md) for palette sources, switching, deployment,
-and maintenance.
+OpenCode, Ghostty, Neovim, WezTerm, Tridactyl, and the Wayland Firefox profile
+select the meowsoot family by default; use `theme monokai-pro` to switch to the
+retained Monokai Pro family. Each family follows the operating system light/dark
+appearance. See [`docs/themes.md`](docs/themes.md) for palette sources,
+switching, deployment, and maintenance.
 
 ## AI coding
 

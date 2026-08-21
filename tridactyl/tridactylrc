@@ -1,4 +1,5 @@
-colorscheme mytheme
+" The shared selector writes this small state file with the active family.
+source ~/.local/state/config-theme/tridactylrc
 
 set smoothscroll true
 set editorcmd /Users/cbrst/.config/tridactyl/editor.sh

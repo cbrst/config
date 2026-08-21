@@ -1,0 +1,37 @@
+/* Meowsoot Night and Dawn palette from marekh19/meowsoot.nvim. */
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --tridactyl-bg: #f9f6f1;
+        --tridactyl-fg: #3c312a;
+        --tridactyl-border-color: #b0998d;
+        --tridactyl-bg-border: 1px solid var(--tridactyl-border-color);
+        --tridactyl-bg-inset: inset 0 0 0 1px #ffffff80;
+        --tridactyl-cmdl-shadow: #3c312a33;
+        --tridactyl-link-fg: #25659d;
+        --tridactyl-selection-bg: #d7cac1;
+        --tridactyl-selection-fg: #3c312a;
+        --tridactyl-hint-fg: #f9f6f1;
+        --tridactyl-hint-bg-solid: #911256;
+        --tridactyl-hint-backdrop: #91125640;
+        --tridactyl-code-bg: #f2eee9;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --tridactyl-bg: #171616;
+        --tridactyl-fg: #e2e0df;
+        --tridactyl-border-color: #454240;
+        --tridactyl-bg-border: 1px solid var(--tridactyl-border-color);
+        --tridactyl-bg-inset: inset 0 0 0 1px #e2e0df80;
+        --tridactyl-cmdl-shadow: #00000066;
+        --tridactyl-link-fg: #96bddf;
+        --tridactyl-selection-bg: #353331;
+        --tridactyl-selection-fg: #e2e0df;
+        --tridactyl-hint-fg: #171616;
+        --tridactyl-hint-bg-solid: #eaa4c9;
+        --tridactyl-hint-backdrop: #eaa4c940;
+        --tridactyl-code-bg: #282625;
+    }
+}

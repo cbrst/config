@@ -56,7 +56,11 @@ The Wayland profile loads `userChrome.css`, which collapses the navigation bar
 until the Firefox toolbox is hovered and hides Firefox window controls. Its
 Downloads button remains on the tab bar; extension action buttons and Firefox's
 unified extensions menu remain in the navigation bar and are available on hover.
-Tridactyl is installed only in this compact profile; uBlock Origin, 1Password,
+It imports the active theme stylesheet from
+`$XDG_STATE_HOME/config-theme/firefox-wayland.css`, which `theme` generates
+from the selected palette. Tridactyl is installed only in this compact profile
+and sources its matching colorscheme from
+`$XDG_STATE_HOME/config-theme/tridactylrc`; uBlock Origin, 1Password,
 Violentmonkey, Stylus, and SponsorBlock are installed in both profiles.
 Both profiles set `extensions.autoDisableScopes = 0`, so Firefox enables their
 Home Manager-provided extensions instead of treating them as disabled sideloads.
@@ -85,10 +89,12 @@ home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
 Restart Firefox after the switch. In a Niri or Hyprland session, run
-`firefox-session` and confirm the compact toolbar and Tridactyl. In another
-session, confirm the normal toolbar and common extensions at `about:addons`.
-If Firefox was already running, close every Firefox window before starting the
-Wayland profile so it reloads the managed toolbar layout.
+`firefox-session` and confirm the compact toolbar, selected theme colors, and
+Tridactyl. In another session, confirm the normal toolbar and common extensions
+at `about:addons`. If Firefox was already running, close every Firefox window
+before starting the Wayland profile so it reloads the managed toolbar layout and
+active theme stylesheet. Run `:source` in Tridactyl to reload its colorscheme
+without restarting Firefox.
 
 `nixie home`, `nixie home --local`, and the Home Manager phase of `nixie all`
 pass `--impure` automatically. A switch can therefore change addon versions

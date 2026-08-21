@@ -1,0 +1,26 @@
+/* Monokai Pro Spectrum and Light palettes from the shared terminal schemes. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --browser-bg: #faf4f2;
+    --browser-fg: #29242a;
+    --browser-muted: #706b6e;
+    --browser-border: #a59fa0;
+    --browser-hover: #f0e9e7;
+    --browser-selected: #e9dfdb;
+    --browser-accent: #7058be;
+    --browser-accent-fg: #faf4f2;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --browser-bg: #222222;
+    --browser-fg: #f7f1ff;
+    --browser-muted: #bab6c0;
+    --browser-border: #69676c;
+    --browser-hover: #2d2b2e;
+    --browser-selected: #3b393d;
+    --browser-accent: #948ae3;
+    --browser-accent-fg: #222222;
+  }
+}

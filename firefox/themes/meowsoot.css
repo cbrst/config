@@ -1,0 +1,26 @@
+/* Meowsoot Night and Dawn palette from marekh19/meowsoot.nvim. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --browser-bg: #f9f6f1;
+    --browser-fg: #3c312a;
+    --browser-muted: #7e7063;
+    --browser-border: #b0998d;
+    --browser-hover: #f2eee9;
+    --browser-selected: #d7cac1;
+    --browser-accent: #911256;
+    --browser-accent-fg: #f9f6f1;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --browser-bg: #171616;
+    --browser-fg: #e2e0df;
+    --browser-muted: #b1ada9;
+    --browser-border: #454240;
+    --browser-hover: #282625;
+    --browser-selected: #353331;
+    --browser-accent: #eaa4c9;
+    --browser-accent-fg: #171616;
+  }
+}

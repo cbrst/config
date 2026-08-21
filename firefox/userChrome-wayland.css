@@ -1,4 +1,55 @@
+@import url("@firefoxTheme@");
+
 /* This stylesheet is installed only in Firefox's Niri/Hyprland profile. */
+
+#navigator-toolbox,
+#TabsToolbar,
+#nav-bar,
+#PersonalToolbar,
+#tabbrowser-tabs {
+  background-color: var(--browser-bg) !important;
+  color: var(--browser-fg) !important;
+}
+
+#navigator-toolbox {
+  border-bottom: 1px solid var(--browser-border) !important;
+}
+
+.tabbrowser-tab[selected] .tab-background,
+#urlbar[focused] > #urlbar-background {
+  background-color: var(--browser-selected) !important;
+}
+
+.tabbrowser-tab:hover > .tab-stack > .tab-background,
+#urlbar-background {
+  background-color: var(--browser-hover) !important;
+}
+
+.tabbrowser-tab,
+#urlbar-background,
+.toolbarbutton-1 > .toolbarbutton-icon {
+  color: var(--browser-fg) !important;
+}
+
+.tab-secondary-label {
+  color: var(--browser-muted) !important;
+}
+
+.tab-close-button:hover,
+.toolbarbutton-1:hover > .toolbarbutton-icon {
+  background-color: var(--browser-selected) !important;
+}
+
+#urlbar[focused] > #urlbar-background {
+  outline: 1px solid var(--browser-accent) !important;
+}
+
+#urlbar-input,
+.urlbarView-row,
+.urlbarView-title,
+.urlbarView-url {
+  color: var(--browser-fg) !important;
+}
 
 .titlebar-buttonbox-container,
 .titlebar-buttonbox,

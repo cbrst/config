@@ -1,0 +1,52 @@
+:root {
+    --tridactyl-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --tridactyl-cmdl-font-family: var(--tridactyl-font-family);
+    --tridactyl-font-size: 12px;
+    --tridactyl-small-font-size: 12px;
+    --tridactyl-cmplt-font-size: var(--tridactyl-font-size);
+
+    --tridactyl-status-font-family: var(--tridactyl-font-family);
+    --tridactyl-status-font-bg: var(--tridactyl-cmdl-bg);
+    --tridactyl-status-border: 2px solid black;
+    --tridactyl-status-border-radius: 4px;
+
+    --tridactyl-of-fg: var(--tridactyl-selection-fg);
+    --tridactyl-of-bg: var(--tridactyl-selection-bg);
+    --tridactyl-url-fg: var(--tridactyl-link-fg);
+
+    --tridactyl-hintspan-font-family: var(--tridactyl-font-family);
+    --tridactyl-hintspan-fg: var(--tridactyl-hint-fg);
+    --tridactyl-hintspan-bg: var(--tridactyl-hint-bg-solid);
+
+    --tridactyl-hint-active-fg: var(--tridactyl-selection-fg);
+    --tridactyl-hint-active-bg: var(--tridactyl-selection-bg);
+    --tridactyl-hint-active-outline: 1px solid var(--tridactyl-border-color);
+
+    --tridactyl-hint-bg: var(--tridactyl-hint-backdrop);
+    --tridactyl-hint-outline: 1px solid var(--tridactyl-hintspan-bg);
+
+    --tridactyl-cmdl-bg: var(--tridactyl-bg);
+    --tridactyl-cmdl-fg: var(--tridactyl-fg);
+    --tridactyl-cmdl-font-size: calc(var(--tridactyl-font-size) * 1.2);
+    --tridactyl-cmplt-option-height: 1.5rem;
+
+    --tridactyl-border-radius: 10px;
+
+    /** Use theme colors */
+    --tridactyl-header-first-bg: var(--tridactyl-code-bg);
+    --tridactyl-header-second-bg: var(--tridactyl-code-bg);
+    --tridactyl-header-third-bg: var(--tridactyl-code-bg);
+}
+
+:root .TridactylStatusIndicator {
+    display: none !important;
+}
+
+/*
+ * Hints
+ */
+
+span.TridactylHint {
+    border-radius: 5px 5px 0 5px !important;
+    transform: translate(-50%, -50%) !important;
+}

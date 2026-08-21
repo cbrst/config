@@ -1,0 +1,37 @@
+/* Monokai Pro Spectrum and Light palettes from the shared terminal schemes. */
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --tridactyl-bg: #faf4f2;
+        --tridactyl-fg: #29242a;
+        --tridactyl-border-color: #a59fa0;
+        --tridactyl-bg-border: 1px solid var(--tridactyl-border-color);
+        --tridactyl-bg-inset: inset 0 0 0 1px #ffffff80;
+        --tridactyl-cmdl-shadow: #29242a33;
+        --tridactyl-link-fg: #1c8ca8;
+        --tridactyl-selection-bg: #e9dfdb;
+        --tridactyl-selection-fg: #29242a;
+        --tridactyl-hint-fg: #faf4f2;
+        --tridactyl-hint-bg-solid: #7058be;
+        --tridactyl-hint-backdrop: #7058be40;
+        --tridactyl-code-bg: #f0e9e7;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --tridactyl-bg: #222222;
+        --tridactyl-fg: #f7f1ff;
+        --tridactyl-border-color: #69676c;
+        --tridactyl-bg-border: 1px solid var(--tridactyl-border-color);
+        --tridactyl-bg-inset: inset 0 0 0 1px #f7f1ff80;
+        --tridactyl-cmdl-shadow: #00000066;
+        --tridactyl-link-fg: #5ad4e6;
+        --tridactyl-selection-bg: #3b393d;
+        --tridactyl-selection-fg: #f7f1ff;
+        --tridactyl-hint-fg: #222222;
+        --tridactyl-hint-bg-solid: #fce566;
+        --tridactyl-hint-backdrop: #fce56640;
+        --tridactyl-code-bg: #2d2b2e;
+    }
+}
