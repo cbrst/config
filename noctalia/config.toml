@@ -145,7 +145,7 @@ pure_black_dark = false
 source = "custom"
 
     [theme.templates]
-    builtin_ids = [ "gtk4", "ghostty", "hyprland" ]
+    builtin_ids = [ "gtk4", "ghostty" ]
 
 [wallpaper]
 directory = "~/Pictures/Wallpapers"

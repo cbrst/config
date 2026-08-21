@@ -1,9 +1,9 @@
 # Niri
 
-Set `machine.niri = true` in the consuming machine configuration to install
-Niri, deploy `niri/config.kdl`, and enable Noctalia. Niri starts Noctalia as
-the desktop shell; it supplies the bar, launcher, control center,
-notifications, wallpaper, lock screen, and OSDs.
+Set `machine.niri = true` and `machine.noctalia = true` in the consuming machine
+configuration to install Niri, deploy `niri/config.kdl`, and enable Noctalia.
+Niri starts Noctalia as the desktop shell; it supplies the bar, launcher,
+control center, notifications, wallpaper, lock screen, and OSDs.
 
 The shared configuration uses a 2px Catppuccin gradient border rather than a
 focus ring, with 8px rounded window geometry and compositor shadows. It applies

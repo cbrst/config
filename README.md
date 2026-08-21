@@ -89,7 +89,7 @@ passes `--impure` automatically. The bootstrap command remains necessary before
 `nixie` is installed.
 
 The shared module automatically uses `/Users/<user>`, skips its Linux-only
-systemd, GTK, Hyprland, Niri, and Noctalia settings, and puts graphical Nix
+systemd, GTK, Niri, and Noctalia settings, and puts graphical Nix
 applications in `~/Applications/Home Manager Apps`. Linux `.desktop` launchers
 and MIME associations are skipped too. The example also selects the native
 macOS 1Password SSH-agent socket. Install the native Ghostty app separately;
@@ -109,28 +109,6 @@ Home Manager installs standard Emacs on Linux and native Emacs Mac Port on
 macOS. The declarative Evil-based configuration and its Neovim-compatible
 keymaps are documented in [`docs/emacs.md`](docs/emacs.md).
 
-## Hyprland
-
-Home Manager deploys the `hypr` and `noctalia` modules. Set `machine.noctalia =
-true` in the consuming machine flake to enable Noctalia as the Hyprland shell:
-
-```sh
-# Resolve the module's intentionally unpinned Firefox and Open VSX downloads.
-home-manager switch --impure --flake /etc/nixos#cbrst
-```
-
-Alternatively, run `nixie home` to refresh the shared `dotfiles` input and
-apply Home Manager with `--impure`.
-
-`hypr/hyprland.lua` is a native Hyprland Lua configuration. It sets Ghostty as
-`TERMINAL` and also defines `BROWSER`, `FILE_MANAGER`, `EDITOR`, and `VISUAL`.
-The Super+Return, Super+B, and Super+E bindings consume those values.
-Noctalia provides the bar, launcher (Super+Space), control center (Super+C),
-notifications, wallpaper, lock screen, and OSDs. Add machine-specific monitor
-rules with `hl.monitor(...)` in `hypr/hyprland.lua`. The shared Linux profile
-uses the Bibata Modern Ice cursor; see [`docs/hyprland.md`](docs/hyprland.md)
-for cursor maintenance and session reload steps.
-
 ## Firefox
 
 Firefox extensions, the Tridactyl configuration, and GitHub-backed userscript
@@ -139,10 +117,11 @@ that install Firefox themselves should set `machine.firefoxSystem = true`.
 
 ## Niri
 
-Set `machine.niri = true` to install Niri, deploy `niri/config.kdl`, and enable
-Noctalia as its shell. The Niri profile starts Noctalia and applies a background
-blur to its layer surfaces and pop-ups. See [`docs/niri.md`](docs/niri.md) for
-bindings, reload instructions, and monitor overrides.
+Set `machine.niri = true` to install Niri and deploy `niri/config.kdl`. Set
+`machine.noctalia = true` to enable Noctalia as its shell. The Niri profile
+starts Noctalia and applies a background blur to its layer surfaces and pop-ups.
+See [`docs/niri.md`](docs/niri.md) for bindings, reload instructions, and
+monitor overrides.
 
 Noctalia's shared bar layout and appearance are documented in
 [`docs/noctalia.md`](docs/noctalia.md).

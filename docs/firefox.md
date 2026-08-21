@@ -19,7 +19,7 @@ machine where Home Manager should install Firefox. Omit `firefoxProfilePath`
 only for a new profile; it defaults to `default`.
 
 Home Manager installs uBlock Origin, 1Password, Violentmonkey, Stylus, and
-SponsorBlock into both managed profiles, and Tridactyl into the Niri/Hyprland
+SponsorBlock into both managed profiles, and Tridactyl into the Niri
 profile only. Firefox is configured to enable those profile extensions
 automatically. Home Manager fetches the latest signed XPI for each addon from
 Mozilla Add-ons during an impure evaluation, so each Home Manager switch checks
@@ -30,11 +30,10 @@ Home Manager writes these XPIs under Firefox's profile extension UUID directory;
 do not replace the generated `extensions` symlink in the Firefox profile.
 
 The managed `default` profile restores the previous window and tabs on normal
-startup. Home Manager also creates a `wayland` profile for Niri and Hyprland.
+startup. Home Manager also creates a `wayland` profile for Niri.
 The `firefox-session` launcher selects `wayland` when `XDG_CURRENT_DESKTOP`
-contains `niri` or `Hyprland` (or when Hyprland's instance variable is present)
-and otherwise selects `default`. The local `firefox.desktop` entry and the Niri
-and Hyprland browser bindings use this launcher.
+contains `niri` and otherwise selects `default`. The local `firefox.desktop`
+entry and the Niri browser binding use this launcher.
 
 The profiles use fixed Home Manager IDs: `default` is ID `0` and the sole
 default profile; `wayland` is ID `1`. Keep these IDs unique when adding a
@@ -91,13 +90,13 @@ home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 Alternatively, run `nixie home` to refresh the `dotfiles` input and apply the
 Home Manager profile.
 
-Restart Firefox after the switch. In a Niri or Hyprland session, run
-`firefox-session` and confirm the compact toolbar, selected theme colors, and
-Tridactyl. In another session, confirm the normal toolbar and common extensions
-at `about:addons`. If Firefox was already running, close every Firefox window
-before starting the Wayland profile so it reloads the managed toolbar layout and
-active theme stylesheet. Run `:source` in Tridactyl to reload its colorscheme
-without restarting Firefox.
+Restart Firefox after the switch. In a Niri session, run `firefox-session` and
+confirm the compact toolbar, selected theme colors, and Tridactyl. In another
+session, confirm the normal toolbar and common extensions at `about:addons`. If
+Firefox was already running, close every Firefox window before starting the
+Wayland profile so it reloads the managed toolbar layout and active theme
+stylesheet. Run `:source` in Tridactyl to reload its colorscheme without
+restarting Firefox.
 
 `nixie home`, `nixie home --local`, and the Home Manager phase of `nixie all`
 pass `--impure` automatically. A switch can therefore change addon versions

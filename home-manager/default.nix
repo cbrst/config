@@ -366,7 +366,6 @@ in
       createDirectories = lib.mkDefault true;
     };
     configFile = {
-      "hypr".source = lib.mkDefault "${dotfiles}/hypr";
       "niri/config.kdl".source = lib.mkDefault "${dotfiles}/niri/config.kdl";
       "noctalia".source = lib.mkDefault "${dotfiles}/noctalia";
       "fastfetch".source = lib.mkDefault "${dotfiles}/fastfetch";

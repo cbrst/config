@@ -22,8 +22,9 @@
       # Machine values and private Ghostty settings live beside this consuming flake.
       machine = (import ./hosts/local.nix) // {
         ghostty = builtins.readFile ./hosts/ghostty.conf;
-        # Set niri = true to install the shared Niri session and its Noctalia shell.
+        # Enable the shared Niri session and its Noctalia shell.
         niri = true;
+        noctalia = true;
       };
     in
     {

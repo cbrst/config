@@ -209,7 +209,7 @@ the remote `dotfiles` input. `nixie home` always refreshes that input, while
 
 The shared module derives the home directory as `/Users/<user>` on Darwin. It
 does not enable systemd user services, GTK and cursor settings, Linux MIME
-associations or `.desktop` launchers, Hyprland, Niri, or Noctalia. The Headroom
+associations or `.desktop` launchers, Niri, or Noctalia. The Headroom
 bootstrap and 1Password desktop autostart services are consequently Linux-only;
 define equivalent `launchd.agents` in a machine-specific Home Manager module if
 needed.

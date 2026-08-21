@@ -1,7 +1,7 @@
 # Noctalia
 
-`noctalia/config.toml` defines the shared shell configuration used by both the
-Niri and Hyprland sessions.
+`noctalia/config.toml` defines the shared shell configuration used by the Niri
+session.
 
 ## Bar
 

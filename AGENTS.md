@@ -29,8 +29,8 @@ paths, tokens, credentials, private keys, or other secrets to tracked files.
 
 Treat cross-platform evaluation as a requirement, not a future enhancement.
 
-- Gate Linux-only packages, systemd services, desktop entries, GTK, Hyprland,
-  Niri, Noctalia, and Linux paths with `pkgs.stdenv.isLinux` or the established
+- Gate Linux-only packages, systemd services, desktop entries, GTK, Niri,
+  Noctalia, and Linux paths with `pkgs.stdenv.isLinux` or the established
   `isLinux` binding.
 - Gate macOS-only behavior with the appropriate Darwin platform check.
 - Prefer portable shell and POSIX-compatible behavior where practical. When a
