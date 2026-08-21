@@ -7,7 +7,7 @@ function M.setup()
 		desc = "Hide concealed Markdown syntax",
 		callback = function()
 			-- Rendered Markdown markers stay hidden while replacement characters remain visible.
-			vim.bo.conceallevel = 2
+			vim.wo.conceallevel = 2
 		end,
 	})
 end

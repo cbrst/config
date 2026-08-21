@@ -121,7 +121,7 @@ data directory; use `:TSUpdate` to update installed parsers or `:TSInstall
 Monokai Pro is selected after plugins load. `auto-dark-mode.nvim` switches
 between `monokai-pro-spectrum` for dark appearances and `monokai-pro-light` for
 light appearances. Lua buffers retain two-column indentation and use
-indent-based folding. Markdown buffers use conceal level 2, render with
+indent-based folding. Markdown windows use conceal level 2, render with
 `render-markdown.nvim`, and run `markdownlint` on buffer entry, write, and
 insert leave.
 
