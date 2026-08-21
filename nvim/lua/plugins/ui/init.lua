@@ -1,8 +1,10 @@
 local M = {}
 
 function M.setup()
-	-- Explicit setup enables rendering with the package's default behavior.
-	require("render-markdown").setup({})
+	require("render-markdown").setup({
+		file_types = { "markdown", "codecompanion" },
+		render_modes = true,
+	})
 	require("dropbar").setup({
 		icons = {
 			enable = vim.g.have_nerd_font,

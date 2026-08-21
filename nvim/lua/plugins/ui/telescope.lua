@@ -5,6 +5,7 @@ local M = {}
 -- └────────────────────────────┘
 function M.setup()
 	require("telescope").setup({
+		defaults = require("telescope.themes").get_ivy(),
 		extensions = {
 			["ui-select"] = require("telescope.themes").get_dropdown(),
 		},
