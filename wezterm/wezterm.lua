@@ -13,12 +13,12 @@ config.audible_bell = "Disabled"
 -- end
 
 -- font
-local fontFamily = "CartographCF Nerd Font"
-local fontFamilyItalic = "CartographCF Nerd Font"
+local fontFamily = "CommitMono"
+local fontFamilyItalic = "CommitMono"
 config.font = wezterm.font({
 	family = fontFamily,
 })
-config.font_size = 10
+config.font_size = 11
 config.line_height = 1.2
 -- This font includes Powerline/Nerd Font glyphs, so zsh can use the full prompt.
 config.set_environment_variables = {
