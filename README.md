@@ -45,6 +45,9 @@ On the NixOS machine, apply it with:
 home-manager switch --impure --flake /etc/nixos#cbrst
 ```
 
+Alternatively, run `nixie home`; it refreshes the `dotfiles` input and applies
+Home Manager with `--impure`.
+
 ### macOS quick start
 
 Use standalone Home Manager unless the Mac already has a `nix-darwin`
@@ -80,6 +83,11 @@ nix run home-manager/release-26.05 -- switch --impure -b backup \
 home-manager switch --impure --flake "$HOME/.config/home-manager#$(id -un)"
 ```
 
+After the bootstrap switch installs `nixie`, later switches can instead use
+`nixie home`. On macOS it defaults to this standalone Home Manager flake and
+passes `--impure` automatically. The bootstrap command remains necessary before
+`nixie` is installed.
+
 The shared module automatically uses `/Users/<user>`, skips its Linux-only
 systemd, GTK, Hyprland, Niri, and Noctalia settings, and puts graphical Nix
 applications in `~/Applications/Home Manager Apps`. Linux `.desktop` launchers
@@ -110,6 +118,9 @@ true` in the consuming machine flake to enable Noctalia as the Hyprland shell:
 # Resolve the module's intentionally unpinned Firefox and Open VSX downloads.
 home-manager switch --impure --flake /etc/nixos#cbrst
 ```
+
+Alternatively, run `nixie home` to refresh the shared `dotfiles` input and
+apply Home Manager with `--impure`.
 
 `hypr/hyprland.lua` is a native Hyprland Lua configuration. It sets Ghostty as
 `TERMINAL` and also defines `BROWSER`, `FILE_MANAGER`, `EDITOR`, and `VISUAL`.
@@ -154,6 +165,13 @@ verification, and recovery commands.
 The shared Linux GTK defaults and machine-specific font override pattern are
 documented in [`docs/gtk.md`](docs/gtk.md).
 
+## Flatpak
+
+The shared Linux Home Manager profile configures the per-user Flathub remote and
+installs JDownloader and SONE. Host-level Flatpak prerequisites, activation,
+verification, updates, and recovery are documented in
+[`docs/flatpak.md`](docs/flatpak.md).
+
 ## Themes
 
 OpenCode, Ghostty, Neovim, WezTerm, Tridactyl, and the Wayland Firefox profile
@@ -165,13 +183,6 @@ switching, deployment, and maintenance.
 ## AI coding
 
 The Linux Home Manager module installs the Headroom CLI with `uv` and provisions
-## Flatpak
-
-The shared Linux Home Manager profile configures the per-user Flathub remote and
-installs JDownloader and SONE. Host-level Flatpak prerequisites, activation,
-verification, updates, and recovery are documented in
-[`docs/flatpak.md`](docs/flatpak.md).
-
 its persistent user service. OpenCode itself is installed independently as a
 Nix package, so it remains available if Headroom is unavailable. macOS machines
 can add an equivalent `launchd.agents` definition in their machine-specific

@@ -122,6 +122,9 @@ or `emacs/init.el`:
 home-manager switch --flake /etc/nixos#cbrst
 ```
 
+Alternatively, run `nixie home`, which refreshes the `dotfiles` input before
+applying Home Manager.
+
 Verify that Emacs loads the declarative configuration without opening a frame:
 
 ```sh

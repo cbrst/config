@@ -33,6 +33,9 @@ home-manager switch --flake /etc/nixos#cbrst
 niri-session
 ```
 
+Alternatively, use `nixie home` for the Home Manager switch; keep
+`niri-session` to start the compositor.
+
 After editing `niri/config.kdl`, reload the active session without logging out:
 
 ```sh

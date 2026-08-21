@@ -19,6 +19,9 @@ home-manager switch --flake /etc/nixos#cbrst
 systemctl --user status tailscale-systray.service
 ```
 
+Alternatively, use `nixie home` for the Home Manager switch; keep the native
+`systemctl` command to inspect the service.
+
 The service should show `active (running)` and its icon should appear in the
 desktop shell's system tray. A new graphical session starts it automatically
 after the switch.

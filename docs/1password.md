@@ -14,6 +14,9 @@ home-manager switch --flake /etc/nixos#cbrst
 systemctl --user status 1password.service
 ```
 
+Alternatively, use `nixie home` for the Home Manager switch; keep the native
+`systemctl` command to inspect the service.
+
 The service should show `active (running)`. A new graphical session starts it
 automatically after the switch.
 

@@ -33,6 +33,9 @@ nix --version
 git --version
 ```
 
+`nixie` is installed by the first Home Manager activation, so use the native
+`nix --version` command to verify this prerequisite.
+
 ## Standalone configuration
 
 Create `~/.config/home-manager`, then copy
@@ -56,6 +59,9 @@ nix build --impure \
   "$HOME/.config/home-manager#homeConfigurations.$(id -un).activationPackage"
 ```
 
+`nixie` does not provide a build-only action; retain this native pre-activation
+check.
+
 Bootstrap Home Manager and activate the configuration:
 
 ```sh
@@ -63,6 +69,10 @@ Bootstrap Home Manager and activate the configuration:
 nix run home-manager/release-26.05 -- switch --impure -b backup \
   --flake "$HOME/.config/home-manager#$(id -un)"
 ```
+
+This bootstrap command is required because `nixie` is installed by the Home
+Manager generation it creates. After it succeeds, use `nixie home` for later
+switches; on macOS its default flake path is `$HOME/.config/home-manager`.
 
 The shared Zsh configuration becomes active in a new shell. Home Manager 25.11
 and newer copies graphical packages into `~/Applications/Home Manager Apps`,
@@ -191,6 +201,10 @@ home-manager switch --impure \
   --flake "$HOME/.config/home-manager#$(id -un)"
 ```
 
+Keep this native command when applying consumer-only changes without refreshing
+the remote `dotfiles` input. `nixie home` always refreshes that input, while
+`nixie home --local` is for testing a local dotfiles checkout.
+
 ## What differs from NixOS
 
 The shared module derives the home directory as `/Users/<user>` on Darwin. It
@@ -215,6 +229,9 @@ command -v nvim
 test -L "$HOME/.config/nvim" && echo "Neovim configuration is managed"
 ```
 
+`nixie` does not inspect Home Manager generations; retain the native command
+when verifying the active generation.
+
 The initial `-b backup` option renames conflicting unmanaged files with a
 `.backup` suffix. Inspect those files and merge anything worth preserving into
 the machine override. A switch stops rather than overwriting when that backup
@@ -227,6 +244,9 @@ Roll back a bad activation with:
 home-manager generations
 "$(home-manager generations | sed -n '2s/.*-> //p')/activate"
 ```
+
+`nixie` does not manage generation rollback, so retain these native recovery
+commands.
 
 If the generated command is unclear, copy the desired generation's activation
 path from `home-manager generations` and run its `activate` executable directly.
@@ -247,6 +267,10 @@ home-manager build --impure --flake ".#$(id -un)"
 home-manager switch --impure --flake ".#$(id -un)"
 ```
 
+For the normal update-and-activate workflow without a separate build, run
+`nixie all`; it updates all flake inputs and applies Home Manager on macOS.
+Keep the native commands above when a build must precede activation.
+
 Keep the Nixpkgs and Home Manager release branches aligned. Do not change
 `home.stateVersion` during routine upgrades; it records the compatibility level
 of the first installation rather than the currently installed release. Keep
@@ -263,6 +287,9 @@ When a Mac already uses `nix-darwin`, import
 `darwin-rebuild switch` instead of `home-manager switch`. Do not activate the
 same user through both standalone Home Manager and `nix-darwin`; migrate one
 owner at a time to avoid competing generations.
+
+`nixie` applies Home Manager only and does not replace `darwin-rebuild switch`
+for macOS system configuration.
 
 ## Upstream references
 

@@ -135,6 +135,9 @@ home-manager switch --flake /etc/nixos#cbrst@asgard \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 
+Alternatively, run `nixie home --local`; it overrides the `dotfiles` input
+with the local checkout without modifying the consumer lockfile.
+
 Quit and restart OpenCode after the switch; skills are loaded only when
 OpenCode starts.
 
@@ -156,6 +159,9 @@ home-manager switch --flake /etc/nixos#cbrst \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 
+Alternatively, run `nixie home --local`; it overrides the `dotfiles` input
+with the local checkout without modifying the consumer lockfile.
+
 Do not use `headroom wrap opencode` or use `headroom install` to target
 OpenCode. Those flows can rewrite the declarative OpenCode configuration.
 
@@ -172,3 +178,6 @@ nvim "+checkhealth codecompanion"
 # Inspect Blink completion providers.
 nvim "+BlinkCmp status"
 ```
+
+Alternatively, use `nixie home` for the Home Manager switch; retain the native
+Neovim commands for the health checks.

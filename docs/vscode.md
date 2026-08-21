@@ -47,6 +47,9 @@ nix flake update dotfiles --flake /etc/nixos
 home-manager switch --flake /etc/nixos#cbrst
 ```
 
+Alternatively, run `nixie home`; it performs both steps by refreshing only the
+`dotfiles` input and applying Home Manager.
+
 To test uncommitted local changes on the NixOS machine, override the remote
 input:
 
@@ -55,6 +58,9 @@ input:
 home-manager switch --flake /etc/nixos#cbrst \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
+
+Alternatively, run `nixie home --local`; it uses the local checkout without
+updating the consumer lockfile.
 
 ## Isolated VSCode Upgrades
 
@@ -93,6 +99,9 @@ Update and apply only that input when a newer VSCode release is needed:
 nix flake update nixpkgs-unstable --flake /etc/nixos
 home-manager switch --flake /etc/nixos#cbrst
 ```
+
+`nixie` has no targeted `nixpkgs-unstable` update action. Keep the native
+update command, then use `nixie home` for the Home Manager switch if desired.
 
 This does not update the NixOS system package set. The unstable VSCode closure
 is installed alongside the stable Home Manager packages.
@@ -140,6 +149,9 @@ the list. The Nix REPL can inspect available names:
 # Search the packaged extension attribute set before adding an extension.
 nix repl '<nixpkgs>'
 ```
+
+`nixie` does not replace `nix repl`; use this native inspection command when
+looking up packaged extension attributes.
 
 ```nix
 vscodeExtensions = with pkgs.vscode-extensions; [
