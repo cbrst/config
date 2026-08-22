@@ -58,9 +58,12 @@ documentation update, not merely a directory or file type.
    # Verify the index contains only this group before committing.
    git diff --cached --check
    git diff --cached
-   # Use a concise subject and a substantive commit body.
-   git commit -m "type: concise summary" \
-     -m "Describe the behavior changed, implementation details, and verification."
+    # Supply each body paragraph separately; Git inserts a blank line between
+    # them.
+    git commit -m "type: concise summary" \
+      -m "Describe the behavior changed and its important implementation
+constraints, manually wrapping every line at 80 characters." \
+      -m "Add another body paragraph when it provides useful review context."
    ```
 
 6. After every commit, run `git status --short`. At the end, report each commit
@@ -78,17 +81,23 @@ include these facts in prose:
 
 - What user-visible behavior or repository state changed.
 - How the implementation achieves it, including important constraints.
-- What validation was run, or why validation was not applicable.
 
 Use a body that adds useful review context. Do not use placeholder text, repeat
-the subject, or make claims that the reviewed diff cannot support.
+the subject, or make claims that the reviewed diff cannot support. Do not put
+validation details in the commit message; report them after committing instead.
+
+Wrap every subject and body line at 80 characters or fewer. Write actual
+newlines in a wrapped paragraph; never write the literal characters `\n` or
+`\n\n` anywhere in a commit-message argument. Git accepts any practical number
+of `-m` arguments and inserts a real blank line between each one, so use one
+`-m` argument per body paragraph. Do not use `\n\n` to create paragraphs.
 
 ## Verification
 
 Run the narrowest relevant checks for each group before committing, then run
 `git diff --check`. For configuration and documentation changes, run the
 repository's available formatter, linter, or syntax check. If a check cannot
-run, state the exact blocker in the commit body and final report.
+run, state the exact blocker in the final report.
 
 When all commits are complete, verify the worktree and inspect the new history:
 

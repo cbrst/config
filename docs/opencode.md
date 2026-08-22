@@ -120,9 +120,13 @@ them, and never discards work. Ask OpenCode to "group and commit my unstaged
 changes" or explicitly invoke the `group-unstaged-commits` skill.
 
 Each commit receives a concise conventional-style subject and a detailed body
-based on the reviewed diff. The body explains the behavior changed,
-implementation details, and actual validation; it must not use placeholder
-text, repeat the subject, or make unsupported claims. Ambiguous groups or files
+based on the reviewed diff. The body explains the behavior changed and its
+important implementation details; it must not use placeholder text, repeat the
+subject, or make unsupported claims. Validation is reported after committing,
+not in the message. Manually wrap every subject and body line at 80 characters
+or fewer, use actual newlines within a paragraph, and never write literal
+`\n` or `\n\n`. Supply each body paragraph with a separate `git commit -m`
+argument, which makes Git insert a real blank line. Ambiguous groups or files
 that contain mixed concerns require confirmation before anything is staged.
 
 The skill is stored at `opencode/skills/group-unstaged-commits/SKILL.md` and

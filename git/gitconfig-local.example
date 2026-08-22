@@ -1,0 +1,8 @@
+# ╭──────────────────╮
+# │ Local Git identity │
+# ╰─════════════════─╯
+# Copy this file to ~/.gitconfig-local and replace these placeholders. It is
+# intentionally untracked because identities differ between consuming machines.
+[user]
+	name = Your Name
+	email = you@example.com

@@ -1,0 +1,43 @@
+#!/bin/sh
+# ╭───────────────────────────────────╮
+# │ Generate draft commit messages AI │
+# ╰─══════════════════════════════════─╯
+# This hook only drafts ordinary commits without an explicit message. Git opens
+# the editor afterward, and a failed or unavailable OpenCode leaves Git's normal
+# message flow untouched.
+
+set -u
+
+message_file=$1
+source=${2:-}
+
+case "$source" in
+  message|template|merge|squash|commit)
+    exit 0
+    ;;
+esac
+
+if git diff --cached --quiet || ! command -v opencode >/dev/null 2>&1; then
+  exit 0
+fi
+
+tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/opencode-commit.XXXXXX") || exit 0
+trap 'rm -rf "$tmp_dir"' EXIT HUP INT TERM
+
+diff_file=$tmp_dir/staged.diff
+output_file=$tmp_dir/message
+git diff --cached --no-ext-diff > "$diff_file" || exit 0
+
+printf '%s\n' 'Generating commit-message draft with OpenCode...' >&2
+if ! opencode run --agent local-quick --file "$diff_file" \
+  'Write a Git commit message for the attached staged diff. Return only the
+commit message as plain text: an imperative subject no longer than 72
+characters, followed by a blank line and a concise explanatory body. Do not
+use Markdown fences, headings, trailers, or validation results.' > "$output_file"; then
+  printf '%s\n' 'OpenCode could not generate a commit message; continuing normally.' >&2
+  exit 0
+fi
+
+if [ -s "$output_file" ]; then
+  cp "$output_file" "$message_file"
+fi

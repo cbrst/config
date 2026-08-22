@@ -208,3 +208,10 @@ dependencies are intentionally ignored.
 
 See [`docs/opencode.md`](docs/opencode.md) for the OpenCode and Headroom
 architecture, operation, recovery, and maintenance commands.
+
+## Git
+
+The shared Git configuration uses native hooks to draft editable commit messages
+from staged diffs with OpenCode; it does not use Husky. Personal and work Git
+identities remain machine-local. See [`docs/git.md`](docs/git.md) for identity
+migration, activation, verification, recovery, and hook behavior.

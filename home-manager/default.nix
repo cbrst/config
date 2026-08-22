@@ -363,6 +363,11 @@ in
     };
     configFile = {
       "fastfetch".source = lib.mkDefault "${dotfiles}/fastfetch";
+      # The global config selects these portable hooks for every local repository.
+      "git/hooks/prepare-commit-msg" = {
+        source = lib.mkDefault "${dotfiles}/git/hooks/prepare-commit-msg";
+        executable = true;
+      };
       # The selector copies one of these immutable palettes into its runtime state.
       "config-theme/firefox".source = lib.mkDefault "${dotfiles}/firefox/themes";
       # Per-file Ghostty links leave room for the generated machine override.
@@ -431,6 +436,8 @@ in
   # ╰─═════════════════─╯
   # Expose shared command-line workflows without requiring machine-local setup.
   home.file = {
+    # Keep shared Git behavior declarative while machine-local includes own identities.
+    ".gitconfig".source = lib.mkDefault "${dotfiles}/git/config";
     ".local/bin/nixie".source = lib.mkDefault "${dotfiles}/zsh/scripts/nixie";
     ".local/bin/theme" = {
       source = lib.mkDefault "${dotfiles}/zsh/scripts/theme";
