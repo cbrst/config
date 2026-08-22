@@ -1,7 +1,17 @@
 # Niri
 
-Set `machine.niri = true` and `machine.noctalia = true` in the consuming machine
-configuration to install Niri, deploy `niri/config.kdl`, and enable Noctalia.
+The default profile is desktop-agnostic. Enable the full Niri and Noctalia
+session in the consuming Home Manager configuration:
+
+```nix
+cbrst.desktop = {
+  niri.enable = true;
+  noctalia.enable = true;
+};
+```
+
+On NixOS, also set `cbrst.desktop.niri.installPackage = false` when the system
+installs Niri itself. Without Noctalia, Niri uses `niri/minimal-config.kdl`.
 Niri starts Noctalia as the desktop shell; it supplies the bar, launcher,
 control center, notifications, wallpaper, lock screen, and OSDs.
 
@@ -29,7 +39,7 @@ Apply the Home Manager generation, then choose the Niri session in the display
 manager or start it from a TTY:
 
 ```sh
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --flake /etc/nixos#cbrst@asgard
 niri-session
 ```
 

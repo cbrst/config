@@ -119,7 +119,7 @@ or `emacs/init.el`:
 
 ```sh
 # Rebuild the configured user environment and relink the Emacs init file.
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
 Alternatively, run `nixie home`, which refreshes the `dotfiles` input before

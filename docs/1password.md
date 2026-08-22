@@ -10,7 +10,7 @@ window. Use the 1Password launcher or browser integration to bring it forward.
 Apply the Home Manager generation, then inspect the user service:
 
 ```sh
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --flake /etc/nixos#cbrst@asgard
 systemctl --user status 1password.service
 ```
 

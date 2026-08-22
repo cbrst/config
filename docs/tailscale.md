@@ -15,7 +15,7 @@ services.tailscale.enable = true;
 Apply the Home Manager generation, then inspect the user service:
 
 ```sh
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --flake /etc/nixos#cbrst@asgard
 systemctl --user status tailscale-systray.service
 ```
 

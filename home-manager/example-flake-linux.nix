@@ -1,5 +1,5 @@
 {
-  description = "Example consumer for cbrst/config home-manager module";
+  description = "Example generic Linux Home Manager consumer for cbrst/config";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -7,11 +7,11 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    ghostty.url = "github:ghostty-org/ghostty";
-    noctalia.url = "github:noctalia-dev/noctalia";
+    # The dotfiles flake owns Ghostty, Noctalia, and Pixibb. Following this
+    # consumer's Nixpkgs keeps all packages on one compatible revision.
     dotfiles = {
       url = "github:cbrst/config";
-      flake = false;
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -19,12 +19,9 @@
     inputs@{ nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
-      # Machine values and private Ghostty settings live beside this consuming flake.
-      machine = (import ./hosts/local.nix) // {
+      # Machine values and private Ghostty settings live beside this consumer.
+      machine = (import ./hosts/machine.nix) // {
         ghostty = builtins.readFile ./hosts/ghostty.conf;
-        # Enable the shared Niri session and its Noctalia shell.
-        niri = true;
-        noctalia = true;
       };
     in
     {
@@ -34,9 +31,9 @@
           inherit system;
           config.allowUnfree = true;
         };
-        extraSpecialArgs = { inherit inputs machine; };
+        extraSpecialArgs = { inherit machine; };
         modules = [
-          "${inputs.dotfiles}/home-manager/default.nix"
+          inputs.dotfiles.homeManagerModules.default
           # This module is applied last for machine-specific deep overrides.
           ./hosts/home.nix
         ];

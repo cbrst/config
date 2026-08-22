@@ -67,7 +67,7 @@ does not already exist. Test local changes on the NixOS machine with:
 
 ```sh
 # Resolve the module's intentionally unpinned evaluation fetches.
-home-manager switch --impure --flake /etc/nixos#cbrst \
+home-manager switch --impure --flake /etc/nixos#cbrst@asgard \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 

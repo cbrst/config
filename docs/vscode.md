@@ -14,7 +14,7 @@ shared VSCode changes. Keep machine-specific overrides after the shared module:
 ```nix
 modules = [
   # Import the shared packages, VSCode configuration, and dotfiles.
-  "${inputs.dotfiles}/home-manager/default.nix"
+  inputs.dotfiles.homeManagerModules.default
   # Apply settings that belong only to this machine afterwards.
   ./hosts/home.nix
 ];
@@ -44,7 +44,7 @@ flake input before switching:
 nix flake update dotfiles --flake /etc/nixos
 
 # Rebuild the user environment without rebuilding the NixOS system.
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
 Alternatively, run `nixie home`; it performs both steps by refreshing only the
@@ -55,7 +55,7 @@ input:
 
 ```sh
 # Evaluate the local checkout instead of the GitHub dotfiles input.
-home-manager switch --flake /etc/nixos#cbrst \
+home-manager switch --flake /etc/nixos#cbrst@asgard \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 
@@ -97,7 +97,7 @@ Update and apply only that input when a newer VSCode release is needed:
 ```sh
 # Refresh the isolated source, then install the resulting Home Manager profile.
 nix flake update nixpkgs-unstable --flake /etc/nixos
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
 `nixie` has no targeted `nixpkgs-unstable` update action. Keep the native

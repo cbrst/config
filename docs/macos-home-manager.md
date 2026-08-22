@@ -108,7 +108,6 @@ machine = {
   # Use the native macOS 1Password SSH-agent socket.
   sshAuthSock = "/Users/${username}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
   niri = false;
-  noctalia = false;
   stateVersion = "26.05";
 };
 ```
@@ -135,7 +134,6 @@ machine = {
   # Keep the remaining simple machine values beside the file reference.
   sshAuthSock = "/Users/${username}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
   niri = false;
-  noctalia = false;
   stateVersion = "26.05";
 };
 ```
@@ -159,7 +157,7 @@ Import the local module in the consumer flake alongside the shared one:
 ```nix
 modules = [
   # Load the shared cross-platform packages and configuration.
-  "${inputs.dotfiles}/home-manager/default.nix"
+  inputs.dotfiles.homeManagerModules.default
 
   # Apply arbitrary settings that belong only to this Mac.
   ./hosts/home.nix

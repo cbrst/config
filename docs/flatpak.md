@@ -43,7 +43,7 @@ activation downloads the applications and their runtimes on first use:
 
 ```sh
 # Resolve the module's intentionally unpinned Firefox and Open VSX downloads.
-home-manager switch --impure --flake /etc/nixos#cbrst
+home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
 Verify the user remote and installed applications afterward:
@@ -74,5 +74,5 @@ switch again; the activation step installs the declared application again:
 
 ```sh
 flatpak --user uninstall org.jdownloader.JDownloader
-home-manager switch --impure --flake /etc/nixos#cbrst
+home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```

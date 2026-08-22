@@ -1,8 +1,11 @@
 {
+  dotfiles,
+  dotfilesInputs,
+}:
+{
   config,
   pkgs,
   lib,
-  inputs,
   machine,
   ...
 }:
@@ -10,8 +13,8 @@ let
   # ╭────────────────────────────╮
   # │ Shared paths and platforms │
   # ╰─══════════════════════════─╯
-  # Keep shared paths relative to the consuming flake's non-flake dotfiles input.
-  dotfiles = inputs.dotfiles;
+  # Dependencies come from this flake, never from a particular machine flake.
+  inputs = dotfilesInputs;
   isLinux = pkgs.stdenv.isLinux;
 
   # ╭───────────────────╮
@@ -115,20 +118,6 @@ let
     [ "@opencode@" ]
     [ "${pkgs.opencode}/bin/opencode" ]
     (builtins.readFile "${dotfiles}/zsh/scripts/opencode");
-
-  # ╭─────────────────────────────╮
-  # │ Optional desktop components │
-  # ╰─═══════════════════════════─╯
-  noctaliaEnabled = machine.noctalia or false;
-  noctaliaModule =
-    { pkgs, lib, ... }:
-    # Imports must be static, so defer Linux gating until this submodule evaluates.
-    lib.mkIf pkgs.stdenv.isLinux {
-      programs.noctalia = {
-        enable = true;
-        systemd.enable = true;
-      };
-    };
 
   # ╭──────────────────╮
   # │ Generated config │
@@ -277,11 +266,18 @@ in
   # ╭────────────────────╮
   # │ Optional imports   │
   # ╰─══════════════════─╯
-  # Noctalia is opt-in; its submodule gates configuration to Linux at evaluation.
-  imports = lib.optionals noctaliaEnabled [
-    inputs.noctalia.homeModules.default
-    noctaliaModule
-  ];
+  imports =
+    [
+      # Pixibb is a user-level Firefox extension, so it belongs with the
+      # shared browser profile rather than a particular NixOS host.
+      inputs.pixibb-downloader.homeManagerModules.default
+      # Desktop features are opt-in so this profile stays portable.
+      (import ./desktop.nix { inherit dotfiles dotfilesInputs; })
+      # Focused modules keep this entry point about shared composition.
+      (import ./editors.nix { inherit emacsConfig emacsPackage meowsootNvim; })
+      (import ./vscode.nix { inherit vscodeExtensions; })
+      ./linux-desktop.nix
+    ];
 
   # ╭─────────────────────╮
   # │ Core home profile   │
@@ -366,8 +362,6 @@ in
       createDirectories = lib.mkDefault true;
     };
     configFile = {
-      "niri/config.kdl".source = lib.mkDefault "${dotfiles}/niri/config.kdl";
-      "noctalia".source = lib.mkDefault "${dotfiles}/noctalia";
       "fastfetch".source = lib.mkDefault "${dotfiles}/fastfetch";
       # The selector copies one of these immutable palettes into its runtime state.
       "config-theme/firefox".source = lib.mkDefault "${dotfiles}/firefox/themes";
@@ -467,64 +461,6 @@ in
       > "$state_dir/tridactylrc"
   '';
 
-  programs.emacs = {
-    # Package Emacs and every ELisp dependency through Nix instead of package.el.
-    enable = true;
-    package = emacsPackage;
-  };
-
-  programs.neovim = {
-    # Home Manager owns the immutable plugin runtime; Lua only configures it.
-    enable = true;
-    # Home Manager wraps the unwrapped editor with the declared plugin runtime.
-    package = pkgs.neovim-unwrapped;
-    extraPackages = [
-      # Keep all Neovim language tooling Nix-built and available in its wrapped PATH.
-      pkgs.emmet-language-server
-      pkgs.lua-language-server
-      pkgs.phpactor
-      pkgs.stylua
-    ];
-    plugins = with pkgs.vimPlugins; [
-      auto-dark-mode-nvim
-      blink-cmp
-      codecompanion-nvim
-      conform-nvim
-      dropbar-nvim
-      fidget-nvim
-      gitsigns-nvim
-      heirline-nvim
-      lazydev-nvim
-      luasnip
-      luvit-meta
-      mini-nvim
-      monokai-pro-nvim
-      meowsootNvim
-      neo-tree-nvim
-      nui-nvim
-      nvim-highlight-colors
-      nvim-lint
-      nvim-lspconfig
-      nvim-treesitter
-      outline-nvim
-      overseer-nvim
-      plenary-nvim
-      render-markdown-nvim
-      snacks-nvim
-      telescope-fzf-native-nvim
-      telescope-nvim
-      telescope-ui-select-nvim
-      todo-comments-nvim
-      trouble-nvim
-      typescript-tools-nvim
-      vim-sleuth
-      vim-tridactyl
-      which-key-nvim
-    ];
-  };
-
-  home.file.".emacs.d/init.el".text = lib.mkDefault emacsConfig;
-
   programs.zsh = {
     # These definitions must merge at normal priority so generated zsh files source the wrapper.
     enable = true;
@@ -563,6 +499,14 @@ in
     };
   };
 
+  # Pixibb's upstream package is Linux-only. The rest of the Firefox profile
+  # remains portable, including its ordinary extension packages on macOS.
+  programs.pixibb-downloader = lib.mkIf isLinux {
+    # The Wayland profile is the shared browser profile with Tridactyl enabled.
+    enable = true;
+    firefoxProfile = "wayland";
+  };
+
   home.activation.removeStaleFirefoxExtensionLinks = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
     # Recreate only old Home Manager links before the new extension tree is linked.
     extensions_root=${lib.escapeShellArg config.programs.firefox.profilesPath}
@@ -596,98 +540,4 @@ in
     ''
   );
 
-  programs.vscode = {
-    # VSCode and its extensions are shared across every Home Manager consumer.
-    enable = true;
-    # Consumers can select a newer package set for VSCode without changing their base system.
-    package = lib.mkDefault pkgs.vscode;
-    profiles.default = {
-      extensions = vscodeExtensions;
-      userSettings = {
-        "workbench.colorTheme" = "Monokai Pro (Filter Spectrum)";
-        "editor.fontFamily" = "CommitMono";
-        "workbench.experimental.modernUI" = true;
-        "workbench.iconTheme" = "Monokai Pro (Filter Spectrum) Icons";
-      };
-    };
-  };
-
-  # ╭────────────────────────╮
-  # │ Linux session settings │
-  # ╰─══════════════════════─╯
-  fonts = lib.mkIf isLinux {
-    fontconfig.enable = lib.mkDefault true;
-  };
-
-  systemd = lib.mkIf isLinux {
-    user.services.headroom-bootstrap = {
-      Unit = {
-        Description = "Install the Headroom CLI used by the OpenCode profile";
-        After = [ "network-online.target" ];
-        Wants = [ "network-online.target" ];
-      };
-      Service = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        # Reinstall the uv tool when its Python interpreter was garbage-collected or replaced.
-        ExecStart = "${pkgs.runtimeShell} -c 'if ! ${config.home.homeDirectory}/.local/bin/headroom --version >/dev/null 2>&1; then ${pkgs.uv}/bin/uv tool install --reinstall --python 3.13 \"headroom-ai[all]\"; fi; ${config.home.homeDirectory}/.local/bin/headroom install apply --preset persistent-service --providers manual'";
-      };
-      Install.WantedBy = [ "default.target" ];
-    };
-    # Quote the numeric-leading name so systemd generates 1password.service.
-    user.services."1password" = {
-      Unit = {
-        Description = "1Password Linux desktop client";
-        After = [ "graphical-session.target" ];
-      };
-      Service = {
-        ExecStart = "${pkgs._1password-gui}/bin/1password --silent";
-        Restart = "on-abnormal";
-      };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
-    user.services.tailscale-systray = {
-      Unit = {
-        Description = "Tailscale system tray client";
-        After = [ "graphical-session.target" ];
-      };
-      Service = {
-        # Use the NixOS system profile so Home Manager does not install Tailscale.
-        ExecStart = "/run/current-system/sw/bin/tailscale systray";
-        Restart = "on-abnormal";
-      };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
-  };
-
-  gtk = lib.mkIf isLinux {
-    enable = lib.mkDefault true;
-    # Keep GTK applications aligned with the session-wide Bibata pointer theme.
-    cursorTheme = {
-      name = lib.mkDefault "Bibata-Modern-Ice";
-      package = lib.mkDefault pkgs.bibata-cursors;
-      size = lib.mkDefault 24;
-    };
-    theme = {
-      name = lib.mkDefault "Adwaita-dark";
-      package = lib.mkDefault pkgs.gnome-themes-extra;
-    };
-    iconTheme = {
-      name = lib.mkDefault "Adwaita";
-      package = lib.mkDefault pkgs.adwaita-icon-theme;
-    };
-    font = {
-      name = lib.mkDefault "Noto Sans";
-      size = lib.mkDefault 11;
-    };
-  };
-
-  # Install Bibata and use its familiar blue arrow in XWayland and GTK applications.
-  home.pointerCursor = lib.mkIf isLinux {
-    package = pkgs.bibata-cursors;
-    name = "Bibata-Modern-Ice";
-    size = 24;
-    gtk.enable = true;
-    x11.enable = true;
-  };
 }

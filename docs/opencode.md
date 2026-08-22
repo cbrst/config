@@ -155,7 +155,7 @@ path to the current home directory. After changing it, apply the shared module:
 
 ```sh
 # Test this uncommitted checkout on the NixOS machine.
-home-manager switch --flake /etc/nixos#cbrst \
+home-manager switch --flake /etc/nixos#cbrst@asgard \
   --override-input dotfiles path:/home/cbrst/Projects/config
 ```
 

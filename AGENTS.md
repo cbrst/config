@@ -8,9 +8,9 @@ This repository contains personal configuration managed primarily through a
 shared Home Manager module. It must evaluate and deploy on NixOS, other Linux
 distributions, and macOS.
 
-The repository intentionally remains a non-flake input. Machine repositories
-pin Nix inputs and import `home-manager/default.nix`; do not add a root
-`flake.nix` or pin machine-specific inputs here.
+The repository is a flake that owns shared user-profile inputs and exposes
+`homeManagerModules.default`. Consumers pin Nixpkgs and Home Manager, then make
+this flake's Nixpkgs input follow theirs. Do not add machine-specific inputs.
 
 Read `README.md` and the relevant file in `docs/` before changing an unfamiliar
 module. They define the supported deployment and recovery procedures.
@@ -36,14 +36,14 @@ Treat cross-platform evaluation as a requirement, not a future enhancement.
 - Prefer portable shell and POSIX-compatible behavior where practical. When a
   script requires Bash or Zsh features, declare the interpreter explicitly.
 - Preserve the `machine` attrset as the interface for documented per-machine
-  options. Add a field only when it is genuinely shared across consumers.
+  values. Add a field only when it is genuinely shared across consumers; use
+  `cbrst.desktop.*` options for optional user-session features.
 
 ## Nix and Home Manager
 
 Use the existing module style and prefer `lib.mkDefault` for shared values that
-machine overrides should replace. Keep unconditional imports portable; when an
-upstream module is Linux-only, follow the existing deferred Linux-gating
-pattern.
+machine overrides should replace. Imports must be static; keep their configured
+behavior platform-gated with `lib.mkIf` and explicit assertions.
 
 This module intentionally fetches current Firefox add-ons and Open VSX
 extensions during evaluation. Do not make it pure by accident or remove

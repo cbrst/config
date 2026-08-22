@@ -8,12 +8,11 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    ghostty.url = "github:ghostty-org/ghostty";
-    noctalia.url = "github:noctalia-dev/noctalia";
-    # This repository is a module source rather than a flake.
     dotfiles = {
       url = "github:cbrst/config";
-      flake = false;
+      # The dotfiles flake owns user-profile dependencies and reuses this
+      # consumer's Darwin Nixpkgs through follows.
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -29,9 +28,6 @@
         hostName = "YOUR_MAC_HOSTNAME";
         # Use the native 1Password SSH agent socket when that agent is enabled.
         sshAuthSock = "/Users/${username}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
-        # Linux-only desktop modules remain disabled on macOS.
-        niri = false;
-        noctalia = false;
         stateVersion = "26.05";
       };
       # The shared profile includes unfree applications such as VSCode and WebStorm.
@@ -43,9 +39,9 @@
     {
       homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        extraSpecialArgs = { inherit inputs machine; };
+        extraSpecialArgs = { inherit machine; };
         modules = [
-          "${inputs.dotfiles}/home-manager/default.nix"
+          inputs.dotfiles.homeManagerModules.default
           {
             # Install the Home Manager CLI into the activated user profile.
             programs.home-manager.enable = true;

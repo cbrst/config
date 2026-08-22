@@ -27,7 +27,7 @@ machine, change `shell.font_family` in `noctalia/config.toml` to an installed
 font, then apply the Home Manager generation:
 
 ```sh
-home-manager switch --impure --flake /etc/nixos#cbrst
+home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
 Alternatively, run `nixie home`, which refreshes the `dotfiles` input before

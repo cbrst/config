@@ -1,0 +1,38 @@
+// Portable Niri session without a desktop shell. Enable Noctalia to use the
+// full config.kdl instead; this remains useful on generic Linux systems.
+input {
+    keyboard {
+        xkb { layout "us"; }
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
+}
+
+layout {
+    gaps 8
+    always-center-single-column
+    default-column-width { proportion 0.5; }
+    focus-ring { on; width 2; active-color "#89b4fa"; inactive-color "#45475a"; }
+    border { on; width 2; active-color "#89b4fa"; inactive-color "#45475a"; }
+}
+
+binds {
+    Mod+Return { spawn "ghostty"; }
+    Mod+B { spawn "firefox"; }
+    Mod+E { spawn "nemo"; }
+    Mod+Q { close-window; }
+    Mod+Shift+E { quit; }
+    Mod+Left { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Up { focus-window-up; }
+    Mod+Down { focus-window-down; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+F { maximize-column; }
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+}

@@ -2,21 +2,27 @@
 
 ## Home Manager
 
-`home-manager/default.nix` is the shared Home Manager module for NixOS, other
-Linux distributions, and macOS. This repository intentionally remains a
-non-flake input; each machine flake supplies its own pinned inputs and imports
-the module:
+This repository is a flake that exposes a shared Home Manager module for NixOS,
+other Linux distributions, and macOS. It owns user-profile dependencies
+(Ghostty, Noctalia, and Pixibb) and composes focused modules for editors, VS
+Code, and optional Linux desktop integration. Each consumer supplies Nixpkgs
+and Home Manager, then makes the dotfiles follow that Nixpkgs:
 
 ```nix
 modules = [
-  "${inputs.dotfiles}/home-manager/default.nix"
+  inputs.dotfiles.homeManagerModules.default
   ./hosts/home.nix
 ];
 ```
 
-See `home-manager/example-flake.nix` for a complete standalone consumer.
-The consuming flake must pass `inputs` and a `machine` attrset through
-`extraSpecialArgs`. `machine.user` is required; these fields are optional:
+See the standalone consumer examples:
+
+- `home-manager/example-flake-nixos.nix`
+- `home-manager/example-flake-linux.nix`
+- `home-manager/example-flake-darwin.nix`
+
+The consuming flake passes only a `machine` attrset through `extraSpecialArgs`.
+`machine.user` is required; these fields are optional:
 
 | Field | Default | Purpose |
 | --- | --- | --- |
@@ -25,14 +31,28 @@ The consuming flake must pass `inputs` and a `machine` attrset through
 | `terminal` | `ghostty` | `TERMINAL` value. |
 | `sshAuthSock` | `$HOME/.1password/agent.sock` | SSH agent socket. |
 | `ghostty` | `""` | Machine-local Ghostty text written to `ghostty/machine`. |
-| `niri` | `false` | Installs and deploys the Niri session with Noctalia on Linux. |
-| `noctalia` | `false` | Enables Noctalia on Linux. |
 | `firefoxSystem` | `false` | Leaves Firefox package ownership to NixOS while Home Manager configures its profile. |
 | `firefoxProfilePath` | `"default"` | Existing Firefox profile path to preserve. |
 | `stateVersion` | `26.05` | Home Manager state version. |
 
 Simple values come from `machine`; machine flakes can add a Home Manager module
-after the shared module for deep overrides. Shared settings use `mkDefault`.
+after the shared module for rare host-specific exceptions. Shared settings use
+`mkDefault`. Put everyday, cross-machine preferences here and reserve the
+consuming host's `home.nix` for actual machine differences.
+
+The default profile is desktop-agnostic. A consumer that wants Niri or the
+Noctalia shell enables the explicit Home Manager options:
+
+```nix
+cbrst.desktop = {
+  niri.enable = true;
+  noctalia.enable = true;
+};
+```
+
+On NixOS, set `cbrst.desktop.niri.installPackage = false` when the system
+already provides Niri. The shared Firefox profile includes Pixibb; its flake
+dependency is owned and pinned here rather than repeated by every consumer.
 Linux-only features are conditional, so macOS consumers can evaluate the
 module; macOS-specific services such as `launchd.agents` belong in a machine
 override module. Keep secrets, Ghostty themes, and Ghostty machine overrides in
@@ -42,7 +62,8 @@ On the NixOS machine, apply it with:
 
 ```sh
 # Resolve the module's intentionally unpinned Firefox and Open VSX downloads.
-home-manager switch --impure --flake /etc/nixos#cbrst
+# NixOS host profiles include both the user and host name.
+home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
 Alternatively, run `nixie home`; it refreshes the `dotfiles` input and applies
@@ -117,8 +138,8 @@ that install Firefox themselves should set `machine.firefoxSystem = true`.
 
 ## Niri
 
-Set `machine.niri = true` to install Niri and deploy `niri/config.kdl`. Set
-`machine.noctalia = true` to enable Noctalia as its shell. The Niri profile
+Enable `cbrst.desktop.niri` and `cbrst.desktop.noctalia` in a consuming Home
+Manager module to deploy the full Niri profile. When both are enabled, Niri
 starts Noctalia and applies a background blur to its layer surfaces and pop-ups.
 See [`docs/niri.md`](docs/niri.md) for bindings, reload instructions, and
 monitor overrides.

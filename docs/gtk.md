@@ -19,7 +19,7 @@ machine configuration after changing the override:
 
 ```sh
 # Rebuild the active Home Manager profile with the machine-local GTK setting.
-home-manager switch --flake /etc/nixos#cbrst
+home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
 Alternatively, run `nixie home`, which refreshes the `dotfiles` input before
