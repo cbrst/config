@@ -500,6 +500,8 @@ in
       mini-nvim
       monokai-pro-nvim
       meowsootNvim
+      neo-tree-nvim
+      nui-nvim
       nvim-highlight-colors
       nvim-lint
       nvim-lspconfig

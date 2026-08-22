@@ -21,13 +21,6 @@ function M.setup()
 	})
 	MiniIcons.mock_nvim_web_devicons()
 
-	-- Replace the persistent tree with an editable explorer focused on the current file.
-	require("mini.files").setup({
-		mappings = {
-			close = "\\",
-		},
-	})
-
 	-- Restrict animation to cursor movement so opening and resizing windows stay immediate.
 	require("mini.animate").setup({
 		scroll = { enable = false },
@@ -36,13 +29,6 @@ function M.setup()
 		close = { enable = false },
 	})
 
-	-- These global mappings replace Lazy's former key-trigger declarations.
-	vim.keymap.set("n", "\\", function()
-		require("mini.files").open(vim.api.nvim_buf_get_name(0))
-	end, { desc = "Browse files near current buffer" })
-	vim.keymap.set("n", "<leader>vt", function()
-		require("mini.files").open(vim.api.nvim_buf_get_name(0))
-	end, { desc = "[V]iew [T]ree files" })
 end
 
 return M

@@ -84,14 +84,14 @@ group and call it from `lua/plugins/init.lua`.
 - `mini.pairs` closes delimiters typed in insert mode. Blink retains completion-
   time `auto_brackets` for accepted callable completions.
 - `mini.indentscope` renders indentation guides.
-- `mini.files` replaces Neo-tree with an editable file explorer. `\\` and
-  `<Space>vt` open the explorer focused on the current buffer; `\\` closes it
-  while the explorer is active.
 - `mini.animate` provides cursor-motion animation only.
 - `heirline.nvim` provides a Moody-inspired statusline: a colored mode tab,
   filename, Git worktree state, diagnostics, filetype, and cursor position.
 - `mini.icons` replaces `nvim-web-devicons`. It mocks the devicons API so
   Telescope continues to render file icons.
+
+Neo-tree provides the persistent file explorer. `\\` and `<Space>vt` toggle it
+and reveal the current buffer's location.
 
 The statusline uses a lighter neutral surface than the active theme's editor
 bar. Dropbar instead uses the editor background, including its active path
