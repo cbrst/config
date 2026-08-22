@@ -105,11 +105,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787415115,
-        "narHash": "sha256-fjJNrd+YSE/+3fAVR63HmIeqN/RTTheR0cZDg6mKvok=",
+        "lastModified": 1787433347,
+        "narHash": "sha256-ZWNtcjrPInLJuRT8a04rnZZON5znmR+WxJhsi5ftJ+g=",
         "owner": "krassnik",
         "repo": "pixibb-downloader",
-        "rev": "70f4bb3c2bed7e23c63845d117e7e4fe8ca1d848",
+        "rev": "3213c704d56fd075348881586ddf6cc821447eaf",
         "type": "gitlab"
       },
       "original": {
