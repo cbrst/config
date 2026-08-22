@@ -7,11 +7,14 @@ nixie() {
 	local host_profile="${NIXIE_HOST_PROFILE:-}"
 	local home_profile="${NIXIE_HOME_PROFILE:-${HOME_MANAGER_PROFILE:-}}"
 	local action="$1"
-	local usage='Usage: nixie [all | update | system | home [--local]]'
+	local usage='Usage: nixie [all | update | system | home [--local] | overview]'
 	local local_dotfiles=0
 	local is_nixos=0
-	local hostname configured_hostname profile dotfiles_dir
+	local hostname configured_hostname profile dotfiles_dir tmpdir
+	local current_manifest candidate_manifest package_expression package before after diagnostic line
+	local changed_packages=0 added_packages=0 removed_packages=0
 	local -a host_profiles home_profiles matching_home_profiles
+	local -A current_packages candidate_packages
 
 	# ╭─────────────────────────╮
 	# │ Platform-aware defaults │
@@ -39,6 +42,7 @@ nixie() {
 		print '  system    Switch the active NixOS system profile.'
 		print '  home      Update the dotfiles input, then switch the active Home Manager profile.'
 		print '  home --local  Switch Home Manager using the local dotfiles checkout.'
+		print '  overview  Evaluate package changes from the latest available flake inputs.'
 		print
 		print 'Without an action, an interactive menu is shown.'
 		print 'Overrides: NIXIE_FLAKE, NIXIE_HOST_PROFILE, NIXIE_HOME_PROFILE, DOTFILES_DIR.'
@@ -62,23 +66,25 @@ nixie() {
 			print -P '%F{magenta}│%f %F{blue}2%f  %BUpdate inputs%b  %F{244}refresh flake.lock only%f'
 			print -P '%F{magenta}│%f %F{yellow}3%f  %BSystem switch%b  %F{244}apply the NixOS profile%f'
 			print -P '%F{magenta}│%f %F{green}4%f  %BHome switch%b    %F{244}refresh dotfiles + apply home%f'
+			print -P '%F{magenta}│%f %F{yellow}5%f  %BPackage overview%b %F{244}preview available updates%f'
 			print -P '%F{magenta}│%f %F{244}q%f  Quit'
 			print -P '%F{magenta}│%f'
-			print -n -P '%F{magenta}╰╸ Select [1-4, q]:%f '
+			print -n -P '%F{magenta}╰╸ Select [1-5, q]:%f '
 			read -r action || return 1
 			case "${action}" in
 				1) action=all; break ;;
 				2) action=update; break ;;
 				3) action=system; break ;;
 				4) action=home; break ;;
+				5) action=overview; break ;;
 				q|Q) return 0 ;;
-				*) print -P '%F{red}Choose 1-4 or q.%f' ;;
+				*) print -P '%F{red}Choose 1-5 or q.%f' ;;
 			esac
 		done
 	fi
 
 	case "${action}" in
-		all|update|system|home) ;;
+		all|update|system|home|overview) ;;
 		*)
 			print -u2 "Unknown nixie action: ${action}"
 			print -u2 'Run nixie --help for usage.'
@@ -112,7 +118,7 @@ nixie() {
 	# Full refreshes update every input so system and home share one lockfile revision.
 	if [[ "${action}" == "all" || "${action}" == "update" ]]; then
 		print -P '%F{cyan}==>%f %BUpdate flake inputs%b'
-		command nix flake update "${flake_path}" || return
+		command nix flake update --option warn-dirty false --flake "${flake_path}" || return
 	fi
 
 	if [[ "${action}" == "update" ]]; then
@@ -122,7 +128,7 @@ nixie() {
 	# A normal home switch must refresh shared dotfiles; local mode intentionally bypasses the lockfile.
 	if [[ "${action}" == "home" ]] && (( ! local_dotfiles )); then
 		print -P '%F{green}==>%f %BUpdate dotfiles input%b'
-		command nix flake update dotfiles --flake "${flake_path}" || return
+		command nix flake update dotfiles --option warn-dirty false --flake "${flake_path}" || return
 	fi
 
 	# ╭───────────────────╮
@@ -131,13 +137,13 @@ nixie() {
 	# Resolve the host before either switch so `home` also gets its machine-specific profile.
 	if (( is_nixos )) && [[ -z "${host_profile}" && ( "${action}" != "home" || -z "${home_profile}" ) ]]; then
 		hostname="$(command hostname -s)" || return
-		host_profiles=("${(@f)$(command nix eval --raw --apply 'configs: builtins.concatStringsSep "\n" (builtins.attrNames configs)' "${flake_path}#nixosConfigurations")}") || return
+		host_profiles=("${(@f)$(command nix eval --option warn-dirty false --raw --apply 'configs: builtins.concatStringsSep "\n" (builtins.attrNames configs)' "${flake_path}#nixosConfigurations" 2>/dev/null)}") || return
 		for profile in "${host_profiles[@]}"; do
 			if [[ "${profile:l}" == "${hostname:l}" ]]; then
 				host_profile="${profile}"
 				break
 			fi
-			configured_hostname="$(command nix eval --raw "${flake_path}#nixosConfigurations.${profile}.config.networking.hostName")" || return
+			configured_hostname="$(command nix eval --option warn-dirty false --raw "${flake_path}#nixosConfigurations.${profile}.config.networking.hostName" 2>/dev/null)" || return
 			if [[ "${configured_hostname:l}" == "${hostname:l}" ]]; then
 				host_profile="${profile}"
 				break
@@ -172,12 +178,13 @@ nixie() {
 		return 0
 	fi
 
-	if (( ! $+commands[home-manager] )); then
+	# The overview builds activation packages with Nix and does not require Home Manager itself.
+	if [[ "${action}" != "overview" ]] && (( ! $+commands[home-manager] )); then
 		print -u2 'home-manager is not available in PATH.'
 		return 1
 	fi
 	if [[ -z "${home_profile}" ]]; then
-		home_profiles=("${(@f)$(command nix eval --raw --apply 'configs: builtins.concatStringsSep "\n" (builtins.attrNames configs)' "${flake_path}#homeConfigurations")}") || return
+		home_profiles=("${(@f)$(command nix eval --option warn-dirty false --raw --apply 'configs: builtins.concatStringsSep "\n" (builtins.attrNames configs)' "${flake_path}#homeConfigurations" 2>/dev/null)}") || return
 		if [[ -n "${host_profile}" ]]; then
 			for profile in "${home_profiles[@]}"; do
 				[[ "${profile}" == *"@${host_profile}" ]] && matching_home_profiles+=("${profile}")
@@ -195,6 +202,216 @@ nixie() {
 			print -u2 'Set NIXIE_HOME_PROFILE to a homeConfigurations key.'
 			return 1
 		fi
+	fi
+
+	# ╭──────────────────╮
+	# │ Package overview │
+	# ╰─════════════════─╯
+	# Evaluate against a separate updated lock file so the preview never changes flake.lock or realizes packages.
+	if [[ "${action}" == "overview" ]]; then
+		if (( ! $+commands[mktemp] )); then
+			print -u2 'mktemp is not available in PATH.'
+			return 1
+		fi
+
+		tmpdir="$(command mktemp -d "${TMPDIR:-/tmp}/nixie.XXXXXX")" || return
+		# Buffer the complete presentation so no partial overview appears beside Nix diagnostics.
+		{
+		print -P '%F{magenta}╭────────────────────────────────────────╮%f'
+		print -P '%F{magenta}│%f  %B%F{white}NIXIE%f%b  %F{244}package constellation%f          %F{magenta}│%f'
+		print -P '%F{magenta}├────────────────────────────────────────╯%f'
+		print -P "%F{magenta}│%f  %F{cyan}◈%f Flake     ${flake_path}"
+		print -P "%F{magenta}│%f  %F{cyan}◈%f Profile   ${home_profile}"
+		if (( is_nixos )); then
+			print -P "%F{magenta}│%f  %F{cyan}◈%f System    ${host_profile}"
+		fi
+		print -P '%F{magenta}│%f'
+
+		command nix flake update --option warn-dirty false --flake "${flake_path}" --output-lock-file "${tmpdir}/flake.lock" 2>"${tmpdir}/diagnostics" || {
+			print -u2 'Unable to resolve updated flake inputs:'
+			while IFS= read -r diagnostic; do print -u2 -- "${diagnostic}"; done < "${tmpdir}/diagnostics"
+			command rm -rf "${tmpdir}"
+			return
+		}
+		# `--read-only` keeps package derivations and their source/output closures out of the store.
+		package_expression='packages: builtins.concatStringsSep "\n" (map (package: "${package.pname or package.name}\t${package.version or "ε"}") packages)'
+		current_manifest="$(command nix eval --option warn-dirty false --read-only --impure --raw --apply "${package_expression}" "${flake_path}#homeConfigurations.${home_profile}.config.home.packages" 2>>"${tmpdir}/diagnostics")" || {
+			print -u2 'Unable to evaluate the current Home Manager package manifest:'
+			while IFS= read -r diagnostic; do print -u2 -- "${diagnostic}"; done < "${tmpdir}/diagnostics"
+			command rm -rf "${tmpdir}"
+			return
+		}
+		candidate_manifest="$(command nix eval --option warn-dirty false --read-only --impure --no-write-lock-file --reference-lock-file "${tmpdir}/flake.lock" --raw --apply "${package_expression}" "${flake_path}#homeConfigurations.${home_profile}.config.home.packages" 2>>"${tmpdir}/diagnostics")" || {
+			print -u2 'Unable to evaluate the updated Home Manager package manifest:'
+			while IFS= read -r diagnostic; do print -u2 -- "${diagnostic}"; done < "${tmpdir}/diagnostics"
+			command rm -rf "${tmpdir}"
+			return
+		}
+		current_packages=()
+		candidate_packages=()
+		while IFS=$'\t' read -r package before; do
+			current_packages[${package}]="${before}"
+		done <<< "${current_manifest}"
+		while IFS=$'\t' read -r package after; do
+			candidate_packages[${package}]="${after}"
+		done <<< "${candidate_manifest}"
+
+		print -P '%F{magenta}│%f  %B╭─ Home Manager ─────────────────────╮%b'
+		for package in ${(ok)candidate_packages}; do
+			[[ -n "${current_packages[${package}]+present}" ]] || continue
+			before="${current_packages[${package}]}"
+			after="${candidate_packages[${package}]}"
+			[[ "${before}" == "${after}" ]] && continue
+			(( ${#package} > 32 )) && package="${package[1,29]}..."
+			(( ${#before} > 18 )) && before="${before[1,15]}..."
+			(( ${#after} > 18 )) && after="${after[1,15]}..."
+			(( changed_packages++ ))
+			print -n -P '%F{magenta}│%f  '
+			printf '%-32s' "${package}"
+			print -n -P ' %F{244}'
+			printf '%18s' "${before}"
+			print -n -P '%f %F{magenta}──▶%f %F{green}'
+			printf '%-18s' "${after}"
+			print -P '%f'
+		done
+		for package in ${(ok)candidate_packages}; do
+			[[ -n "${current_packages[${package}]+present}" ]] && continue
+			before='∅'
+			after="${candidate_packages[${package}]}"
+			(( ${#package} > 32 )) && package="${package[1,29]}..."
+			(( ${#after} > 18 )) && after="${after[1,15]}..."
+			(( changed_packages++ ))
+			(( added_packages++ ))
+			print -n -P '%F{magenta}│%f  '
+			printf '%-32s' "${package}"
+			print -n -P ' %F{244}'
+			printf '%18s' "${before}"
+			print -n -P '%f %F{magenta}──▶%f %F{green}'
+			printf '%-18s' "${after}"
+			print -P '%f'
+		done
+		for package in ${(ok)current_packages}; do
+			[[ -n "${candidate_packages[${package}]+present}" ]] && continue
+			before="${current_packages[${package}]}"
+			after='∅'
+			(( ${#package} > 32 )) && package="${package[1,29]}..."
+			(( ${#before} > 18 )) && before="${before[1,15]}..."
+			(( changed_packages++ ))
+			(( removed_packages++ ))
+			print -n -P '%F{magenta}│%f  '
+			printf '%-32s' "${package}"
+			print -n -P ' %F{244}'
+			printf '%18s' "${before}"
+			print -n -P '%f %F{magenta}──▶%f %F{green}'
+			printf '%-18s' "${after}"
+			print -P '%f'
+		done
+		if (( ! changed_packages )); then
+			print -P '%F{magenta}│%f  %B╰─%f %F{244}no package changes ───────────────╯%f'
+		else
+			print -P '%F{magenta}│%f  %B╰────────────────────────────────────╯%b'
+		fi
+
+		if (( is_nixos )); then
+			current_manifest="$(command nix eval --option warn-dirty false --read-only --impure --raw --apply "${package_expression}" "${flake_path}#nixosConfigurations.${host_profile}.config.environment.systemPackages" 2>>"${tmpdir}/diagnostics")" || {
+				print -u2 'Unable to evaluate the current NixOS package manifest:'
+				while IFS= read -r diagnostic; do print -u2 -- "${diagnostic}"; done < "${tmpdir}/diagnostics"
+				command rm -rf "${tmpdir}"
+				return
+			}
+			candidate_manifest="$(command nix eval --option warn-dirty false --read-only --impure --no-write-lock-file --reference-lock-file "${tmpdir}/flake.lock" --raw --apply "${package_expression}" "${flake_path}#nixosConfigurations.${host_profile}.config.environment.systemPackages" 2>>"${tmpdir}/diagnostics")" || {
+				print -u2 'Unable to evaluate the updated NixOS package manifest:'
+				while IFS= read -r diagnostic; do print -u2 -- "${diagnostic}"; done < "${tmpdir}/diagnostics"
+				command rm -rf "${tmpdir}"
+				return
+			}
+			current_packages=()
+			candidate_packages=()
+			while IFS=$'\t' read -r package before; do
+				current_packages[${package}]="${before}"
+			done <<< "${current_manifest}"
+			while IFS=$'\t' read -r package after; do
+				candidate_packages[${package}]="${after}"
+			done <<< "${candidate_manifest}"
+			print -P '%F{magenta}│%f'
+			print -P '%F{magenta}│%f  %B╭─ NixOS ────────────────────────────╮%b'
+			local section_changes=${changed_packages}
+			for package in ${(ok)candidate_packages}; do
+				[[ -n "${current_packages[${package}]+present}" ]] || continue
+				before="${current_packages[${package}]}"
+				after="${candidate_packages[${package}]}"
+				[[ "${before}" == "${after}" ]] && continue
+				(( ${#package} > 32 )) && package="${package[1,29]}..."
+				(( ${#before} > 18 )) && before="${before[1,15]}..."
+				(( ${#after} > 18 )) && after="${after[1,15]}..."
+				(( changed_packages++ ))
+				print -n -P '%F{magenta}│%f  '
+				printf '%-32s' "${package}"
+				print -n -P ' %F{244}'
+				printf '%18s' "${before}"
+				print -n -P '%f %F{magenta}──▶%f %F{green}'
+				printf '%-18s' "${after}"
+				print -P '%f'
+			done
+			for package in ${(ok)candidate_packages}; do
+				[[ -n "${current_packages[${package}]+present}" ]] && continue
+				before='∅'
+				after="${candidate_packages[${package}]}"
+				(( ${#package} > 32 )) && package="${package[1,29]}..."
+				(( ${#after} > 18 )) && after="${after[1,15]}..."
+				(( changed_packages++ ))
+				(( added_packages++ ))
+				print -n -P '%F{magenta}│%f  '
+				printf '%-32s' "${package}"
+				print -n -P ' %F{244}'
+				printf '%18s' "${before}"
+				print -n -P '%f %F{magenta}──▶%f %F{green}'
+				printf '%-18s' "${after}"
+				print -P '%f'
+			done
+			for package in ${(ok)current_packages}; do
+				[[ -n "${candidate_packages[${package}]+present}" ]] && continue
+				before="${current_packages[${package}]}"
+				after='∅'
+				(( ${#package} > 32 )) && package="${package[1,29]}..."
+				(( ${#before} > 18 )) && before="${before[1,15]}..."
+				(( changed_packages++ ))
+				(( removed_packages++ ))
+				print -n -P '%F{magenta}│%f  '
+				printf '%-32s' "${package}"
+				print -n -P ' %F{244}'
+				printf '%18s' "${before}"
+				print -n -P '%f %F{magenta}──▶%f %F{green}'
+				printf '%-18s' "${after}"
+				print -P '%f'
+			done
+			if (( changed_packages == section_changes )); then
+				print -P '%F{magenta}│%f  %B╰─%f %F{244}no package changes ───────────────╯%f'
+			else
+				print -P '%F{magenta}│%f  %B╰────────────────────────────────────╯%b'
+			fi
+		fi
+
+		print -P '%F{magenta}│%f'
+		if (( changed_packages )); then
+			print -P "%F{magenta}│%f  %F{cyan}✦%f ${changed_packages} packages would change"
+			(( added_packages )) && print -P "%F{magenta}│%f  %F{yellow}✚%f ${added_packages} packages would be added"
+			(( removed_packages )) && print -P "%F{magenta}│%f  %F{red}−%f ${removed_packages} packages would be removed"
+		else
+			print -P '%F{magenta}│%f  %F{cyan}✦%f Everything is up to date'
+		fi
+		print -P '%F{magenta}│%f'
+		print -P '%F{magenta}│%f  %F{244}No packages built · no generation activated%f'
+		print -P '%F{magenta}│%f'
+		if (( is_nixos )); then
+			print -P '%F{magenta}╰╸%f Apply with %Bnixie all%b'
+		else
+			print -P '%F{magenta}╰╸%f Apply with %Bnixie home%b'
+		fi
+		} > "${tmpdir}/overview"
+		while IFS= read -r line; do print -r -- "${line}"; done < "${tmpdir}/overview"
+		command rm -rf "${tmpdir}"
+		return 0
 	fi
 
 	# ╭─────────────────────╮

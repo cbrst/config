@@ -18,18 +18,21 @@ nixie update  # all flake inputs
 nixie system  # NixOS only
 nixie home    # dotfiles input, then Home Manager
 
+# Preview packages that would change without changing flake.lock or activating.
+nixie overview
+
 # Display built-in usage documentation.
 nixie --help
 ```
 
-ZSH completes the actions (`all`, `update`, `system`, and `home`) and offers
-`--local` only after `nixie home`. Open a new ZSH session after applying Home
-Manager to load the completion.
+ZSH completes the actions (`all`, `update`, `system`, `home`, and `overview`)
+and offers `--local` only after `nixie home`. Open a new ZSH session after
+applying Home Manager to load the completion.
 
 `all` runs the complete daily workflow:
 
 ```sh
-nix flake update /etc/nixos
+nix flake update --flake /etc/nixos
 sudo nixos-rebuild switch --flake /etc/nixos#asgard
 home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
@@ -39,6 +42,42 @@ Each action stops at the first failure. `update` changes only the flake lock.
 dotfile changes are fetched and applied without rebuilding NixOS. Commit the
 resulting `flake.lock` change from the consuming flake when you want other
 machines to use the same pinned revisions.
+
+## Package overview
+
+`nixie overview` creates an updated lock file in a temporary directory and
+compares evaluation-only package manifests from the current and candidate
+configurations. On NixOS it also compares `environment.systemPackages`. It
+prints changed packages in aligned rows, including additions and removals:
+
+```text
+╭────────────────────────────────────────╮
+│  NIXIE  package constellation          │
+├────────────────────────────────────────╯
+│
+│  ╭─ Home Manager ─────────────────────╮
+│  firefox                            141.0 ──▶ 142.0
+│  neovim                            0.11.3 ──▶ 0.11.4
+│  ╰────────────────────────────────────╯
+│
+│  ✦ 2 packages would change
+│
+│  No packages built · no generation activated
+│
+╰╸ Apply with nixie all
+```
+
+The arrow begins in the same column on every package row. This operation may
+fetch updated flake metadata and source expressions, but uses `nix eval
+--read-only`: it does not download or build package sources or outputs, modify
+the consuming flake's `flake.lock`, or activate a NixOS or Home Manager
+generation. The comparison is between the flake's current and updated
+declarative package lists; run `nixie all` on NixOS or `nixie home` elsewhere
+after reviewing the result.
+
+`overview` buffers its presentation until every manifest evaluation succeeds,
+so its frame and summary are never interleaved with routine Nix diagnostics.
+Warnings and errors are shown only when an overview calculation fails.
 
 ## Runtime profile selection
 
