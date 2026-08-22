@@ -160,8 +160,8 @@ the revised Home Manager generation:
 home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
-Alternatively, run `nixie home`, which refreshes the `dotfiles` input before
-applying Home Manager.
+Alternatively, run `nixie update`, then `nixie home`, to update the consuming
+flake's Nixpkgs pin and apply the locked Home Manager configuration.
 
 For local checkout testing, use the documented `dotfiles` input override in
 [`docs/vscode.md`](vscode.md#apply-changes), substituting the relevant Home

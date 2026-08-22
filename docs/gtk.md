@@ -22,8 +22,7 @@ machine configuration after changing the override:
 home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
-Alternatively, run `nixie home`, which refreshes the `dotfiles` input before
-applying Home Manager.
+Alternatively, run `nixie home` to apply the locked Home Manager configuration.
 
 Restart affected GTK applications after the switch so they read the generated
 GTK settings.

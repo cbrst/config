@@ -7,13 +7,13 @@ nixie() {
 	local host_profile="${NIXIE_HOST_PROFILE:-}"
 	local home_profile="${NIXIE_HOME_PROFILE:-${HOME_MANAGER_PROFILE:-}}"
 	local action="$1"
-	local usage='Usage: nixie [all | update | system | home [--local] | overview]'
+	local usage='Usage: nixie [all | update | publish | system | home [--local] | overview]'
 	local local_dotfiles=0
 	local is_nixos=0
 	local hostname configured_hostname profile dotfiles_dir tmpdir
 	local current_manifest candidate_manifest package_expression package before after diagnostic line
-	local changed_packages=0 added_packages=0 removed_packages=0
-	local -a host_profiles home_profiles matching_home_profiles
+	local changed_packages=0 added_packages=0 removed_packages=0 published_locks=0
+	local -a host_profiles home_profiles matching_home_profiles publish_flakes
 	local -A current_packages candidate_packages
 
 	# ╭─────────────────────────╮
@@ -28,6 +28,7 @@ nixie() {
 	fi
 	# Preserve legacy overrides while selecting a usable default for every supported platform.
 	flake_path="${NIXIE_FLAKE:-${NIXOS_FLAKE:-${default_flake}}}"
+	dotfiles_dir="${DOTFILES_DIR:-${HOME}/Projects/config}"
 
 	# ╭──────────────────╮
 	# │ Usage and action │
@@ -37,10 +38,11 @@ nixie() {
 		print -- "${usage}"
 		print
 		print 'Actions:'
-		print '  all       Update all flake inputs, switch NixOS when available, then switch Home Manager.'
-		print '  update    Update all pinned inputs in the selected flake.'
+		print '  all       Update inputs, switch NixOS when available, then switch Home Manager.'
+		print '  update    Update the consumer lockfile and the local dotfiles lockfile when present.'
+		print '  publish   Commit and push changed flake.lock files.'
 		print '  system    Switch the active NixOS system profile.'
-		print '  home      Update the dotfiles input, then switch the active Home Manager profile.'
+		print '  home      Switch the active Home Manager profile from its locked inputs.'
 		print '  home --local  Switch Home Manager using the local dotfiles checkout.'
 		print '  overview  Evaluate package changes from the latest available flake inputs.'
 		print
@@ -65,26 +67,28 @@ nixie() {
 			print -P '%F{magenta}│%f %F{cyan}1%f  %BFull refresh%b  %F{244}inputs + system + home%f'
 			print -P '%F{magenta}│%f %F{blue}2%f  %BUpdate inputs%b  %F{244}refresh flake.lock only%f'
 			print -P '%F{magenta}│%f %F{yellow}3%f  %BSystem switch%b  %F{244}apply the NixOS profile%f'
-			print -P '%F{magenta}│%f %F{green}4%f  %BHome switch%b    %F{244}refresh dotfiles + apply home%f'
-			print -P '%F{magenta}│%f %F{yellow}5%f  %BPackage overview%b %F{244}preview available updates%f'
+			print -P '%F{magenta}│%f %F{green}4%f  %BHome switch%b    %F{244}apply locked home profile%f'
+			print -P '%F{magenta}│%f %F{blue}5%f  %BPublish locks%b   %F{244}commit + push flake.lock%f'
+			print -P '%F{magenta}│%f %F{yellow}6%f  %BPackage overview%b %F{244}preview available updates%f'
 			print -P '%F{magenta}│%f %F{244}q%f  Quit'
 			print -P '%F{magenta}│%f'
-			print -n -P '%F{magenta}╰╸ Select [1-5, q]:%f '
+			print -n -P '%F{magenta}╰╸ Select [1-6, q]:%f '
 			read -r action || return 1
 			case "${action}" in
 				1) action=all; break ;;
 				2) action=update; break ;;
 				3) action=system; break ;;
 				4) action=home; break ;;
-				5) action=overview; break ;;
+				5) action=publish; break ;;
+				6) action=overview; break ;;
 				q|Q) return 0 ;;
-				*) print -P '%F{red}Choose 1-5 or q.%f' ;;
+				*) print -P '%F{red}Choose 1-6 or q.%f' ;;
 			esac
 		done
 	fi
 
 	case "${action}" in
-		all|update|system|home|overview) ;;
+		all|update|publish|system|home|overview) ;;
 		*)
 			print -u2 "Unknown nixie action: ${action}"
 			print -u2 'Run nixie --help for usage.'
@@ -115,20 +119,51 @@ nixie() {
 	# ╭────────────────╮
 	# │ Input updates  │
 	# ╰────────────────╯
-	# Full refreshes update every input so system and home share one lockfile revision.
+	# Full refreshes update every consumer input so system and home share one lockfile revision.
 	if [[ "${action}" == "all" || "${action}" == "update" ]]; then
 		print -P '%F{cyan}==>%f %BUpdate flake inputs%b'
 		command nix flake update --option warn-dirty false --flake "${flake_path}" || return
+		# The shared flake owns pins such as Pixibb. Update its checkout when it is
+		# available, but do not require one on machines that only consume it remotely.
+		if [[ -f "${dotfiles_dir}/flake.nix" ]]; then
+			print -P '%F{cyan}==>%f %BUpdate local dotfiles inputs%b'
+			command nix flake update --option warn-dirty false --flake "${dotfiles_dir}" || return
+		else
+			print -P '%F{yellow}==>%f Skip local dotfiles input update (checkout not found)'
+		fi
 	fi
 
 	if [[ "${action}" == "update" ]]; then
 		return 0
 	fi
 
-	# A normal home switch must refresh shared dotfiles; local mode intentionally bypasses the lockfile.
-	if [[ "${action}" == "home" ]] && (( ! local_dotfiles )); then
-		print -P '%F{green}==>%f %BUpdate dotfiles input%b'
-		command nix flake update dotfiles --option warn-dirty false --flake "${flake_path}" || return
+	# Publishing is deliberately limited to lockfiles so unrelated worktree changes stay local.
+	if [[ "${action}" == "publish" ]]; then
+		if (( ! $+commands[git] )); then
+			print -u2 'Git is not available in PATH.'
+			return 1
+		fi
+		for profile in "${flake_path}" "${dotfiles_dir}"; do
+			[[ -f "${profile}/flake.lock" ]] || continue
+			command git -C "${profile}" rev-parse --show-toplevel >/dev/null 2>&1 || {
+				print -u2 "Flake directory is not a Git repository: ${profile}"
+				return 1
+			}
+			publish_flakes+=("${profile}")
+		done
+		for profile in "${publish_flakes[@]}"; do
+			command git -C "${profile}" diff --quiet HEAD -- flake.lock || {
+				print -P "%F{cyan}==>%f %BPublish lockfile%b ${profile}"
+				command git -C "${profile}" add -- flake.lock || return
+				command git -C "${profile}" commit --only -m 'chore: update flake lock' -- flake.lock || return
+				command git -C "${profile}" push || return
+				published_locks=1
+			}
+		done
+		if (( ! published_locks )); then
+			print -P '%F{yellow}==>%f No changed flake.lock files to publish'
+		fi
+		return 0
 	fi
 
 	# ╭───────────────────╮
@@ -406,7 +441,7 @@ nixie() {
 		if (( is_nixos )); then
 			print -P '%F{magenta}╰╸%f Apply with %Bnixie all%b'
 		else
-			print -P '%F{magenta}╰╸%f Apply with %Bnixie home%b'
+			print -P '%F{magenta}╰╸%f Apply with %Bnixie update && nixie home%b'
 		fi
 		} > "${tmpdir}/overview"
 		while IFS= read -r line; do print -r -- "${line}"; done < "${tmpdir}/overview"
@@ -419,7 +454,6 @@ nixie() {
 	# ╰─────────────────────╯
 	# Local mode retains the old dotfiles test workflow without changing flake.lock.
 	if (( local_dotfiles )); then
-		dotfiles_dir="${DOTFILES_DIR:-${HOME}/Projects/config}"
 		if [[ ! -d "${dotfiles_dir}" ]]; then
 			print -u2 "Dotfiles checkout not found: ${dotfiles_dir}"
 			return 1

@@ -30,8 +30,7 @@ font, then apply the Home Manager generation:
 home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
-Alternatively, run `nixie home`, which refreshes the `dotfiles` input before
-applying Home Manager.
+Alternatively, run `nixie home` to apply the locked Home Manager configuration.
 
 The shared configuration selects the editable
 `noctalia/palettes/monochrome-custom.json` palette, which begins as a copy of

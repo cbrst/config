@@ -7,7 +7,7 @@ _nixie() {
 
 	_arguments -C \
 		'(-h --help)'{-h,--help}'[Display usage information]' \
-		'1:action:(all update system home overview)' \
+		'1:action:(all update publish system home overview)' \
 		'2:home option:->home_option' \
 		'*::arguments:_guard "^-*" "no additional arguments"'
 

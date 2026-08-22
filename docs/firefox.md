@@ -87,8 +87,7 @@ restart Firefox, then run `:native` in Tridactyl to confirm the host responds.
 home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
-Alternatively, run `nixie home` to refresh the `dotfiles` input and apply the
-Home Manager profile.
+Alternatively, run `nixie home` to apply the locked Home Manager profile.
 
 Restart Firefox after the switch. In a Niri session, run `firefox-session` and
 confirm the compact toolbar, selected theme colors, and Tridactyl. In another

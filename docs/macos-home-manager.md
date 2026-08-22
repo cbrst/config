@@ -200,7 +200,7 @@ home-manager switch --impure \
 ```
 
 Keep this native command when applying consumer-only changes without refreshing
-the remote `dotfiles` input. `nixie home` always refreshes that input, while
+the remote `dotfiles` input. `nixie home` applies that same locked input, while
 `nixie home --local` is for testing a local dotfiles checkout.
 
 ## What differs from NixOS

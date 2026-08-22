@@ -37,7 +37,7 @@ pkgs = import nixpkgs {
 ## Apply Changes
 
 After changing this repository, commit and push it, then update the consuming
-flake input before switching:
+flake lock before switching:
 
 ```sh
 # Update the shared dotfiles input in the machine flake.
@@ -47,8 +47,9 @@ nix flake update dotfiles --flake /etc/nixos
 home-manager switch --flake /etc/nixos#cbrst@asgard
 ```
 
-Alternatively, run `nixie home`; it performs both steps by refreshing only the
-`dotfiles` input and applying Home Manager.
+Alternatively, run `nixie update`, then `nixie home`. The first command updates
+the consumer's locked `dotfiles` revision; the second applies that lockfile
+without changing it.
 
 To test uncommitted local changes on the NixOS machine, override the remote
 input:

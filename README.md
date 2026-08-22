@@ -66,8 +66,8 @@ On the NixOS machine, apply it with:
 home-manager switch --impure --flake /etc/nixos#cbrst@asgard
 ```
 
-Alternatively, run `nixie home`; it refreshes the `dotfiles` input and applies
-Home Manager with `--impure`.
+Run `nixie update` to refresh pinned inputs, then `nixie home` to apply the
+locked Home Manager configuration with `--impure`.
 
 ### macOS quick start
 
